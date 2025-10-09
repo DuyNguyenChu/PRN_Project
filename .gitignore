@@ -18,3 +18,4 @@ Thumbs.db
 *.log
 /.vs
 /api/api.csproj.user
+/api/appsettings.json
