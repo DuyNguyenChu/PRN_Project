@@ -1,9 +1,5 @@
-using api.Data;
 using System.IO;
-using api.Model;
-using api.Repository;
 using api.Interface;
-using api.Services;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.Google;
