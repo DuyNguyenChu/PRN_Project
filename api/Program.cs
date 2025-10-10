@@ -25,10 +25,23 @@ using api.Interface.Services;
 using Microsoft.Extensions.FileProviders;
 using api.Helpers;
 using CloudinaryDotNet;
+using api.Service;
+using api.Models;
+using api.Repositories;
+using FluentValidation;
+using FluentValidation.AspNetCore;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddFluentValidation(fv =>
+    {
+        // Quét tất cả các class kế thừa AbstractValidator trong assembly
+        fv.RegisterValidatorsFromAssemblyContaining<Program>();
+        // Hoặc dùng AppDomain nếu validator nằm ở nhiều project khác nhau:
+        // fv.RegisterValidatorsFromAssemblies(AppDomain.CurrentDomain.GetAssemblies());
+    }); ;
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(option =>
 {
@@ -80,22 +93,23 @@ builder.Services.AddCors(options =>
 });
 
 // Configure Database
-builder.Services.AddDbContext<ApplicationDBContext>(options =>
+builder.Services.AddDbContext<PrnprojectContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
 
+
 // Configure Identity
-builder.Services.AddIdentity<AppUser, IdentityRole>(options =>
-{
-    options.Password.RequireDigit = true;
-    options.Password.RequireLowercase = true;
-    options.Password.RequireUppercase = true;
-    options.Password.RequireNonAlphanumeric = true;
-    options.Password.RequiredLength = 12;
-})
-.AddEntityFrameworkStores<ApplicationDBContext>()
-.AddDefaultTokenProviders();
+//builder.Services.AddIdentity<AppUser, IdentityRole>(options =>
+//{
+//    options.Password.RequireDigit = true;
+//    options.Password.RequireLowercase = true;
+//    options.Password.RequireUppercase = true;
+//    options.Password.RequireNonAlphanumeric = true;
+//    options.Password.RequiredLength = 12;
+//})
+//.AddEntityFrameworkStores<ApplicationDBContext>()
+//.AddDefaultTokenProviders();
 
 // Configure Authentication (JWT, Google, GitHub)
 builder.Services.AddAuthentication(options =>
@@ -158,46 +172,49 @@ var cloudinary = new Cloudinary(cloudinaryAccount);
 
 builder.Services.AddSingleton(cloudinary);
 // Dependency Injection
-builder.Services.AddScoped<ITokenService, TokenService>();
-builder.Services.AddScoped<ISubmissionRepository, SubmissionRepository>();
-builder.Services.AddScoped<IProblemRepository, ProblemRepository>();
-builder.Services.AddScoped<IProblemService, ProblemService>();
-builder.Services.AddScoped<IProblemHomePageRepository, ProblemHomePageRepository>();
-builder.Services.AddScoped<IProblemHomePageServices, ProblemHomePageServices>();
-builder.Services.AddScoped<IContestService, ContestService>();
-builder.Services.AddScoped<IContestRepository, ContestRepository>();
-builder.Services.AddScoped<IContestRegistationRepository, ContestRegistationRepository>();
-builder.Services.AddScoped<IContestRegistationService, ContestRegistationService>();
-builder.Services.AddScoped<IUserRepository, UserRepository>();
-builder.Services.AddScoped<IUserService, UserService>();
-builder.Services.AddScoped<IUserAdminRepository, UserAdminRepository>();
-builder.Services.AddScoped<IProgramingLanguageService, ProgramingLanguageService>();
-builder.Services.AddScoped<IProgramingLanguageRepository, ProgramingLanguageRepository>();
-builder.Services.AddScoped<IBlogRepository, BlogRepository>();
-builder.Services.AddScoped<IProblemAdminRepository, ProblemAdminRepository>();
-builder.Services.AddScoped<IProblemAdminService, ProblemAdminService>();
-builder.Services.AddScoped<ISubmissionRepository, SubmissionRepository>();
-builder.Services.AddScoped<ISubmissionService, SubmissionService>();
-builder.Services.AddScoped<IProblemManagementRepository, ProblemManagementRepository>();
-builder.Services.AddScoped<IProblemManagementService, ProblemManagementService>();
-builder.Services.AddScoped<ISubmissionsAdminRepository, SubmissionsAdminRepository>();
-builder.Services.AddScoped<ITestCaseRepository, TestCaseRepository>();
-builder.Services.AddScoped<ITestCaseService, TestCaseService>();
-builder.Services.AddScoped<OtpService>();
-builder.Services.AddScoped<IBlogLikeRepository, BlogLikeRepository>();
-builder.Services.AddScoped<IBlogLikeService, BlogLikeService>();
-builder.Services.AddScoped<IBlogShareRepository, BlogShareRepository>();
-builder.Services.AddScoped<IBlogShareService, BlogShareService>();
-builder.Services.AddScoped<IBlogCommentRepository, BlogCommentRepository>();
-builder.Services.AddScoped<IBlogCommentService, BlogCommentService>();
-builder.Services.AddScoped<IBlogBookmarkRepository, BlogBookmarkRepository>();
-builder.Services.AddScoped<IBlogBookmarkService, BlogBookmarkService>();
-builder.Services.AddScoped<IBlogForbiddenWordRepository, BlogForbiddenWordRepository>();
-builder.Services.AddScoped<IBlogForbiddenWordService, BlogForbiddenWordService>();
-builder.Services.AddScoped<IRankingRepository, RankingRepository>();
-builder.Services.AddScoped<IRankingService, RankingService>();
-builder.Services.AddScoped<ITestCaseStatusRepository, TestCaseStatusRepository>();
-builder.Services.AddScoped<ITestCaseStatusService, TestCaseStatusService>();
+//builder.Services.AddScoped<ITokenService, TokenService>();
+//builder.Services.AddScoped<ISubmissionRepository, SubmissionRepository>();
+//builder.Services.AddScoped<IProblemRepository, ProblemRepository>();
+//builder.Services.AddScoped<IProblemService, ProblemService>();
+//builder.Services.AddScoped<IProblemHomePageRepository, ProblemHomePageRepository>();
+//builder.Services.AddScoped<IProblemHomePageServices, ProblemHomePageServices>();
+//builder.Services.AddScoped<IContestService, ContestService>();
+//builder.Services.AddScoped<IContestRepository, ContestRepository>();
+//builder.Services.AddScoped<IContestRegistationRepository, ContestRegistationRepository>();
+//builder.Services.AddScoped<IContestRegistationService, ContestRegistationService>();
+//builder.Services.AddScoped<IUserRepository, UserRepository>();
+//builder.Services.AddScoped<IUserService, UserService>();
+//builder.Services.AddScoped<IUserAdminRepository, UserAdminRepository>();
+//builder.Services.AddScoped<IProgramingLanguageService, ProgramingLanguageService>();
+//builder.Services.AddScoped<IProgramingLanguageRepository, ProgramingLanguageRepository>();
+//builder.Services.AddScoped<IBlogRepository, BlogRepository>();
+//builder.Services.AddScoped<IProblemAdminRepository, ProblemAdminRepository>();
+//builder.Services.AddScoped<IProblemAdminService, ProblemAdminService>();
+//builder.Services.AddScoped<ISubmissionRepository, SubmissionRepository>();
+//builder.Services.AddScoped<ISubmissionService, SubmissionService>();
+//builder.Services.AddScoped<IProblemManagementRepository, ProblemManagementRepository>();
+//builder.Services.AddScoped<IProblemManagementService, ProblemManagementService>();
+//builder.Services.AddScoped<ISubmissionsAdminRepository, SubmissionsAdminRepository>();
+//builder.Services.AddScoped<ITestCaseRepository, TestCaseRepository>();
+//builder.Services.AddScoped<ITestCaseService, TestCaseService>();
+//builder.Services.AddScoped<OtpService>();
+//builder.Services.AddScoped<IBlogLikeRepository, BlogLikeRepository>();
+//builder.Services.AddScoped<IBlogLikeService, BlogLikeService>();
+//builder.Services.AddScoped<IBlogShareRepository, BlogShareRepository>();
+//builder.Services.AddScoped<IBlogShareService, BlogShareService>();
+//builder.Services.AddScoped<IBlogCommentRepository, BlogCommentRepository>();
+//builder.Services.AddScoped<IBlogCommentService, BlogCommentService>();
+//builder.Services.AddScoped<IBlogBookmarkRepository, BlogBookmarkRepository>();
+//builder.Services.AddScoped<IBlogBookmarkService, BlogBookmarkService>();
+//builder.Services.AddScoped<IBlogForbiddenWordRepository, BlogForbiddenWordRepository>();
+//builder.Services.AddScoped<IBlogForbiddenWordService, BlogForbiddenWordService>();
+//builder.Services.AddScoped<IRankingRepository, RankingRepository>();
+//builder.Services.AddScoped<IRankingService, RankingService>();
+//builder.Services.AddScoped<ITestCaseStatusRepository, TestCaseStatusRepository>();
+//builder.Services.AddScoped<ITestCaseStatusService, TestCaseStatusService>();
+builder.Services.AddScoped<api.Service.IActionService, api.Service.ActionService>();
+builder.Services.AddScoped<api.Repositories.IActionRepository, api.Repositories.ActionRepository>();
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 // Logging
 builder.Logging.AddConsole();
