@@ -18,5 +18,7 @@ public partial class Action : EntityBase<int>
 
     public int? UpdatedBy { get; set; }
 
+    public virtual ICollection<ActionInMenu> ActionInMenus { get; set; } = new List<ActionInMenu>();
+
     public virtual ICollection<Permission> Permissions { get; set; } = new List<Permission>();
 }

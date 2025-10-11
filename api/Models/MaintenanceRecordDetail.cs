@@ -3,9 +3,8 @@ using System.Collections.Generic;
 
 namespace api.Models;
 
-public partial class MaintenanceRecordDetail
+public partial class MaintenanceRecordDetail : EntityBase<int>
 {
-    public int Id { get; set; }
 
     public int RecordId { get; set; }
 
@@ -24,8 +23,6 @@ public partial class MaintenanceRecordDetail
     public DateTimeOffset? LastModifiedDate { get; set; }
 
     public int? UpdatedBy { get; set; }
-
-    public bool IsDeleted { get; set; }
 
     public virtual MaintenanceRecord Record { get; set; } = null!;
 }

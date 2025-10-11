@@ -1,8 +1,9 @@
 ﻿using api.Dtos.Action;
 using api.Extensions;
 using api.Helpers;
+using api.Interface.Repository;
+using api.Interface.Services;
 using api.Mappers;
-using api.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
@@ -111,7 +112,7 @@ namespace api.Service
         //    throw new NotImplementedException();
         //}
 
-        public async Task<ApiResponse> GetPagedAsync(DTParameters parameters)
+        public async Task<ApiResponse> GetPagedAsync(api.Extensions.DTParameters parameters)
         {
             var data = await _actionRepository.GetPagedAsync(parameters);
 

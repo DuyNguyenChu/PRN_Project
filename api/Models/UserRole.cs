@@ -3,9 +3,8 @@ using System.Collections.Generic;
 
 namespace api.Models;
 
-public partial class UserRole
+public partial class UserRole : EntityBase<int>
 {
-    public int Id { get; set; }
 
     public int RoleId { get; set; }
 
@@ -18,8 +17,6 @@ public partial class UserRole
     public DateTimeOffset? LastModifiedDate { get; set; }
 
     public int? UpdatedBy { get; set; }
-
-    public bool IsDeleted { get; set; }
 
     public virtual Role Role { get; set; } = null!;
 

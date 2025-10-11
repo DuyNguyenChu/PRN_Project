@@ -3,9 +3,8 @@ using System.Collections.Generic;
 
 namespace api.Models;
 
-public partial class DriverViolation
+public partial class DriverViolation : EntityBase<int>
 {
-    public int Id { get; set; }
 
     public int ViolationTypeId { get; set; }
 
@@ -32,8 +31,6 @@ public partial class DriverViolation
     public DateTimeOffset? LastModifiedDate { get; set; }
 
     public int? UpdatedBy { get; set; }
-
-    public bool IsDeleted { get; set; }
 
     public virtual Driver Driver { get; set; } = null!;
 

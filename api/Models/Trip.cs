@@ -3,9 +3,8 @@ using System.Collections.Generic;
 
 namespace api.Models;
 
-public partial class Trip
+public partial class Trip : EntityBase<int>
 {
-    public int Id { get; set; }
 
     public int? TripRequestId { get; set; }
 
@@ -54,8 +53,6 @@ public partial class Trip
     public DateTimeOffset? LastModifiedDate { get; set; }
 
     public int? UpdatedBy { get; set; }
-
-    public bool IsDeleted { get; set; }
 
     public virtual Driver Driver { get; set; } = null!;
 

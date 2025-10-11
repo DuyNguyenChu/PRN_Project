@@ -3,9 +3,8 @@ using System.Collections.Generic;
 
 namespace api.Models;
 
-public partial class FolderUpload
+public partial class FolderUpload : EntityBase<int>
 {
-    public int Id { get; set; }
 
     public string FolderName { get; set; } = null!;
 
@@ -22,8 +21,6 @@ public partial class FolderUpload
     public DateTimeOffset? LastModifiedDate { get; set; }
 
     public int? UpdatedBy { get; set; }
-
-    public bool IsDeleted { get; set; }
 
     public virtual ICollection<FileUpload> FileUploads { get; set; } = new List<FileUpload>();
 }

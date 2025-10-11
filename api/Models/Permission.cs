@@ -3,9 +3,8 @@ using System.Collections.Generic;
 
 namespace api.Models;
 
-public partial class Permission
+public partial class Permission : EntityBase<int>
 {
-    public int Id { get; set; }
 
     public int MenuId { get; set; }
 
@@ -20,8 +19,6 @@ public partial class Permission
     public DateTimeOffset? LastModifiedDate { get; set; }
 
     public int? UpdatedBy { get; set; }
-
-    public bool IsDeleted { get; set; }
 
     public virtual Action Action { get; set; } = null!;
 

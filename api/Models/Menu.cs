@@ -3,9 +3,8 @@ using System.Collections.Generic;
 
 namespace api.Models;
 
-public partial class Menu
+public partial class Menu : EntityBase<int>
 {
-    public int Id { get; set; }
 
     public string Name { get; set; } = null!;
 
@@ -31,7 +30,9 @@ public partial class Menu
 
     public int? UpdatedBy { get; set; }
 
-    public bool IsDeleted { get; set; }
+    public bool IsAdminOnly { get; set; }
+
+    public virtual ICollection<ActionInMenu> ActionInMenus { get; set; } = new List<ActionInMenu>();
 
     public virtual ICollection<Permission> Permissions { get; set; } = new List<Permission>();
 }

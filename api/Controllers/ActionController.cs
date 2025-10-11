@@ -1,7 +1,7 @@
 ﻿using api.Dtos.Action;
 using api.Extensions;
 using api.Helpers;
-using api.Service;
+using api.Interface.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -11,7 +11,7 @@ namespace api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ActionController : BaseController, IBaseController<int, CreateActionDto, UpdateActionDto, DTParameters>
+    public class ActionController : BaseController, IBaseController<int, CreateActionDto, UpdateActionDto, api.Extensions.DTParameters>
     {
         private readonly IActionService _actionService;
 
@@ -54,7 +54,7 @@ namespace api.Controllers
         //}
 
         [HttpPost("paged-advanced")]
-        public async Task<IActionResult> GetPagedAsync([FromBody] DTParameters parameters)
+        public async Task<IActionResult> GetPagedAsync([FromBody] api.Extensions.DTParameters parameters)
         {
             var result = await _actionService.GetPagedAsync(parameters);
 

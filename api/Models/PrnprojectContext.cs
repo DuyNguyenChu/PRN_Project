@@ -17,6 +17,8 @@ public partial class PrnprojectContext : DbContext
 
     public virtual DbSet<Action> Actions { get; set; }
 
+    public virtual DbSet<ActionInMenu> ActionInMenus { get; set; }
+
     public virtual DbSet<Driver> Drivers { get; set; }
 
     public virtual DbSet<DriverStatus> DriverStatuses { get; set; }
@@ -87,8 +89,8 @@ public partial class PrnprojectContext : DbContext
         var configuration = builder.Build();
         optionsBuilder.UseSqlServer(configuration.GetConnectionString("DefaultConnection"));
     }
-//#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
-//        => optionsBuilder.UseSqlServer("Server=DUNGHOA;Database=PRNProject;User Id=sa;Password=123;Encrypt=True;TrustServerCertificate=True");
+    //#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
+    //        => optionsBuilder.UseSqlServer("Server=DUNGHOA;Database=PRNProject;User Id=sa;Password=123;Trusted_Connection=True;TrustServerCertificate=True");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -100,6 +102,23 @@ public partial class PrnprojectContext : DbContext
 
             entity.Property(e => e.Description).HasMaxLength(500);
             entity.Property(e => e.Name).HasMaxLength(255);
+        });
+
+        modelBuilder.Entity<ActionInMenu>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__ActionIn__3214EC071CA6610C");
+
+            entity.ToTable("ActionInMenu");
+
+            entity.HasOne(d => d.Action).WithMany(p => p.ActionInMenus)
+                .HasForeignKey(d => d.ActionId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_ActionInMenu_Action");
+
+            entity.HasOne(d => d.Menu).WithMany(p => p.ActionInMenus)
+                .HasForeignKey(d => d.MenuId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_ActionInMenu_Menu");
         });
 
         modelBuilder.Entity<Driver>(entity =>
@@ -287,6 +306,7 @@ public partial class PrnprojectContext : DbContext
             entity.Property(e => e.Url)
                 .HasMaxLength(255)
                 .IsUnicode(false);
+            entity.Property(e => e.IsAdminOnly).IsRequired().HasDefaultValue(false);
         });
 
         modelBuilder.Entity<Permission>(entity =>

@@ -3,9 +3,8 @@ using System.Collections.Generic;
 
 namespace api.Models;
 
-public partial class TripStatus
+public partial class TripStatus : EntityBase<int>
 {
-    public int Id { get; set; }
 
     public string Name { get; set; } = null!;
 
@@ -20,8 +19,6 @@ public partial class TripStatus
     public DateTimeOffset? LastModifiedDate { get; set; }
 
     public int? UpdatedBy { get; set; }
-
-    public bool IsDeleted { get; set; }
 
     public virtual ICollection<Trip> Trips { get; set; } = new List<Trip>();
 }

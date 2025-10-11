@@ -7,7 +7,7 @@ namespace api.Helpers
     public interface IBaseController<TKey, CreateDto, UpdateDto, AdvancedDTParameter>
         where CreateDto : class
         where UpdateDto : class
-        where AdvancedDTParameter : DTParameters
+        where AdvancedDTParameter : api.Extensions.DTParameters
     {
         Task<IActionResult> GetByIdAsync(TKey id);
         Task<IActionResult> CreateAsync([FromBody] CreateDto obj);

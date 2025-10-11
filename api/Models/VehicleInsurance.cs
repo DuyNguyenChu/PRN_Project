@@ -3,9 +3,8 @@ using System.Collections.Generic;
 
 namespace api.Models;
 
-public partial class VehicleInsurance
+public partial class VehicleInsurance : EntityBase<int>
 {
-    public int Id { get; set; }
 
     public int VehicleId { get; set; }
 
@@ -28,8 +27,6 @@ public partial class VehicleInsurance
     public DateTimeOffset? LastModifiedDate { get; set; }
 
     public int? UpdatedBy { get; set; }
-
-    public bool IsDeleted { get; set; }
 
     public virtual Vehicle Vehicle { get; set; } = null!;
 }

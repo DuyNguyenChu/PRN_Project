@@ -21,7 +21,6 @@ using api.Interface.Services;
 using Microsoft.Extensions.FileProviders;
 using api.Helpers;
 using CloudinaryDotNet;
-using api.Service;
 using api.Models;
 using api.Repositories;
 using FluentValidation;
@@ -95,19 +94,19 @@ builder.Services.AddDbContext<PrnprojectContext>(options =>
 });
 
 
-// Configure Identity
+//Configure Identity
 //builder.Services.AddIdentity<AppUser, IdentityRole>(options =>
 //{
 //    options.Password.RequireDigit = true;
-//    options.Password.RequireLowercase = true;
-//    options.Password.RequireUppercase = true;
-//    options.Password.RequireNonAlphanumeric = true;
-//    options.Password.RequiredLength = 12;
+//options.Password.RequireLowercase = true;
+//options.Password.RequireUppercase = true;
+//options.Password.RequireNonAlphanumeric = true;
+//options.Password.RequiredLength = 12;
 //})
 //.AddEntityFrameworkStores<ApplicationDBContext>()
 //.AddDefaultTokenProviders();
 
-// Configure Authentication (JWT, Google, GitHub)
+//Configure Authentication(JWT, Google, GitHub)
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
@@ -166,7 +165,7 @@ var cloudinaryAccount = new Account(
 );
 var cloudinary = new Cloudinary(cloudinaryAccount);
 
-builder.Services.AddSingleton(cloudinary);
+//builder.Services.AddSingleton(cloudinary);
 // Dependency Injection
 //builder.Services.AddScoped<ITokenService, TokenService>();
 //builder.Services.AddScoped<ISubmissionRepository, SubmissionRepository>();
@@ -208,8 +207,26 @@ builder.Services.AddSingleton(cloudinary);
 //builder.Services.AddScoped<IRankingService, RankingService>();
 //builder.Services.AddScoped<ITestCaseStatusRepository, TestCaseStatusRepository>();
 //builder.Services.AddScoped<ITestCaseStatusService, TestCaseStatusService>();
-builder.Services.AddScoped<api.Service.IActionService, api.Service.ActionService>();
-builder.Services.AddScoped<api.Repositories.IActionRepository, api.Repositories.ActionRepository>();
+
+//services
+builder.Services.AddScoped<IActionService, api.Service.ActionService>();
+builder.Services.AddScoped<IMenuService, api.Service.MenuService>();
+builder.Services.AddScoped<IPermissionService, api.Service.PermissionService>();
+builder.Services.AddScoped<IUserService, api.Service.UserService>();
+builder.Services.AddScoped<IRoleService, api.Service.RoleService>();
+builder.Services.AddScoped<IAuthService, api.Service.AuthService>();
+builder.Services.AddScoped<IUserStatusService, api.Service.UserStatusService>();
+builder.Services.AddScoped<ITokenProviderService, api.Service.TokenProviderService>();
+
+//Repository
+builder.Services.AddScoped<IMenuRepository, api.Repositories.MenuRepository>();
+builder.Services.AddScoped<IPermissionRepository, api.Repositories.PermissionRepository>();
+builder.Services.AddScoped<IRoleRepository, api.Repositories.RoleRepository>();
+builder.Services.AddScoped<IActionRepository, api.Repositories.ActionRepository>();
+builder.Services.AddScoped<IUserRepository, api.Repositories.UserRepository>();
+builder.Services.AddScoped<IUserStatusRepository, api.Repositories.UserStatusRepository>();
+builder.Services.AddScoped<IUserRoleRepository, api.Repositories.UserRoleRepository>();
+builder.Services.AddScoped<IActionInMenuRepository, api.Repositories.ActionInMenuRepository>();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 // Logging

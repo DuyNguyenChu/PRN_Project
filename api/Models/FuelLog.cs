@@ -3,9 +3,8 @@ using System.Collections.Generic;
 
 namespace api.Models;
 
-public partial class FuelLog
+public partial class FuelLog : EntityBase<int>
 {
-    public int Id { get; set; }
 
     public string GasStation { get; set; } = null!;
 
@@ -42,8 +41,6 @@ public partial class FuelLog
     public DateTimeOffset? LastModifiedDate { get; set; }
 
     public int? UpdatedBy { get; set; }
-
-    public bool IsDeleted { get; set; }
 
     public virtual Driver Driver { get; set; } = null!;
 

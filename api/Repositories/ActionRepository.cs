@@ -1,4 +1,5 @@
 ﻿using api.Extensions;
+using api.Interface.Repository;
 using api.Models;
 using api.ViewModel;
 using Microsoft.EntityFrameworkCore;
@@ -14,7 +15,7 @@ namespace api.Repositories
             _context = context;
         }
 
-        public async Task<DTResult<ActionAggregate>> GetPagedAsync(DTParameters parameters)
+        public async Task<DTResult<ActionAggregate>> GetPagedAsync(api.Extensions.DTParameters parameters)
         {
             var keyword = parameters.Search?.Value;
             var orderCriteria = string.Empty;

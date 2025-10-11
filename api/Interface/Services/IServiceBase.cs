@@ -13,7 +13,7 @@ namespace api.Interface.Services
     public interface IServiceBase<TKey, CreateDto, UpdateDto, AdvancedDTParameter>
         where CreateDto : class
         where UpdateDto : class
-        where AdvancedDTParameter : DTParameters
+        where AdvancedDTParameter : api.Extensions.DTParameters
     {
         Task<ApiResponse> GetByIdAsync(TKey id);
         Task<ApiResponse> CreateAsync(CreateDto obj);
