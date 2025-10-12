@@ -14,19 +14,19 @@ namespace api.Helpers
             /// <summary>
             /// Chưa kích hoạt
             /// </summary>
-            NotActivated = 1001,
+            NotActivated = 1,
             /// <summary>
             /// Đã kích hoạt
             /// </summary>
-            Actived = 1002,
+            Actived = 2,
             /// <summary>
             /// Bị khoá
             /// </summary>
-            Locked = 1003,
+            Locked = 3,
             /// <summary>
             /// Ngưng hoạt động
             /// </summary>
-            Deactivated = 1004
+            Deactivated = 4
         }
 
         public enum Action

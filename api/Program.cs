@@ -25,6 +25,8 @@ using api.Models;
 using api.Repositories;
 using FluentValidation;
 using FluentValidation.AspNetCore;
+using api.Options;
+using Newtonsoft.Json.Converters;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services
@@ -35,8 +37,10 @@ builder.Services.AddControllers()
         fv.RegisterValidatorsFromAssemblyContaining<Program>();
         // Hoặc dùng AppDomain nếu validator nằm ở nhiều project khác nhau:
         // fv.RegisterValidatorsFromAssemblies(AppDomain.CurrentDomain.GetAssemblies());
-    }); ;
-
+    });
+builder.Services.AddControllers().AddNewtonsoftJson(options =>
+    options.SerializerSettings.Converters.Add(new StringEnumConverter())
+);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(option =>
 {
@@ -228,6 +232,8 @@ builder.Services.AddScoped<IUserStatusRepository, api.Repositories.UserStatusRep
 builder.Services.AddScoped<IUserRoleRepository, api.Repositories.UserRoleRepository>();
 builder.Services.AddScoped<IActionInMenuRepository, api.Repositories.ActionInMenuRepository>();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+
+builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
 
 // Logging
 builder.Logging.AddConsole();
