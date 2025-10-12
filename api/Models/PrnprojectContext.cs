@@ -1,6 +1,11 @@
 ﻿using System;
+using System.Reflection;
 using System.Collections.Generic;
+using api.Extensions;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
+using Microsoft.EntityFrameworkCore.Storage;
+using System.Data;
 
 namespace api.Models;
 
@@ -94,6 +99,76 @@ public partial class PrnprojectContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.HasDbFunction(typeof(DateTimeExtensions).GetMethod(nameof(DateTimeExtensions.ToVietnameseDateTimeOffset)))
+                 .HasTranslation(e =>
+                 {
+                     return new SqlFunctionExpression(
+                         functionName: "format",
+                         arguments: new[]
+                         {
+                            e.First(),
+                            new SqlFragmentExpression("'dd/MM/yyyy HH:mm:ss'")
+                         },
+                         nullable: true,
+                         argumentsPropagateNullability: new[] { true, false },
+                         type: typeof(string),
+                         typeMapping: new StringTypeMapping("nvarchar(max)", DbType.String)
+                      );
+                 });
+
+        modelBuilder.HasDbFunction(typeof(DateTimeExtensions).GetMethod(nameof(DateTimeExtensions.ToVietnameseDateOffset)))
+            .HasTranslation(e =>
+            {
+                return new SqlFunctionExpression(
+                    functionName: "format",
+                    arguments: new[]{
+                            e.First(),
+                            new SqlFragmentExpression("'dd/MM/yyyy'")
+
+                    },
+                    nullable: true,
+                    argumentsPropagateNullability: new[] { true, false },
+                    type: typeof(string),
+                    typeMapping: new StringTypeMapping("nvarchar(max)", DbType.String)
+                );
+            });
+
+        modelBuilder.HasDbFunction(typeof(DateTimeExtensions).GetMethod(nameof(DateTimeExtensions.ToVietnameseDateTime)))
+            .HasTranslation(e =>
+            {
+                return new SqlFunctionExpression(
+                    functionName: "format",
+                    arguments: new[]
+                    {
+                            e.First(),
+                            new SqlFragmentExpression("'dd/MM/yyyy HH:mm:ss'")
+                    },
+                    nullable: true,
+                    argumentsPropagateNullability: new[] { true, false },
+                    type: typeof(string),
+                    typeMapping: new StringTypeMapping("nvarchar(max)", DbType.String)
+                 );
+            });
+
+        modelBuilder.HasDbFunction(typeof(DateTimeExtensions).GetMethod(nameof(DateTimeExtensions.ToVietnameseDate)))
+            .HasTranslation(e =>
+            {
+                return new SqlFunctionExpression(
+                    functionName: "format",
+                    arguments: new[]{
+                            e.First(),
+                            new SqlFragmentExpression("'dd/MM/yyyy'")
+
+                    },
+                    nullable: true,
+                    argumentsPropagateNullability: new[] { true, false },
+                    type: typeof(string),
+                    typeMapping: new StringTypeMapping("nvarchar(max)", DbType.String)
+                );
+            });
+
+
+
         modelBuilder.Entity<Action>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PK__Action__3214EC0715F3A2FD");
@@ -697,6 +772,7 @@ public partial class PrnprojectContext : DbContext
         });
 
         OnModelCreatingPartial(modelBuilder);
+        base.OnModelCreating(modelBuilder);
     }
 
     partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
