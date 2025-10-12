@@ -31,7 +31,7 @@ namespace api.Helpers
 
         public enum Action
         {
-            CREATE = 1001,
+            CREATE = 1,
             READ,
             UPDATE,
             DELETE,
@@ -48,7 +48,7 @@ namespace api.Helpers
 
         public enum Menu
         {
-            DASHBOARD = 1001,
+            DASHBOARD = 1,
             TRIP_MANAGEMENT,
             TRIP_REQUEST_LIST,
             TRIP_LIST,
@@ -106,7 +106,7 @@ namespace api.Helpers
 
         public enum Role
         {
-            ADMIN = 1001,
+            ADMIN = 1,
             USER,
             DRIVER,
             DISPATCHER,
