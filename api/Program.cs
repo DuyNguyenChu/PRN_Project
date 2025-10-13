@@ -27,7 +27,9 @@ using FluentValidation;
 using FluentValidation.AspNetCore;
 using api.Options;
 using Newtonsoft.Json.Converters;
+using Microsoft.Extensions.Configuration;
 var builder = WebApplication.CreateBuilder(args);
+var configuration = builder.Configuration;
 
 // Add services
 builder.Services.AddControllers()
@@ -113,21 +115,25 @@ builder.Services.AddDbContext<PrnprojectContext>(options =>
 //Configure Authentication(JWT, Google, GitHub)
 builder.Services.AddAuthentication(options =>
 {
-    options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = GoogleDefaults.AuthenticationScheme;
+    // Đặt JWT làm scheme mặc định cho việc xác thực và thách thức
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    // Vẫn giữ Cookie làm scheme đăng nhập cho OAuth (Google, Github)
     options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
 })
-.AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
+.AddJwtBearer(options => // Cấu hình chi tiết cho JWT
 {
+    // Sử dụng JwtSettings đã được bind ở dưới
+    var jwtSettings = configuration.GetSection("JwtSettings").Get<JwtSettings>();
     options.TokenValidationParameters = new TokenValidationParameters
     {
         ValidateIssuer = true,
-        ValidIssuer = builder.Configuration["JWT:Issuer"],
         ValidateAudience = true,
-        ValidAudience = builder.Configuration["JWT:Audience"],
-        ValidateIssuerSigningKey = true,
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:SigningKey"])),
         ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = jwtSettings?.Issuer,
+        ValidAudience = jwtSettings?.Audience,
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings?.SecretKey ?? string.Empty)),
         ClockSkew = TimeSpan.Zero
     };
 })

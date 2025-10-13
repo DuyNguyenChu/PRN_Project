@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace api.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class ActionController : BaseController, IBaseController<int, CreateActionDto, UpdateActionDto, api.Extensions.DTParameters>
