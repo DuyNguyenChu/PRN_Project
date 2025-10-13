@@ -84,40 +84,38 @@ namespace api.Service
             return ApiResponse.Success(data);
         }
 
-        //public async Task<ApiResponse> GetPagedAsync(SearchQuery query)
-        //{
-        //    var data = _userStatusRepository
-        //        .FindByCondition(x => !x.IsDeleted)
-        //        .Select(x => new UserStatusListDto
-        //        {
-        //            Color = x.Color,
-        //            CreatedDate = x.CreatedDate,
-        //            Description = x.Description,
-        //            Id = x.Id,
-        //            Name = x.Name,
-        //        });
+        public async Task<ApiResponse> GetPagedAsync(SearchQuery query)
+        {
+            var data = _userStatusRepository
+                .FindByCondition(x => !x.IsDeleted)
+                .Select(x => new UserStatusListDto
+                {
+                    Color = x.Color,
+                    CreatedDate = x.CreatedDate,
+                    Id = x.Id,
+                    Name = x.Name,
+                });
 
-        //    var totalRecord = await data.CountAsync();
-        //    if (!string.IsNullOrEmpty(query.Keyword))
-        //    {
-        //        data = data
-        //            .Where(x => x.Name.ToLower().Contains(query.Keyword.ToLower()) ||
-        //            x.Description != null && x.Description.ToLower().Contains(query.Keyword.ToLower())
-        //        );
+            var totalRecord = await data.CountAsync();
+            if (!string.IsNullOrEmpty(query.Keyword))
+            {
+                data = data
+                    .Where(x => x.Name.ToLower().Contains(query.Keyword.ToLower())
+                );
 
-        //    }
+            }
 
-        //    var pagedData = new PagingData<UserStatusListDto>
-        //    {
-        //        CurrentPage = query.PageIndex,
-        //        PageSize = query.PageSize,
-        //        DataSource = await data.Skip((query.PageIndex - 1) * query.PageSize).Take(query.PageSize).ToListAsync(),
-        //        Total = totalRecord,
-        //        TotalFiltered = await data.CountAsync()
-        //    };
+            var pagedData = new PagingData<UserStatusListDto>
+            {
+                CurrentPage = query.PageIndex,
+                PageSize = query.PageSize,
+                DataSource = await data.Skip((query.PageIndex - 1) * query.PageSize).Take(query.PageSize).ToListAsync(),
+                Total = totalRecord,
+                TotalFiltered = await data.CountAsync()
+            };
 
-        //    return ApiResponse.Success(pagedData);
-        //}
+            return ApiResponse.Success(pagedData);
+        }
 
         //public Task<ApiResponse> GetPagedAsync<T>(AdvancedSearchQuery<T> query)
         //{

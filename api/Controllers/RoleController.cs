@@ -1,5 +1,6 @@
 ﻿using api.Dtos.Permission;
 using api.Dtos.Role;
+using api.Extensions;
 using api.Helpers;
 using api.Interface.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -46,14 +47,14 @@ namespace api.Controllers
             return BaseResult(data);
         }
 
-        //[HttpPost("paged")]
-        ////[CustomAuthorize(Enums.Menu.ROLE, Enums.Action.READ)]
-        //public async Task<IActionResult> GetPagedAsync([FromBody] SearchQuery query)
-        //{
-        //    var data = await _roleService.GetPagedAsync(query);
+        [HttpPost("paged")]
+        //[CustomAuthorize(Enums.Menu.ROLE, Enums.Action.READ)]
+        public async Task<IActionResult> GetPagedAsync([FromBody] SearchQuery query)
+        {
+            var data = await _roleService.GetPagedAsync(query);
 
-        //    return BaseResult(data);
-        //}
+            return BaseResult(data);
+        }
 
         [HttpPost("paged-advanced")]
         //[CustomAuthorize(Enums.Menu.ROLE, Enums.Action.READ)]

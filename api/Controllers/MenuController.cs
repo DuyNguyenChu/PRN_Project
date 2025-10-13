@@ -44,14 +44,14 @@ namespace api.Controllers
             return BaseResult(result);
         }
 
-        //[HttpPost("paged")]
-        //[AllowAnonymous]
-        //public async Task<IActionResult> GetPagedAsync([FromBody] SearchQuery query)
-        //{
-        //    var result = await _menuService.GetPagedAsync(query);
+        [HttpPost("paged")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetPagedAsync([FromBody] SearchQuery query)
+        {
+            var result = await _menuService.GetPagedAsync(query);
 
-        //    return BaseResult(result);
-        //}
+            return BaseResult(result);
+        }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetByIdAsync(int id)

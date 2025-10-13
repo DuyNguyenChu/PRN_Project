@@ -23,7 +23,7 @@ namespace api.Interface.Services
         Task<ApiResponse> SoftDeleteAsync(TKey id);
         Task<ApiResponse> SoftDeleteListAsync(IEnumerable<TKey> objs);
         Task<ApiResponse> GetAllAsync();
-        //Task<ApiResponse> GetPagedAsync(SearchQuery query);
+        Task<ApiResponse> GetPagedAsync(SearchQuery query);
         //Task<ApiResponse> GetPagedAsync<T>(AdvancedSearchQuery<T> query);
         Task<ApiResponse> GetPagedAsync(AdvancedDTParameter parameters);
     }

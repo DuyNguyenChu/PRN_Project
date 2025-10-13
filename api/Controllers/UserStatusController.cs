@@ -45,12 +45,12 @@ namespace api.Controllers
         }
 
 
-        //[HttpPost("paged")]
-        //public async Task<IActionResult> GetPagedAsync([FromBody] SearchQuery query)
-        //{
-        //    var result = await _userStatusService.GetPagedAsync(query);
-        //    return BaseResult(result);
-        //}
+        [HttpPost("paged")]
+        public async Task<IActionResult> GetPagedAsync([FromBody] SearchQuery query)
+        {
+            var result = await _userStatusService.GetPagedAsync(query);
+            return BaseResult(result);
+        }
 
         //[CustomAuthorize(Enums.Menu.USER_STATUS, Enums.Action.READ)]
         [HttpPost("paged-advanced")]

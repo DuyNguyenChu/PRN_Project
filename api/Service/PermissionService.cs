@@ -54,10 +54,10 @@ namespace api.Service
             throw new NotImplementedException();
         }
 
-        //public Task<ApiResponse> GetPagedAsync(SearchQuery query)
-        //{
-        //    throw new NotImplementedException();
-        //}
+        public Task<ApiResponse> GetPagedAsync(SearchQuery query)
+        {
+            throw new NotImplementedException();
+        }
 
         //public Task<ApiResponse> GetPagedAsync<T>(AdvancedSearchQuery<T> query)
         //{

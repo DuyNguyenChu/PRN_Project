@@ -14,7 +14,7 @@ namespace api.Helpers
         Task<IActionResult> UpdateAsync([FromBody] UpdateDto obj);
         Task<IActionResult> SoftDeleteAsync(TKey id);
         Task<IActionResult> GetAllAsync();
-        //Task<IActionResult> GetPagedAsync([FromBody] SearchQuery query);
+        Task<IActionResult> GetPagedAsync([FromBody] SearchQuery query);
         Task<IActionResult> GetPagedAsync([FromBody] AdvancedDTParameter parameters);
     }
 

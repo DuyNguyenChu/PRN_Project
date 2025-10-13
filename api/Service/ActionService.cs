@@ -67,45 +67,45 @@ namespace api.Service
             return ApiResponse.Success(dto);
         }
 
-        //public async Task<ApiResponse> GetPagedAsync(SearchQuery query)
-        //{
-        //    var data = _actionRepository
-        //        .FindByCondition(x => !x.IsDeleted)
-        //        .Select(x => new ActionListDto
-        //        {
-        //            CreatedDate = x.CreatedDate,
-        //            Description = x.Description,
-        //            Id = x.Id,
-        //            Name = x.Name,
-        //        });
+        public async Task<ApiResponse> GetPagedAsync(SearchQuery query)
+        {
+            var data = _actionRepository
+                .FindByCondition(x => !x.IsDeleted)
+                .Select(x => new ActionListDto
+                {
+                    CreatedDate = x.CreatedDate,
+                    Description = x.Description,
+                    Id = x.Id,
+                    Name = x.Name,
+                });
 
-        //    var totalRecord = await data.CountAsync();
-        //    if (!string.IsNullOrEmpty(query.Keyword))
-        //    {
-        //        data = data
-        //            .Where(x => x.Name.ToLower().Contains(query.Keyword.ToLower()) ||
-        //            x.Description != null && x.Description.ToLower().Contains(query.Keyword.ToLower())
-        //        );
+            var totalRecord = await data.CountAsync();
+            if (!string.IsNullOrEmpty(query.Keyword))
+            {
+                data = data
+                    .Where(x => x.Name.ToLower().Contains(query.Keyword.ToLower()) ||
+                    x.Description != null && x.Description.ToLower().Contains(query.Keyword.ToLower())
+                );
 
-        //    }
+            }
 
-        //    if (!string.IsNullOrEmpty(query.OrderBy))
-        //    {
-        //        data = data
-        //            .OrderByDynamic(query.OrderBy, query.SortType == "asc" ? LinqExtensions.Order.Asc : LinqExtensions.Order.Desc);
-        //    }
+            if (!string.IsNullOrEmpty(query.OrderBy))
+            {
+                data = data
+                    .OrderByDynamic(query.OrderBy, query.SortType == "asc" ? LinqExtensions.Order.Asc : LinqExtensions.Order.Desc);
+            }
 
-        //    var pagedData = new PagingData<ActionListDto>
-        //    {
-        //        CurrentPage = query.PageIndex,
-        //        PageSize = query.PageSize,
-        //        DataSource = await data.Skip((query.PageIndex - 1) * query.PageSize).Take(query.PageSize).ToListAsync(),
-        //        Total = totalRecord,
-        //        TotalFiltered = await data.CountAsync()
-        //    };
+            var pagedData = new PagingData<ActionListDto>
+            {
+                CurrentPage = query.PageIndex,
+                PageSize = query.PageSize,
+                DataSource = await data.Skip((query.PageIndex - 1) * query.PageSize).Take(query.PageSize).ToListAsync(),
+                Total = totalRecord,
+                TotalFiltered = await data.CountAsync()
+            };
 
-        //    return ApiResponse.Success(pagedData);
-        //}
+            return ApiResponse.Success(pagedData);
+        }
 
         //public Task<ApiResponse> GetPagedAsync<T>(AdvancedSearchQuery<T> query)
         //{

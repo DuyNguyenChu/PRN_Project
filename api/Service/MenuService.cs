@@ -143,27 +143,27 @@ namespace api.Service
             return ApiResponse.Success(data);
         }
 
-        //public async Task<ApiResponse> GetPagedAsync(SearchQuery query)
-        //{
-        //    var data = await _menuRepository
-        //        .FindByCondition(x => !x.IsDeleted && (string.IsNullOrEmpty(query.Keyword) || x.MenuType == query.Keyword))
-        //        .Select(x => new MenuListDto
-        //        {
-        //            ClassName = x.ClassName,
-        //            Icon = x.Icon,
-        //            Id = x.Id,
-        //            MenuType = x.MenuType,
-        //            Name = x.Name,
-        //            SortOrder = x.SortOrder,
-        //            Url = x.Url,
-        //            ParentId = x.ParentId,
-        //        })
-        //        .ToListAsync();
-        //    var menuTree = BuildMenuTree(data);
+        public async Task<ApiResponse> GetPagedAsync(SearchQuery query)
+        {
+            var data = await _menuRepository
+                .FindByCondition(x => !x.IsDeleted && (string.IsNullOrEmpty(query.Keyword) || x.MenuType == query.Keyword))
+                .Select(x => new MenuListDto
+                {
+                    ClassName = x.ClassName,
+                    Icon = x.Icon,
+                    Id = x.Id,
+                    MenuType = x.MenuType,
+                    Name = x.Name,
+                    SortOrder = x.SortOrder,
+                    Url = x.Url,
+                    ParentId = x.ParentId,
+                })
+                .ToListAsync();
+            var menuTree = BuildMenuTree(data);
 
-        //    return ApiResponse.Success(menuTree);
+            return ApiResponse.Success(menuTree);
 
-        //}
+        }
 
         private List<MenuListDto> BuildMenuTree(List<MenuListDto> menus, int? parentId = null)
         {

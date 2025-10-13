@@ -46,13 +46,13 @@ namespace api.Controllers
             return BaseResult(result);
         }
 
-        //[HttpPost("paged")]
-        //public async Task<IActionResult> GetPagedAsync([FromBody] SearchQuery query)
-        //{
-        //    var result = await _actionService.GetPagedAsync(query);
+        [HttpPost("paged")]
+        public async Task<IActionResult> GetPagedAsync([FromBody] SearchQuery query)
+        {
+            var result = await _actionService.GetPagedAsync(query);
 
-        //    return BaseResult(result);
-        //}
+            return BaseResult(result);
+        }
 
         [HttpPost("paged-advanced")]
         public async Task<IActionResult> GetPagedAsync([FromBody] api.Extensions.DTParameters parameters)

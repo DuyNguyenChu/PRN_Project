@@ -189,63 +189,58 @@ namespace api.Service
             return ApiResponse.Success(data);
         }
 
-        //public async Task<ApiResponse> GetPagedAsync(SearchQuery query)
-        //{
-        //    var data = _userRepository
-        //        .FindByCondition(x => !x.IsDeleted)
-        //        .Select(x => new UserListDto
-        //        {
-        //            Id = x.Id,
-        //            Username = x.Username,
-        //            FirstName = x.FirstName,
-        //            LastName = x.LastName,
-        //            Email = x.Email,
-        //            PhoneNumber = x.PhoneNumber,
-        //            AccessFailedCount = x.AccessFailedCount,
-        //            LockEnabled = x.LockEnabled,
-        //            LockEndDate = x.LockEndDate,
-        //            Gender = x.Gender,
-        //            Name = x.FirstName + " " + x.LastName,
-        //            AvatarId = x.AvatarId,
-        //            AvatarUrl = x.Avatar == null ? null : _storageService.GetOriginalUrl(x.Avatar.FileKey),
-        //            UserStatusId = x.UserStatusId,
-        //            UserStatusName = x.UserStatus.Name,
-        //            IdentityNumber = x.IdentityNumber,
-        //            AddressDetail = x.AddresDetail,
-        //            CreatedDate = x.CreatedDate,
-        //        });
+        public async Task<ApiResponse> GetPagedAsync(SearchQuery query)
+        {
+            var data = _userRepository
+                .FindByCondition(x => !x.IsDeleted)
+                .Select(x => new UserListDto
+                {
+                    Id = x.Id,
+                    Username = x.UserName,
+                    FirstName = x.FirstName,
+                    LastName = x.LastName,
+                    Email = x.Email,
+                    PhoneNumber = x.PhoneNumber,
+                    Gender = x.Gender,
+                    Name = x.FirstName + " " + x.LastName,
+                    AvatarId = x.AvatarId,
+                    //AvatarUrl = x.Avatar == null ? null : _storageService.GetOriginalUrl(x.Avatar.FileKey),
+                    UserStatusId = x.UserStatusId,
+                    UserStatusName = x.UserStatus.Name,
+                    CreatedDate = x.CreatedDate,
+                });
 
-        //    var totalRecord = await data.CountAsync();
-        //    if (!string.IsNullOrEmpty(query.Keyword))
-        //    {
-        //        data = data
-        //            .Where(x => x.Username.ToLower().Contains(query.Keyword.ToLower()) ||
-        //            x.FirstName.ToLower().Contains(query.Keyword.ToLower()) ||
-        //            x.LastName.ToLower().Contains(query.Keyword.ToLower()) ||
-        //            x.Email.ToLower().Contains(query.Keyword.ToLower()) ||
-        //            x.PhoneNumber != null && x.PhoneNumber.ToLower().Contains(query.Keyword.ToLower()) ||
-        //            (x.Name).ToLower().Contains(query.Keyword.ToLower())
-        //        );
+            var totalRecord = await data.CountAsync();
+            if (!string.IsNullOrEmpty(query.Keyword))
+            {
+                data = data
+                    .Where(x => x.Username.ToLower().Contains(query.Keyword.ToLower()) ||
+                    x.FirstName.ToLower().Contains(query.Keyword.ToLower()) ||
+                    x.LastName.ToLower().Contains(query.Keyword.ToLower()) ||
+                    x.Email.ToLower().Contains(query.Keyword.ToLower()) ||
+                    x.PhoneNumber != null && x.PhoneNumber.ToLower().Contains(query.Keyword.ToLower()) ||
+                    (x.Name).ToLower().Contains(query.Keyword.ToLower())
+                );
 
-        //    }
+            }
 
-        //    if (!string.IsNullOrEmpty(query.OrderBy))
-        //    {
-        //        data = data
-        //            .OrderByDynamic(query.OrderBy, query.SortType == "asc" ? LinqExtensions.Order.Asc : LinqExtensions.Order.Desc);
-        //    }
+            if (!string.IsNullOrEmpty(query.OrderBy))
+            {
+                data = data
+                    .OrderByDynamic(query.OrderBy, query.SortType == "asc" ? LinqExtensions.Order.Asc : LinqExtensions.Order.Desc);
+            }
 
-        //    var pagedData = new PagingData<UserListDto>
-        //    {
-        //        CurrentPage = query.PageIndex,
-        //        PageSize = query.PageSize,
-        //        DataSource = await data.Skip((query.PageIndex - 1) * query.PageSize).Take(query.PageSize).ToListAsync(),
-        //        Total = totalRecord,
-        //        TotalFiltered = await data.CountAsync()
-        //    };
+            var pagedData = new PagingData<UserListDto>
+            {
+                CurrentPage = query.PageIndex,
+                PageSize = query.PageSize,
+                DataSource = await data.Skip((query.PageIndex - 1) * query.PageSize).Take(query.PageSize).ToListAsync(),
+                Total = totalRecord,
+                TotalFiltered = await data.CountAsync()
+            };
 
-        //    return ApiResponse.Success(pagedData);
-        //}
+            return ApiResponse.Success(pagedData);
+        }
 
         //public Task<ApiResponse> GetPagedAsync<T>(AdvancedSearchQuery<T> query)
         //{

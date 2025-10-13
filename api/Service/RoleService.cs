@@ -148,54 +148,54 @@ namespace api.Service
             return ApiResponse.Success(dto);
         }
 
-        //public async Task<ApiResponse> GetPagedAsync(SearchQuery query)
-        //{
-        //    var data = await (from a in _roleRepository.GetAll()
-        //                      join b in _permissionRepository.GetAll() on a.Id equals b.RoleId into groupAB
-        //                      from b in groupAB.DefaultIfEmpty()
-        //                      join c in _menuRepository.GetAll() on b.MenuId equals c.Id into groupBC
-        //                      from c in groupBC.DefaultIfEmpty()
-        //                      join d in _actionRepository.GetAll() on b.ActionId equals d.Id into groupCD
-        //                      from d in groupCD.DefaultIfEmpty()
-        //                      where !a.IsDeleted && (b == null || !b.IsDeleted) && (c == null || !c.IsDeleted) && (d == null || !d.IsDeleted)
-        //                      select new
-        //                      {
-        //                          Id = a.Id,
-        //                          Name = a.Name,
-        //                          Description = a.Description,
-        //                          CreatedDate = a.CreatedDate,
-        //                          PermissionId = b != null ? b.Id : (int?)b.Id,
-        //                          MenuName = c != null ? c.Name : string.Empty,
-        //                          ActionName = d != null ? d.Name : string.Empty,
-        //                          TotalUsers = a.UserRoles.Count(x => !x.IsDeleted)
-        //                      })
-        //               .GroupBy(x => new
-        //               {
-        //                   x.Id,
-        //                   x.Name,
-        //                   x.Description,
-        //                   x.CreatedDate,
-        //                   x.TotalUsers
-        //               })
-        //               .Select(x => new RoleListDto
-        //               {
-        //                   Id = x.Key.Id,
-        //                   CreatedDate = x.Key.CreatedDate,
-        //                   Description = x.Key.Description,
-        //                   Name = x.Key.Name,
-        //                   TotalUser = x.Key.TotalUsers,
-        //                   Permissons = x.Where(xx => xx.PermissionId.HasValue).Select(xx => new RolePermissonDto
-        //                   {
-        //                       Id = xx.PermissionId.Value,
-        //                       ActionName = xx.ActionName,
-        //                       MenuName = xx.MenuName,
-        //                   })
-        //                   .ToList()
-        //               })
-        //               .ToListAsync();
+        public async Task<ApiResponse> GetPagedAsync(SearchQuery query)
+        {
+            var data = await (from a in _roleRepository.GetAll()
+                              join b in _permissionRepository.GetAll() on a.Id equals b.RoleId into groupAB
+                              from b in groupAB.DefaultIfEmpty()
+                              join c in _menuRepository.GetAll() on b.MenuId equals c.Id into groupBC
+                              from c in groupBC.DefaultIfEmpty()
+                              join d in _actionRepository.GetAll() on b.ActionId equals d.Id into groupCD
+                              from d in groupCD.DefaultIfEmpty()
+                              where !a.IsDeleted && (b == null || !b.IsDeleted) && (c == null || !c.IsDeleted) && (d == null || !d.IsDeleted)
+                              select new
+                              {
+                                  Id = a.Id,
+                                  Name = a.Name,
+                                  Description = a.Description,
+                                  CreatedDate = a.CreatedDate,
+                                  PermissionId = b != null ? b.Id : (int?)b.Id,
+                                  MenuName = c != null ? c.Name : string.Empty,
+                                  ActionName = d != null ? d.Name : string.Empty,
+                                  TotalUsers = a.UserRoles.Count(x => !x.IsDeleted)
+                              })
+                       .GroupBy(x => new
+                       {
+                           x.Id,
+                           x.Name,
+                           x.Description,
+                           x.CreatedDate,
+                           x.TotalUsers
+                       })
+                       .Select(x => new RoleListDto
+                       {
+                           Id = x.Key.Id,
+                           CreatedDate = x.Key.CreatedDate,
+                           Description = x.Key.Description,
+                           Name = x.Key.Name,
+                           TotalUser = x.Key.TotalUsers,
+                           Permissons = x.Where(xx => xx.PermissionId.HasValue).Select(xx => new RolePermissonDto
+                           {
+                               Id = xx.PermissionId.Value,
+                               ActionName = xx.ActionName,
+                               MenuName = xx.MenuName,
+                           })
+                           .ToList()
+                       })
+                       .ToListAsync();
 
-        //    return ApiResponse.Success(data);
-        //}
+            return ApiResponse.Success(data);
+        }
 
         //public async Task<ApiResponse> GetPagedAsync<T>(AdvancedSearchQuery<T> query)
         //{
