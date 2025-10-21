@@ -1,8 +1,7 @@
 # .gitignore (Root level)
 # Ignore node_modules folder from frontend
 /frontend/node_modules/
-/Template/frontend/node_modules/
-/Template/frontend/.env.local
+/frontend/.env.local
 
 # Ignore build or dist folder if it exists
 /build/
