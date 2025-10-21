@@ -2,12 +2,7 @@
 # Ignore node_modules folder from frontend
 /frontend/node_modules/
 /Template/frontend/node_modules/
-/Template/frontend/.pnp
-/Template/frontend/.pnp.js
 /Template/frontend/.env.local
-/Template/frontend/.env.development.local
-/Template/frontend/.env.test.local
-/Template/frontend/.env.production.local
 
 # Ignore build or dist folder if it exists
 /build/
