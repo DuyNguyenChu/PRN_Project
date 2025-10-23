@@ -1,0 +1,21 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+
+namespace api.Dtos.VehicleRegistration
+{
+    public class VehicleRegistrationCreateDto
+    {
+        public int VehicleId { get; set; }
+
+        public string RegistrationNumber { get; set; } = null!;
+
+        public DateTimeOffset IssueDate { get; set; }
+
+        public DateTimeOffset ExpiryDate { get; set; }
+
+        public int Status { get; set; }
+    }
+
+}
