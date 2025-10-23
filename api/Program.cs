@@ -28,7 +28,15 @@ using FluentValidation.AspNetCore;
 using api.Options;
 using Newtonsoft.Json.Converters;
 using Microsoft.Extensions.Configuration;
+using api.Service;
 var builder = WebApplication.CreateBuilder(args);
+
+
+//
+builder.WebHost.UseUrls("http://localhost:5180", "http://0.0.0.0:5180");
+
+
+//
 var configuration = builder.Configuration;
 
 // Add services
@@ -227,7 +235,11 @@ builder.Services.AddScoped<IRoleService, api.Service.RoleService>();
 builder.Services.AddScoped<IAuthService, api.Service.AuthService>();
 builder.Services.AddScoped<IUserStatusService, api.Service.UserStatusService>();
 builder.Services.AddScoped<ITokenProviderService, api.Service.TokenProviderService>();
-
+builder.Services.AddScoped<IVehicleService, VehicleService>();
+builder.Services.AddScoped<IVehicleRegistrationService, VehicleRegistrationService>();
+builder.Services.AddScoped<IVehicleBranchService, VehicleBranchService>();
+builder.Services.AddScoped<IVehicleStatusService, VehicleStatusService>();
+builder.Services.AddScoped<IVehicleModelService, VehicleModelService>();
 //Repository
 builder.Services.AddScoped<IMenuRepository, api.Repositories.MenuRepository>();
 builder.Services.AddScoped<IPermissionRepository, api.Repositories.PermissionRepository>();
@@ -238,6 +250,11 @@ builder.Services.AddScoped<IUserStatusRepository, api.Repositories.UserStatusRep
 builder.Services.AddScoped<IUserRoleRepository, api.Repositories.UserRoleRepository>();
 builder.Services.AddScoped<IActionInMenuRepository, api.Repositories.ActionInMenuRepository>();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+builder.Services.AddScoped<IVehicleRepository, VehicleRepository>();
+builder.Services.AddScoped<IVehicleRegistrationRepository, VehicleRegistrationRepository>();
+builder.Services.AddScoped<IVehicleBranchRepository, VehicleBranchRepository>();
+builder.Services.AddScoped<IVehicleStatusRepository, VehicleStatusRepository>();
+builder.Services.AddScoped<IVehicleModelRepository, VehicleModelRepository>();
 
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
 
