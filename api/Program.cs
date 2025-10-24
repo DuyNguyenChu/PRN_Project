@@ -29,6 +29,10 @@ using api.Options;
 using Newtonsoft.Json.Converters;
 using Microsoft.Extensions.Configuration;
 using api.Service;
+using api.Repository;
+using api.Interfaces.Repository;
+using api.Interfaces;
+using api.Services;
 var builder = WebApplication.CreateBuilder(args);
 
 
@@ -240,6 +244,11 @@ builder.Services.AddScoped<IVehicleRegistrationService, VehicleRegistrationServi
 builder.Services.AddScoped<IVehicleBranchService, VehicleBranchService>();
 builder.Services.AddScoped<IVehicleStatusService, VehicleStatusService>();
 builder.Services.AddScoped<IVehicleModelService, VehicleModelService>();
+builder.Services.AddScoped<IVehicleAccidentService, VehicleAccidentService>();
+builder.Services.AddScoped<IVehicleAssignmentService, VehicleAssignmentService>();
+builder.Services.AddScoped<IVehicleInspectionService, VehicleInspectionService>();
+builder.Services.AddScoped<IVehicleInsuranceService, VehicleInsuranceService>();
+builder.Services.AddScoped<IVehicleTypeService, VehicleTypeService>();
 //Repository
 builder.Services.AddScoped<IMenuRepository, api.Repositories.MenuRepository>();
 builder.Services.AddScoped<IPermissionRepository, api.Repositories.PermissionRepository>();
@@ -255,7 +264,11 @@ builder.Services.AddScoped<IVehicleRegistrationRepository, VehicleRegistrationRe
 builder.Services.AddScoped<IVehicleBranchRepository, VehicleBranchRepository>();
 builder.Services.AddScoped<IVehicleStatusRepository, VehicleStatusRepository>();
 builder.Services.AddScoped<IVehicleModelRepository, VehicleModelRepository>();
-
+builder.Services.AddScoped<IVehicleAccidentRepository, VehicleAccidentRepository>();
+builder.Services.AddScoped<IVehicleAssignmentRepository, VehicleAssignmentRepository>();
+builder.Services.AddScoped<IVehicleInspectionRepository, VehicleInspectionRepository>();
+builder.Services.AddScoped<IVehicleInsuranceRepository, VehicleInsuranceRepository>();
+builder.Services.AddScoped<IVehicleTypeRepository, VehicleTypeRepository>();
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
 
 // Logging
