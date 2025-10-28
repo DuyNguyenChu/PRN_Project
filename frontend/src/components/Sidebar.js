@@ -137,6 +137,32 @@ export default function Sidebar() {
                         </NavLink>
                     </div>
                 </div>
+                <div className="nav-item dropdown">
+                    <a
+                        href="#"
+                        className={`nav-link dropdown-toggle ${isSystemActive ? 'active' : ''}`}
+                        data-bs-toggle="dropdown"
+                    >
+                        <i className="far fa-laptop me-2"></i>Quản Lý xe
+                    </a>
+                    <div className="dropdown-menu bg-transparent border-0">
+                        <NavLink to="/Vehicle" className="dropdown-item">
+                            Xe
+                        </NavLink>
+                        <NavLink to="/VehicleRegistration" className="dropdown-item">
+                            Đăng ký xe
+                        </NavLink>
+                        <NavLink to="/VehicleBranch" className="dropdown-item">
+                            Chi nhánh xe
+                        </NavLink>
+                        <NavLink to="/VehicleStatus" className="dropdown-item">
+                            Tình trạng xe
+                        </NavLink>
+                        <NavLink to="/VehicleModel" className="dropdown-item">
+                            Mẫu xe
+                        </NavLink>
+                    </div>
+                </div>
             </div>
         </nav>
     );

@@ -26,7 +26,12 @@ namespace api.Mappers
                 Description = entity.Description,
                 CreatedDate = entity.CreatedDate,
                 LastModifiedDate = entity.LastModifiedDate,
-                IsDeleted = entity.IsDeleted
+                IsDeleted = entity.IsDeleted,
+
+                VehicleTypeName = entity.VehicleType?.Name ?? "Unknown",
+                VehicleStatusName = entity.VehicleStatus?.Name ?? "Unknown",
+                VehicleBranchName = entity.VehicleBranch?.Name ?? "Unknown",
+                VehicleModelName = entity.VehicleModel?.Name ?? "Unknown"
             };
         }
         public static Vehicle ToCreateEntity(this VehicleCreateDto dto)
