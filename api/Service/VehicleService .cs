@@ -22,6 +22,7 @@ namespace api.Service
             var vehicles = await _vehicleRepository.GetAllAsync();
             return vehicles.Select(v => v.ToEntityDto());
         }
+        
         public async Task<IEnumerable<VehicleDto>> SearchAsync(string name)
         {
             if (string.IsNullOrWhiteSpace(name))
