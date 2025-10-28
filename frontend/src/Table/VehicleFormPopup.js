@@ -29,7 +29,6 @@ function VehicleFormPopup({ item, onClose, apiUrl, token, onSuccess, showConfirm
     );
     const [id, setId] = useState(item?.id || null);
     const createdDate = item?.createdDate || new Date().toLocaleString();
-    const ManufactureYear = item?.ManufactureYear || new Date().toLocaleString();
 
     const handleSubmit = () => {
         // Bước 4: Validate toàn bộ form trước khi thực hiện logic submit
@@ -47,7 +46,6 @@ function VehicleFormPopup({ item, onClose, apiUrl, token, onSuccess, showConfirm
                     name: values.name,
                     color: values.color,
                     vehicleTypeId: Number(values.vehicleTypeId),
-                    // vehicleTypeId: Number(1),
                     vehicleStatusId: Number(values.vehicleStatusId),
                     vehicleBranchId: Number(values.vehicleBranchId),
                     vehicleModelId: Number(values.vehicleModelId),
@@ -222,10 +220,6 @@ function VehicleFormPopup({ item, onClose, apiUrl, token, onSuccess, showConfirm
                     {/* Không có lỗi cho trường này */}
                 </div>
 
-                <div className="form-group mt-3">
-                    <label>Năm sản xuất</label>
-                    <input type="text" className="form-control" value={ManufactureYear} />
-                </div>
                 <div className="form-group mt-3">
                     <label>Ngày tạo</label>
                     <input type="text" className="form-control" value={createdDate} disabled />

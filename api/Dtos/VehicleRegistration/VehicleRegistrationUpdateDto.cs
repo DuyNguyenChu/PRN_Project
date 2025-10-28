@@ -7,7 +7,7 @@ namespace api.Dtos.VehicleRegistration
 {
     public class VehicleRegistrationUpdateDto
     {
-        public int Id { get; set; }
+        public int VehicleId { get; set; }
 
         public string RegistrationNumber { get; set; } = null!;
 

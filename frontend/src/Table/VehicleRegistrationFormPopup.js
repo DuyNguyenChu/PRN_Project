@@ -7,7 +7,8 @@ import { required, maxLength } from '../validator/validators'; // Sửa lại đ
 function VehicleRegistrationFormPopup({ item, onClose, apiUrl, token, onSuccess, showConfirmModal, showNotifyModal }) {
     const initialState = {
         // name: item?.name || '',
-        vehicleId: item?.vehicleId || '',
+        // vehicleId: item?.vehicleId || '',
+        vehicleId: item?.vehicleId ? String(item.vehicleId) : '',
         registrationNumber: item?.registrationNumber || '',
         status: item?.status || 0,
         issueDate: item?.issueDate ? item.issueDate.split('T')[0] : new Date().toISOString().split('T')[0],
@@ -42,7 +43,9 @@ function VehicleRegistrationFormPopup({ item, onClose, apiUrl, token, onSuccess,
                 // Dùng `values` từ hook
                 const payload = {
                     // name: values.name,
+                    // vehicleId: Number(values.vehicleId),
                     vehicleId: Number(values.vehicleId),
+                    // registrationNumber: values.registrationNumber,
                     registrationNumber: values.registrationNumber,
                     issueDate: new Date(values.issueDate).toISOString(),
                     expiryDate: new Date(values.expiryDate).toISOString(),
@@ -71,7 +74,7 @@ function VehicleRegistrationFormPopup({ item, onClose, apiUrl, token, onSuccess,
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await axios.get('http://localhost:5180/api/VehicleModel', {
+                const response = await axios.get('http://localhost:5180/api/Vehicle', {
                     headers: { Authorization: `Bearer ${token}` },
                 });
 
@@ -83,13 +86,11 @@ function VehicleRegistrationFormPopup({ item, onClose, apiUrl, token, onSuccess,
         fetchData();
     }, [token]);
 
-    useEffect(() => {
-        if (vehicle.length > 0 && item?.vehicleId) {
-            handleChange({
-                target: { name: 'vehicleId', value: item.vehicleId },
-            });
-        }
-    }, [vehicle, item]);
+    // useEffect(() => {
+    //     if (item && vehicle.length > 0) {
+    //         handleChange({ target: { name: 'vehicleId', value: item.vehicleId } });
+    //     }
+    // }, [vehicle, item]);
 
     return (
         <div className="popup-overlay">
@@ -98,41 +99,28 @@ function VehicleRegistrationFormPopup({ item, onClose, apiUrl, token, onSuccess,
 
                 <div className="form-group mt-3">
                     <label>Tên xe</label>
-                    {/* <select
-                        className="form-select"
-                        name="vehicleId"
-                        value={values.vehicleId ? String(values.vehicleId) : ''} // 🔹 ép về string
-                        onChange={(e) =>
-                            handleChange({
-                                target: { name: 'vehicleId', value: Number(e.target.value) },
-                            })
-                        }
-                    >
-                        <option value="">-- Chọn loại xe --</option>
-                        {vehicle.map((type) => (
-                            <option key={type.id} value={type.id}>
-                                {type.name}
-                            </option>
-                        ))}
-                    </select> */}
                     <select
                         className="form-select"
                         name="vehicleId"
-                        value={values.vehicleId ? String(values.vehicleId) : ''} // ép về string
-                        onChange={(e) =>
-                            handleChange({
-                                target: { name: 'vehicleId', value: Number(e.target.value) },
-                            })
-                        }
+                        // value={values.vehicleId ?? ''}
+                        value={values.vehicleId ?? ''}
+                        // onChange={(e) =>
+                        //     handleChange({
+                        //         target: { name: 'vehicleId', value: Number(e.target.value) },
+                        //     })
+                        // }
+                        onChange={(e) => handleChange(e)}
                     >
-                        <option value="">-- Chọn xe --</option>
-                        {vehicle.map((v) => (
-                            <option key={v.id} value={v.id}>
-                                {v.name}
+                        <option value="">-- Chọn chi nhánh xe --</option>
+                        {vehicle.map((type) => (
+                            // <option key={type.id} value={type.id}>
+                            //     {type.name}
+                            // </option>
+                            <option key={type.id} value={String(type.id)}>
+                                {type.name}
                             </option>
                         ))}
                     </select>
-
                     {errors.vehicleId && <div className="text-danger mt-1">{errors.vehicleId}</div>}
                 </div>
 

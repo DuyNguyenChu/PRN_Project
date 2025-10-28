@@ -29,6 +29,7 @@ namespace api.Mappers
             {
                 Name = dto.Name,
                 Description = dto.Description ?? string.Empty,
+                LastModifiedDate = DateTimeOffset.UtcNow,
                 CreatedDate = DateTimeOffset.UtcNow
             };
         }
