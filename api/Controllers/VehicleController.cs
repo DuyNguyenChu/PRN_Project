@@ -23,10 +23,10 @@ namespace api.Controllers
         //     var list = await _service.GetAllAsync();
         //     return Ok(list);
         // }
-        public async Task<ApiResponse> GetAll()
+        public async Task<IActionResult> GetAll()
         {
             var data = (await _service.GetAllAsync()).ToList();
-            return ApiResponse.Success(data);
+            return BaseResult(ApiResponse.Success(data));
         }
 
         [HttpGet("search")]

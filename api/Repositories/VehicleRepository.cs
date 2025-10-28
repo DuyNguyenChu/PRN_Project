@@ -18,7 +18,14 @@ namespace api.Repositories
         }
         public async Task<IEnumerable<Vehicle>> GetAllAsync()
         {
-            return await _context.Vehicles.ToListAsync();
+            // return await _context.Vehicles.ToListAsync();
+            return await _context.Vehicles
+                .Where(v => v.IsDeleted != true)
+                .Include(v => v.VehicleType)
+                .Include(v => v.VehicleStatus)
+                .Include(v => v.VehicleBranch)
+                .Include(v => v.VehicleModel)
+                .ToListAsync();
         }
         public async Task<Vehicle?> GetByIdAsync(int id)
         {

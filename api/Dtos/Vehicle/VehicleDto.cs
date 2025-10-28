@@ -20,6 +20,10 @@ namespace api.Dtos.Vehicle
         public DateTimeOffset CreatedDate { get; set; }
         public DateTimeOffset? LastModifiedDate { get; set; }
         public bool IsDeleted { get; set; }
+        required public string VehicleTypeName { get; set; } 
+        required public string VehicleStatusName { get; set; }
+        required public string VehicleBranchName { get; set; }
+        required public string VehicleModelName { get; set; }
     }
 
 }
