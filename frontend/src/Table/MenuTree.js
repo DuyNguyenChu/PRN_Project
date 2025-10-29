@@ -1,7 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
-import axios from 'axios';
-import { useFormValidation } from '../validator/useFormValidation'; // Sửa lại đường dẫn nếu cần
-import { required, maxLength } from '../validator/validators'; // Sửa lại đường dẫn nếu cần
+import React from 'react';
 
 // (Được định nghĩa bên trong file chính)
 export default function MenuTree({ menus, parentId, onEdit, onDelete, allowUpdate, allowDelete }) {
@@ -15,7 +12,7 @@ export default function MenuTree({ menus, parentId, onEdit, onDelete, allowUpdat
             }
             // Nếu parentId là một ID (vd: 5)
             // Sử dụng so sánh lỏng (==) để khớp "5" (string) với 5 (number)
-            return menu.parentId == parentId;
+            return menu.parentId === parentId;
         })
         .sort((a, b) => a.sortOrder - b.sortOrder); // 'order' đã được map
 

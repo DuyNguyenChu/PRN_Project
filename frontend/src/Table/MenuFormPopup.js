@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect} from 'react';
 import axios from 'axios';
 import { useFormValidation } from '../validator/useFormValidation'; // Sửa lại đường dẫn nếu cần
 import { required, maxLength } from '../validator/validators'; // Sửa lại đường dẫn nếu cần
@@ -35,7 +35,7 @@ function MenuFormPopup({
         icon: [maxLength(100)],
     };
 
-    const { values, errors, handleChange, setValues, validateForm, isSubmitDisabled } = useFormValidation(
+    const { values, errors, handleChange, setValues, validateForm } = useFormValidation(
         initialState,
         validationRules,
     );
@@ -56,7 +56,7 @@ function MenuFormPopup({
                 // (SỬA LỖI HIỂN THỊ CON)
                 .filter((menu) => {
                     if (parentId === null) return !menu.parentId;
-                    return menu.parentId == parentId;
+                    return menu.parentId === parentId;
                 })
                 .sort((a, b) => a.sortOrder - b.sortOrder)
                 .flatMap((menu) => [
@@ -109,7 +109,7 @@ function MenuFormPopup({
         if (token && actionApiUrl) {
             loadDependencies();
         }
-    }, [item, apiUrl, actionApiUrl, token, isUpdate, setValues, showNotifyModal]);
+    }, [item, apiUrl, actionApiUrl, token, isUpdate, setValues, showNotifyModal, isReadOnly]);
 
     // (MỚI) Hàm xử lý check/uncheck Action
     const handleActionToggle = (actionId) => {

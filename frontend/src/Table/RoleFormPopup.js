@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef} from 'react';
 import axios from 'axios';
 import { useFormValidation } from '../validator/useFormValidation'; // Sửa lại đường dẫn nếu cần
 import { required, maxLength } from '../validator/validators'; // Sửa lại đường dẫn nếu cần
@@ -27,7 +27,7 @@ function MenuPermissionRow({ menu, allMenus, allActions, selectedMap, onToggle, 
     
     // Logic 2: Tìm các con của menu này
     const children = allMenus
-        .filter(m => m.parentId == menu.id)
+        .filter(m => m.parentId === menu.id)
         .sort((a, b) => a.order - b.order);
 
     // Logic 3: Kiểm tra xem hàng này (Tất cả quyền của menu) đã được check hay chưa
@@ -237,7 +237,7 @@ function RoleFormPopup({
         };
 
         fetchData();
-    }, [apiUrl, menuApiUrl, actionApiUrl, item, isUpdate, userDataString, showNotifyModal]);
+    }, [apiUrl, menuApiUrl, actionApiUrl, item, isUpdate, userDataString, showNotifyModal, menuPermissionsApiUrl]);
 
 
     // (SỬA) Cập nhật trạng thái checkbox "Chọn tất cả" (tính cả disable)
@@ -399,7 +399,7 @@ function RoleFormPopup({
 
     
     // --- (SỬA) Tính isSubmitDisabled dựa trên errors ---
-    const isSubmitDisabledCalculated = Object.values(errors).some(error => error !== null);
+    // const isSubmitDisabledCalculated = Object.values(errors).some(error => error !== null);
     // --- Kết thúc sửa ---
 
     return (

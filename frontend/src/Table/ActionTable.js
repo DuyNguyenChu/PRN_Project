@@ -132,7 +132,7 @@ export default function ActionTable({ apiUrl, token, onEdit, refreshFlag, filter
         } finally {
             setLoading(false);
         }
-    }, [apiUrl, token, page, pageSize, search, sortDir, filters]);
+    }, [apiUrl, token, page, pageSize, search, sortDir, filters, sortField]);
 
     useEffect(() => {
         fetchData();

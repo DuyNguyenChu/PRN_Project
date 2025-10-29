@@ -2,21 +2,21 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { API_URL } from '~/api/api';
 import { useFormValidation } from '../validator/useFormValidation'; // Sửa lại đường dẫn nếu cần
-import { required, maxLength, emailValidator, minLength, isNumber } from '../validator/validators'; // Sửa lại đường dẫn nếu cần
+import { required, maxLength, emailValidator, isNumber } from '../validator/validators'; // Sửa lại đường dẫn nếu cần
 
 /**
  * Helper function để định dạng ngày ISO sang YYYY-MM-DD cho input type="date"
  */
-const formatDateForInput = (isoDate) => {
-    if (!isoDate) return '';
-    try {
-        // Cắt chuỗi để lấy phần YYYY-MM-DD
-        return new Date(isoDate).toISOString().split('T')[0];
-    } catch (e) {
-        console.error('Ngày không hợp lệ:', isoDate, e);
-        return '';
-    }
-};
+// const formatDateForInput = (isoDate) => {
+//     if (!isoDate) return '';
+//     try {
+//         // Cắt chuỗi để lấy phần YYYY-MM-DD
+//         return new Date(isoDate).toISOString().split('T')[0];
+//     } catch (e) {
+//         console.error('Ngày không hợp lệ:', isoDate, e);
+//         return '';
+//     }
+// };
 
 function UserFormPopup({ item, onClose, apiUrl, token, onSuccess, showConfirmModal, showNotifyModal }) {
     // Xác định chế độ (true: Cập nhật, false: Thêm mới)
