@@ -24,6 +24,17 @@ export const maxLength = (max) => (value) => {
     return null; // Hợp lệ
 };
 
+export const minLength = (min) => (value) => {
+    // Bỏ qua nếu giá trị rỗng (để kết hợp với `required` nếu cần)
+    if (!value) {
+        return null;
+    }
+    if (String(value).length < min) {
+        return `Tối thiểu ${min} ký tự.`;
+    }
+    return null; // Hợp lệ
+};
+
 // Quy tắc: Phải là một số
 export const isNumber = (value) => {
     if (!value) {

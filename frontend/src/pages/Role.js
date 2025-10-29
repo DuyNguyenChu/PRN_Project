@@ -13,6 +13,9 @@ export default function Role({ permissionFlags }) {
     const toggleFilter = () => setShowFilter(!showFilter);
 
     const apiUrl = `${API_URL}/Role`; // URL API của bạn
+    const menuApiUrl = `${API_URL}/Menu`; // (MỚI) URL API cho Menu
+    const actionApiUrl = `${API_URL}/Action`; // (MỚI) URL API cho Action
+    const menuPermissionsApiUrl = `${API_URL}/Menu/permissons`; // (MỚI) URL API cho Menu Permissions
     const token = localStorage.getItem('accessToken'); // Lấy token từ login
 
     const [showForm, setShowForm] = useState(false);
@@ -118,7 +121,6 @@ export default function Role({ permissionFlags }) {
 
     return (
         <div className="container-fluid px-4">
-
             <div className="col-sm-12 col-xl-12 py-4">
                 <div className="bg-light rounded h-100 p-4">
                     <div className="d-flex justify-content-between align-items-center mb-4">
@@ -139,6 +141,9 @@ export default function Role({ permissionFlags }) {
                     item={editingItem}
                     onClose={() => setShowPopup(false)} // dùng showPopup
                     apiUrl={apiUrl}
+                    menuApiUrl={menuApiUrl} // (MỚI) API cho Menu (Vd: /api/v1/menu)
+                    actionApiUrl={actionApiUrl}
+                    menuPermissionsApiUrl={menuPermissionsApiUrl}
                     token={token}
                     onSuccess={() => {
                         reloadTable(); // reload bảng
