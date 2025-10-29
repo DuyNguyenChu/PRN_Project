@@ -24,6 +24,17 @@ export const maxLength = (max) => (value) => {
     return null; // Hợp lệ
 };
 
+export const minLength = (min) => (value) => {
+    // Bỏ qua nếu giá trị rỗng (để kết hợp với `required` nếu cần)
+    if (!value) {
+        return null;
+    }
+    if (String(value).length < min) {
+        return `Tối thiểu ${min} ký tự.`;
+    }
+    return null; // Hợp lệ
+};
+
 // Quy tắc: Phải là một số
 export const isNumber = (value) => {
     if (!value) {
@@ -37,3 +48,11 @@ export const isNumber = (value) => {
 
 // Bạn có thể thêm nhiều quy tắc khác ở đây...
 // ví dụ: isEmail, minLength, v.v.
+
+export const emailValidator = (value) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (value && !emailRegex.test(value)) {
+        return 'Email không hợp lệ.';
+    }
+    return null;
+};
