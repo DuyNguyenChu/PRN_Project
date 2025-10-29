@@ -15,6 +15,10 @@ import UserStatus from '../pages/UserStatus';
 import Action from '../pages/Action';
 import Role from '../pages/Role';
 import Vehicle from '../pages/Vehicle';
+import VehicleRegistration from '../pages/VehicleRegistration';
+import VehicleBranch from '../pages/VehicleBranch';
+import VehicleStatus from '../pages/VehicleStatus';
+import VehicleModel from '../pages/VehicleModel';
 import Profile from '../pages/Profile';
 import User from '../pages/User';
 import Menu from '../pages/Menu';
@@ -84,6 +88,10 @@ function AppRoutes() {
                 <Route path="/action" element={<Action />} />
                 <Route path="/role" element={<Role />} />
                 <Route path="/Vehicle" element={<Vehicle />} />
+                <Route path="/VehicleRegistration" element={<VehicleRegistration />} />
+                <Route path="/VehicleBranch" element={<VehicleBranch />} />
+                <Route path="/VehicleStatus" element={<VehicleStatus />} />
+                <Route path="/VehicleModel" element={<VehicleModel />} />
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/user" element={<User />} />
                 <Route path="/menu" element={<Menu />} />

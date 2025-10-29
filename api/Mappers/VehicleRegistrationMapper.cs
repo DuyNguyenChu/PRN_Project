@@ -55,7 +55,7 @@ namespace api.Mappers
         // Chuyển từ UpdateDto → Entity (chỉ cập nhật trường được phép)
         public static VehicleRegistration ToUpdateEntity(this VehicleRegistrationUpdateDto dto, VehicleRegistration existing)
         {
-
+            existing.VehicleId = dto.VehicleId;
             existing.RegistrationNumber = dto.RegistrationNumber;
             existing.IssueDate = dto.IssueDate;
             existing.ExpiryDate = dto.ExpiryDate;

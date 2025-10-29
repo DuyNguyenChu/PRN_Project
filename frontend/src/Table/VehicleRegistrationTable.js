@@ -2,7 +2,7 @@ import { useEffect, useState, useCallback, useRef } from 'react';
 import moment from 'moment';
 import axios from 'axios';
 
-export default function VehicleTable({ apiUrl, token, onEdit, refreshFlag, filters }) {
+export default function VehicleRegistrationTable({ apiUrl, token, onEdit, refreshFlag, filters }) {
     const [data, setData] = useState([]);
     const [totalRecords, setTotalRecords] = useState(0);
     const [page, setPage] = useState(1);
@@ -226,25 +226,25 @@ export default function VehicleTable({ apiUrl, token, onEdit, refreshFlag, filte
                 <thead>
                     <tr className="text-uppercase text-gray-500 fs-7">
                         <th>STT</th>
-                        <th onClick={() => handleSort('name')} style={{ cursor: 'pointer' }}>
+                        {/* <th onClick={() => handleSort('name')} style={{ cursor: 'pointer' }}>
                             Tên {sortField === 'name' && (sortDir === 'asc' ? '▲' : '▼')}
-                        </th>
-                        <th onClick={() => handleSort('vehicleTypeName')} style={{ cursor: 'pointer' }}>
-                            loại xe {sortField === 'vehicleTypeName' && (sortDir === 'asc' ? '▲' : '▼')}
-                        </th>
-                        <th onClick={() => handleSort('vehicleStatusName')} style={{ cursor: 'pointer' }}>
-                            trạng thái xe {sortField === 'vehicleStatusName' && (sortDir === 'asc' ? '▲' : '▼')}
-                        </th>
-                        <th onClick={() => handleSort('vehicleBranchName')} style={{ cursor: 'pointer' }}>
-                            chi nhánh xe {sortField === 'vehicleBranchName' && (sortDir === 'asc' ? '▲' : '▼')}
-                        </th>
-                        <th onClick={() => handleSort('vehicleModelName')} style={{ cursor: 'pointer' }}>
-                            mẫu xe {sortField === 'vehicleModelName' && (sortDir === 'asc' ? '▲' : '▼')}
-                        </th>
-                        <th onClick={() => handleSort('color')} style={{ cursor: 'pointer' }}>
-                            Màu sắc {sortField === 'color' && (sortDir === 'asc' ? '▲' : '▼')}
+                        </th> */}
+
+                        <th onClick={() => handleSort('vehicleName')} style={{ cursor: 'pointer' }}>
+                            Tên xe {sortField === 'vehicleName' && (sortDir === 'asc' ? '▲' : '▼')}
                         </th>
 
+
+                        <th onClick={() => handleSort('registrationNumber')} style={{ cursor: 'pointer' }}>
+                            Số đăng ký {sortField === 'registrationNumber' && (sortDir === 'asc' ? '▲' : '▼')}
+                        </th>
+                    
+                        <th onClick={() => handleSort('issueDate')} style={{ cursor: 'pointer' }}>
+                            ngày phát hành {sortField === 'issueDate' && (sortDir === 'asc' ? '▲' : '▼')}
+                        </th>
+                        <th onClick={() => handleSort('expiryDate')} style={{ cursor: 'pointer' }}>
+                            Ngày hết hạn {sortField === 'expiryDate' && (sortDir === 'asc' ? '▲' : '▼')}
+                        </th>
                         <th onClick={() => handleSort('createdDate')} style={{ cursor: 'pointer' }}>
                             Ngày tạo {sortField === 'createdDate' && (sortDir === 'asc' ? '▲' : '▼')}
                         </th>
@@ -268,16 +268,12 @@ export default function VehicleTable({ apiUrl, token, onEdit, refreshFlag, filte
                         data.map((row, index) => (
                             <tr key={row.id}>
                                 <td>{(page - 1) * pageSize + index + 1}</td>
-                                <td>{row.name}</td>
-                                <td>{row.vehicleTypeName}</td>
-                                <td>{row.vehicleStatusName}</td>
-                                <td>{row.vehicleBranchName}</td>
-                                <td>{row.vehicleModelName}</td>
-                                <td>
-                                    <span className="badge" style={{ background: row.color }}>
-                                        &nbsp;&nbsp;&nbsp;
-                                    </span>
-                                </td>
+                                {/* <td>{row.name}</td> */}
+                                <td>{row.vehicleName}</td>
+                                <td>{row.registrationNumber}</td>
+
+                                <td>{moment(row.issueDate).format('DD/MM/YYYY HH:mm:ss')}</td>
+                                <td>{moment(row.expiryDate).format('DD/MM/YYYY HH:mm:ss')}</td>
                                 <td>{moment(row.createdDate).format('DD/MM/YYYY HH:mm:ss')}</td>
 
                                 <td className="text-end">

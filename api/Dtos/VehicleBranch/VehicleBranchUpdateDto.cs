@@ -8,6 +8,7 @@ namespace api.Dtos.VehicleBranch
     public class VehicleBranchUpdateDto
     {
         public string Name { get; set; } = null!;
+        public DateTimeOffset? LastModifiedDate { get; set; }
         public string? Description { get; set; }
         public bool IsDeleted { get; set; }
     }

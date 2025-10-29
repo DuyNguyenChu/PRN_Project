@@ -7,7 +7,7 @@ import { required, maxLength } from '../validator/validators'; // Sửa lại đ
 function VehicleFormPopup({ item, onClose, apiUrl, token, onSuccess, showConfirmModal, showNotifyModal }) {
     const initialState = {
         name: item?.name || '',
-        vehicleTypeId: item?.vehicleTypeId || 1,
+        vehicleTypeId: item?.vehicleTypeId || '',
         vehicleStatusId: item?.vehicleStatusId || '',
         vehicleBranchId: item?.vehicleBranchId || '',
         vehicleModelId: item?.vehicleModelId || '',
@@ -29,7 +29,6 @@ function VehicleFormPopup({ item, onClose, apiUrl, token, onSuccess, showConfirm
     );
     const [id, setId] = useState(item?.id || null);
     const createdDate = item?.createdDate || new Date().toLocaleString();
-    const ManufactureYear = item?.ManufactureYear || new Date().toLocaleString();
 
     const handleSubmit = () => {
         // Bước 4: Validate toàn bộ form trước khi thực hiện logic submit
@@ -46,14 +45,17 @@ function VehicleFormPopup({ item, onClose, apiUrl, token, onSuccess, showConfirm
                 const payload = {
                     name: values.name,
                     color: values.color,
-                    // vehicleTypeId: Number(values.vehicleTypeId),
-                    vehicleTypeId: Number(1),
+                    vehicleTypeId: Number(values.vehicleTypeId),
                     vehicleStatusId: Number(values.vehicleStatusId),
                     vehicleBranchId: Number(values.vehicleBranchId),
                     vehicleModelId: Number(values.vehicleModelId),
                 };
                 if (item) {
-                    await axios.put(`${apiUrl}/${id}`, { ...payload, id }, { headers: { Authorization: `Bearer ${token}` } });
+                    await axios.put(
+                        `${apiUrl}/${id}`,
+                        { ...payload, id },
+                        { headers: { Authorization: `Bearer ${token}` } },
+                    );
                     showNotifyModal('Cập nhật thành công!');
                 } else {
                     await axios.post(apiUrl, payload, { headers: { Authorization: `Bearer ${token}` } });
@@ -66,7 +68,7 @@ function VehicleFormPopup({ item, onClose, apiUrl, token, onSuccess, showConfirm
         });
     };
 
-    // const [vehicleTypes, setVehicleTypes] = useState([]);
+    const [vehicleTypes, setVehicleTypes] = useState([]);
     const [vehicleStatuses, setVehicleStatuses] = useState([]);
     const [vehicleBranches, setVehicleBranches] = useState([]);
     const [vehicleModels, setVehicleModels] = useState([]);
@@ -74,9 +76,11 @@ function VehicleFormPopup({ item, onClose, apiUrl, token, onSuccess, showConfirm
     useEffect(() => {
         const fetchData = async () => {
             try {
-                // const [types, statuses, branches, models] = await Promise.all([
-                const [statuses, branches, models] = await Promise.all([
-                    // axios.get('/api/vehicleTypes', { headers: { Authorization: `Bearer ${token}` } }),
+                const [types, statuses, branches, models] = await Promise.all([
+                    // const [statuses, branches, models] = await Promise.all([
+                    axios.get('http://localhost:5180/api/vehicle-types', {
+                        headers: { Authorization: `Bearer ${token}` },
+                    }),
                     axios.get('http://localhost:5180/api/VehicleStatus', {
                         headers: { Authorization: `Bearer ${token}` },
                     }),
@@ -87,7 +91,7 @@ function VehicleFormPopup({ item, onClose, apiUrl, token, onSuccess, showConfirm
                         headers: { Authorization: `Bearer ${token}` },
                     }),
                 ]);
-                // setVehicleTypes(types.data);
+                setVehicleTypes(types.data);
                 setVehicleStatuses(statuses.data.resources);
                 setVehicleBranches(branches.data.resources);
                 setVehicleModels(models.data.resources);
@@ -116,15 +120,19 @@ function VehicleFormPopup({ item, onClose, apiUrl, token, onSuccess, showConfirm
                     {errors.name && <div className="text-danger mt-1">{errors.name}</div>}
                 </div>
 
-                {/* <div className="form-group mt-3">
+                <div className="form-group mt-3">
                     <label>Loại xe</label>
                     <select
                         className="form-select"
                         name="vehicleTypeId"
-                        value={values.vehicleTypeId || ''}
-                        onChange={handleChange}
+                        value={values.vehicleTypeId ?? ''}
+                        onChange={(e) =>
+                            handleChange({
+                                target: { name: 'vehicleTypeId', value: Number(e.target.value) },
+                            })
+                        }
                     >
-                        <option value="1">-- Chọn loại xe --</option>
+                        <option value="">-- Chọn loại xe --</option>
                         {vehicleTypes.map((type) => (
                             <option key={type.id} value={type.id}>
                                 {type.name}
@@ -132,7 +140,7 @@ function VehicleFormPopup({ item, onClose, apiUrl, token, onSuccess, showConfirm
                         ))}
                     </select>
                     {errors.vehicleTypeId && <div className="text-danger mt-1">{errors.vehicleTypeId}</div>}
-                </div> */}
+                </div>
 
                 <div className="form-group mt-3">
                     <label>trạng thái xe</label>
@@ -161,7 +169,7 @@ function VehicleFormPopup({ item, onClose, apiUrl, token, onSuccess, showConfirm
                     <select
                         className="form-select"
                         name="vehicleBranchId"
-                        value={values.vehicleBranchId || ''}
+                        value={values.vehicleBranchId ?? ''}
                         onChange={(e) =>
                             handleChange({
                                 target: { name: 'vehicleBranchId', value: Number(e.target.value) },
@@ -212,10 +220,6 @@ function VehicleFormPopup({ item, onClose, apiUrl, token, onSuccess, showConfirm
                     {/* Không có lỗi cho trường này */}
                 </div>
 
-                <div className="form-group mt-3">
-                    <label>Năm sản xuất</label>
-                    <input type="text" className="form-control" value={ManufactureYear} disabled />
-                </div>
                 <div className="form-group mt-3">
                     <label>Ngày tạo</label>
                     <input type="text" className="form-control" value={createdDate} disabled />

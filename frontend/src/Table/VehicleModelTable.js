@@ -2,7 +2,7 @@ import { useEffect, useState, useCallback, useRef } from 'react';
 import moment from 'moment';
 import axios from 'axios';
 
-export default function VehicleTable({ apiUrl, token, onEdit, refreshFlag, filters }) {
+export default function VehicleModelTable({ apiUrl, token, onEdit, refreshFlag, filters }) {
     const [data, setData] = useState([]);
     const [totalRecords, setTotalRecords] = useState(0);
     const [page, setPage] = useState(1);
@@ -229,20 +229,12 @@ export default function VehicleTable({ apiUrl, token, onEdit, refreshFlag, filte
                         <th onClick={() => handleSort('name')} style={{ cursor: 'pointer' }}>
                             Tên {sortField === 'name' && (sortDir === 'asc' ? '▲' : '▼')}
                         </th>
-                        <th onClick={() => handleSort('vehicleTypeName')} style={{ cursor: 'pointer' }}>
-                            loại xe {sortField === 'vehicleTypeName' && (sortDir === 'asc' ? '▲' : '▼')}
+                        <th onClick={() => handleSort('description')} style={{ cursor: 'pointer' }}>
+                            Mô tả {sortField === 'description' && (sortDir === 'asc' ? '▲' : '▼')}
                         </th>
-                        <th onClick={() => handleSort('vehicleStatusName')} style={{ cursor: 'pointer' }}>
-                            trạng thái xe {sortField === 'vehicleStatusName' && (sortDir === 'asc' ? '▲' : '▼')}
-                        </th>
-                        <th onClick={() => handleSort('vehicleBranchName')} style={{ cursor: 'pointer' }}>
-                            chi nhánh xe {sortField === 'vehicleBranchName' && (sortDir === 'asc' ? '▲' : '▼')}
-                        </th>
-                        <th onClick={() => handleSort('vehicleModelName')} style={{ cursor: 'pointer' }}>
-                            mẫu xe {sortField === 'vehicleModelName' && (sortDir === 'asc' ? '▲' : '▼')}
-                        </th>
-                        <th onClick={() => handleSort('color')} style={{ cursor: 'pointer' }}>
-                            Màu sắc {sortField === 'color' && (sortDir === 'asc' ? '▲' : '▼')}
+
+                        <th onClick={() => handleSort('lastModifiedDate')} style={{ cursor: 'pointer' }}>
+                            Ngày sửa đổi cuối cùng {sortField === 'lastModifiedDate' && (sortDir === 'asc' ? '▲' : '▼')}
                         </th>
 
                         <th onClick={() => handleSort('createdDate')} style={{ cursor: 'pointer' }}>
@@ -269,15 +261,8 @@ export default function VehicleTable({ apiUrl, token, onEdit, refreshFlag, filte
                             <tr key={row.id}>
                                 <td>{(page - 1) * pageSize + index + 1}</td>
                                 <td>{row.name}</td>
-                                <td>{row.vehicleTypeName}</td>
-                                <td>{row.vehicleStatusName}</td>
-                                <td>{row.vehicleBranchName}</td>
-                                <td>{row.vehicleModelName}</td>
-                                <td>
-                                    <span className="badge" style={{ background: row.color }}>
-                                        &nbsp;&nbsp;&nbsp;
-                                    </span>
-                                </td>
+                                <td>{row.description}</td>
+                                <td>{moment(row.lastModifiedDate).format('DD/MM/YYYY HH:mm:ss')}</td>
                                 <td>{moment(row.createdDate).format('DD/MM/YYYY HH:mm:ss')}</td>
 
                                 <td className="text-end">
