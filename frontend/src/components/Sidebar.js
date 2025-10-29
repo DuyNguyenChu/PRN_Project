@@ -97,7 +97,7 @@ export default function Sidebar() {
                         className={`nav-link dropdown-toggle ${isUserManagementActive ? 'active' : ''}`}
                         data-bs-toggle="dropdown"
                     >
-                        <i className="far fa-user me-2"></i>Người dùng
+                        <i className="fa fa-user me-2"></i>Người dùng
                     </a>
                     <div className="dropdown-menu bg-transparent border-0">
                         <NavLink to="/userStatus" className="dropdown-item">
@@ -109,12 +109,6 @@ export default function Sidebar() {
                         <NavLink to="/user" className="dropdown-item">
                             Danh sách người dùng
                         </NavLink>
-                        <NavLink to="/error" className="dropdown-item">
-                            404 Error
-                        </NavLink>
-                        <NavLink to="/blank" className="dropdown-item">
-                            Blank Page
-                        </NavLink>
                     </div>
                 </div>
                 <div className="nav-item dropdown">
@@ -123,14 +117,14 @@ export default function Sidebar() {
                         className={`nav-link dropdown-toggle ${isSystemActive ? 'active' : ''}`}
                         data-bs-toggle="dropdown"
                     >
-                        <i className="far fa-laptop me-2"></i>Hệ thống
+                        <i className="fa fa-laptop me-2"></i>Hệ thống
                     </a>
                     <div className="dropdown-menu bg-transparent border-0">
                         <NavLink to="/action" className="dropdown-item">
                             Hành động
                         </NavLink>
-                        <NavLink to="/register" className="dropdown-item">
-                            Register
+                        <NavLink to="/menu" className="dropdown-item">
+                            Danh mục hệ thống
                         </NavLink>
                         <NavLink to="/error" className="dropdown-item">
                             404 Error

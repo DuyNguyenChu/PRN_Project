@@ -39,7 +39,7 @@ function UserFormPopup({ item, onClose, apiUrl, token, onSuccess, showConfirmMod
         email: item?.email || '',
         phoneNumber: item?.phoneNumber || '',
         gender: item?.gender || 1, // Mặc định là 1 (Nam), hoặc null/'' tùy logic
-        userStatus: item?.userStatus?.id || '', // Chỉ lưu ID
+        userStatus: item?.userStatusId || '', // Chỉ lưu ID
         roles: item?.roles?.map((role) => role.id) || [], // Mảng các ID
         passwordHash: 'Abc@123456',
     };

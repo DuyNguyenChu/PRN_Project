@@ -109,7 +109,7 @@ export default function UserTable({ apiUrl, token, onEdit, refreshFlag, filters 
                 }
             }
 
-            const res = await axios.post(`${apiUrl}/paged`, requestBody, {
+            const res = await axios.post(`${apiUrl}/paged-advanced`, requestBody, {
                 headers: {
                     'Content-Type': 'application/json',
                     Authorization: `Bearer ${token}`,

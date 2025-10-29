@@ -117,89 +117,12 @@ export default function Role({ permissionFlags }) {
     const reloadTable = () => setRefreshFlag((prev) => !prev);
 
     return (
-        <div className="container-fluid pt-4 px-4">
-            <button
-                type="button"
-                className="btn btn-outline-primary m-2"
-                id="btn_user_status_filter"
-                onClick={toggleFilter}
-            >
-                <i className="fa fa-filter me-2"></i>Bộ lọc
-            </button>
-            <div className={`col-sm-12 col-xl-12 filter-box ${showFilter ? 'show' : 'hide'}`}>
-                <div className="bg-light rounded h-100 p-4">
-                    <h6 className="mb-4">Tuỳ chọn bộ lọc</h6>
-                    <div className="row">
-                        <div className="col-xl-4 mb-3">
-                            <label htmlFor="filter_name" className="form-label">
-                                Tên:
-                            </label>
-                            <input
-                                type="text"
-                                className="form-control"
-                                id="filter_name"
-                                placeholder="Tên"
-                                onChange={(e) => setFilterInputs({ ...filterInputs, name: e.target.value })}
-                            />
-                        </div>
-                        <div className="col-xl-4 mb-3">
-                            <label htmlFor="filter_description" className="form-label">
-                                Mô tả:
-                            </label>
-                            <input
-                                type="text"
-                                className="form-control"
-                                id="filter_description"
-                                placeholder="Mô tả"
-                                onChange={(e) => setFilterInputs({ ...filterInputs, description: e.target.value })}
-                            />
-                        </div>
-                        <div className="col-xl-4 mb-3">
-                            <label htmlFor="filter_created_date" className="form-label">
-                                Ngày tạo
-                            </label>
-                            <div className="input-group">
-                                <DatePicker
-                                    selectsRange
-                                    startDate={startDate}
-                                    endDate={endDate}
-                                    onChange={(update) => {
-                                        setDateRange(update);
-                                    }}
-                                    isClearable={true}
-                                    className="form-control datepicker-custom"
-                                    placeholderText="Chọn khoảng ngày"
-                                    dateFormat="dd/MM/yyyy"
-                                    popperPlacement="bottom"
-                                />
-                            </div>
-                        </div>
-                    </div>
-                    <div className="d-flex justify-content-end">
-                        <button
-                            type="submit"
-                            className="btn btn-primary me-3"
-                            id="btn_apply_filter"
-                            onClick={handleApplyFilter}
-                        >
-                            Áp dụng
-                        </button>
-                        <button
-                            type="reset"
-                            className="btn btn-outline-primary"
-                            id="btn_reset_filter"
-                            onClick={handleResetFilter}
-                        >
-                            Đặt lại
-                        </button>
-                    </div>
-                </div>
-            </div>
+        <div className="container-fluid px-4">
 
             <div className="col-sm-12 col-xl-12 py-4">
                 <div className="bg-light rounded h-100 p-4">
                     <div className="d-flex justify-content-between align-items-center mb-4">
-                        <h6 className="mb-4">Vai trò người dùng</h6>
+                        <h6>Vai trò người dùng</h6>
                     </div>
                     <RoleTable
                         apiUrl={apiUrl}
