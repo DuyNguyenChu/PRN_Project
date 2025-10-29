@@ -1,19 +1,25 @@
 import { useState, useRef } from 'react';
-import RoleTable from '../Table/RoleTable';
-import '../styles/css/Role.css';
-import RoleFormPopup from '../Table/RoleFormPopup';
+import UserTable from '../Table/UserTable';
+import '../styles/css/User.css';
+import UserFormPopup from '../Table/UserFormPopup';
 import ConfirmModal from '../Table/ConfirmModal';
 import DatePicker from 'react-datepicker'; // Thêm thư viện react-datepicker
 import 'react-datepicker/dist/react-datepicker.css'; // Thêm CSS cho datepicker
 import { API_URL } from '~/api/api';
 import moment from 'moment';
 
-export default function Role({ permissionFlags }) {
+export default function User({ permissionFlags }) {
     const [showFilter, setShowFilter] = useState(false);
     const toggleFilter = () => setShowFilter(!showFilter);
 
-    const apiUrl = `${API_URL}/Role`; // URL API của bạn
-    const token = localStorage.getItem('accessToken'); // Lấy token từ login
+    const apiUrl = `${API_URL}/User`; // URL API của bạn
+    const userDataString = localStorage.getItem('userData');
+
+    const userData = JSON.parse(userDataString);
+    if (!userData || !userData.resources || !userData.resources.accessToken) {
+        throw new Error('Không tìm thấy token người dùng. Vui lòng đăng nhập lại.');
+    }
+    const token = userData.resources.accessToken;
 
     const [showForm, setShowForm] = useState(false);
     const [showPopup, setShowPopup] = useState(false);
@@ -22,7 +28,7 @@ export default function Role({ permissionFlags }) {
 
     const [showConfirm, setShowConfirm] = useState(false);
     const [confirmMessage, setConfirmMessage] = useState('');
-    const [confirmRole, setConfirmRole] = useState(() => {});
+    const [confirmUser, setConfirmUser] = useState(() => {});
 
     const [notifyMessage, setNotifyMessage] = useState('');
     const [showNotify, setShowNotify] = useState(false);
@@ -51,9 +57,9 @@ export default function Role({ permissionFlags }) {
     };
 
     // gọi confirm modal từ popup
-    const showConfirmModal = (message, Role, onCancel) => {
+    const showConfirmModal = (message, user, onCancel) => {
         setConfirmMessage(message);
-        setConfirmRole(() => Role);
+        setConfirmUser(() => user);
         setShowConfirm(true);
 
         // lưu lại callback khi user bấm Hủy confirm
@@ -199,9 +205,12 @@ export default function Role({ permissionFlags }) {
             <div className="col-sm-12 col-xl-12 py-4">
                 <div className="bg-light rounded h-100 p-4">
                     <div className="d-flex justify-content-between align-items-center mb-4">
-                        <h6 className="mb-4">Vai trò người dùng</h6>
+                        <h6 className="mb-4">Danh sách người dùng</h6>
+                        <button type="button" className="btn btn-primary" id="btn_add_user_status" onClick={handleAdd}>
+                            <i className="fa fa-plus me-2"></i>Thêm mới
+                        </button>
                     </div>
-                    <RoleTable
+                    <UserTable
                         apiUrl={apiUrl}
                         token={token}
                         onEdit={handleEdit}
@@ -212,7 +221,7 @@ export default function Role({ permissionFlags }) {
             </div>
             {/* Popup nhập liệu */}
             {showPopup && (
-                <RoleFormPopup
+                <UserFormPopup
                     item={editingItem}
                     onClose={() => setShowPopup(false)} // dùng showPopup
                     apiUrl={apiUrl}
@@ -221,7 +230,7 @@ export default function Role({ permissionFlags }) {
                         reloadTable(); // reload bảng
                         setShowPopup(false);
                     }}
-                    showConfirmModal={(message, Role) => showConfirmModal(message, Role, () => setShowPopup(true))}
+                    showConfirmModal={(message, user) => showConfirmModal(message, user, () => setShowPopup(true))}
                     showNotifyModal={showNotifyModal}
                 />
             )}
@@ -230,7 +239,7 @@ export default function Role({ permissionFlags }) {
                     message={confirmMessage}
                     onClose={handleCancelConfirm} // khi bấm Hủy
                     onConfirm={() => {
-                        confirmRole();
+                        confirmUser();
                         setShowConfirm(false);
                     }}
                 />

@@ -37,3 +37,11 @@ export const isNumber = (value) => {
 
 // Bạn có thể thêm nhiều quy tắc khác ở đây...
 // ví dụ: isEmail, minLength, v.v.
+
+export const emailValidator = (value) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (value && !emailRegex.test(value)) {
+        return 'Email không hợp lệ.';
+    }
+    return null;
+};

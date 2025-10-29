@@ -15,6 +15,8 @@ import UserStatus from '../pages/UserStatus';
 import Action from '../pages/Action';
 import Role from '../pages/Role';
 import Vehicle from '../pages/Vehicle';
+import Profile from '../pages/Profile';
+import User from '../pages/User';
 
 import MainLayout from '../Layout/MainLayout';
 import AuthLayout from '../Layout/AuthLayout';
@@ -81,6 +83,8 @@ function AppRoutes() {
                 <Route path="/action" element={<Action />} />
                 <Route path="/role" element={<Role />} />
                 <Route path="/Vehicle" element={<Vehicle />} />
+                <Route path="/profile" element={<Profile />} />
+                <Route path="/user" element={<User />} />
             </Route>
 
             {/* Nếu người dùng gõ một đường dẫn không tồn tại, chuyển về trang login */}

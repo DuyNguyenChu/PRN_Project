@@ -14,7 +14,7 @@ export default function Sidebar() {
         <nav className="navbar bg-light navbar-light">
             <NavLink to="/dashboard" className="navbar-brand mx-4 mb-3">
                 <h3 className="text-primary">
-                    <i className="fa fa-hashtag me-2"></i>DASHMIN
+                    <i className="fa fa-hashtag me-2"></i>G - CAR
                 </h3>
             </NavLink>
             <div className="d-flex align-items-center ms-4 mb-4">
@@ -105,6 +105,9 @@ export default function Sidebar() {
                         </NavLink>
                         <NavLink to="/role" className="dropdown-item">
                             Vai trò người dùng
+                        </NavLink>
+                        <NavLink to="/user" className="dropdown-item">
+                            Danh sách người dùng
                         </NavLink>
                         <NavLink to="/error" className="dropdown-item">
                             404 Error
