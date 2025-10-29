@@ -136,31 +136,7 @@ export default function User({ permissionFlags }) {
                 <div className="bg-light rounded h-100 p-4">
                     <h6 className="mb-4">Tuỳ chọn bộ lọc</h6>
                     <div className="row">
-                        <div className="col-xl-4 mb-3">
-                            <label htmlFor="filter_name" className="form-label">
-                                Tên:
-                            </label>
-                            <input
-                                type="text"
-                                className="form-control"
-                                id="filter_name"
-                                placeholder="Tên"
-                                onChange={(e) => setFilterInputs({ ...filterInputs, name: e.target.value })}
-                            />
-                        </div>
-                        <div className="col-xl-4 mb-3">
-                            <label htmlFor="filter_description" className="form-label">
-                                Mô tả:
-                            </label>
-                            <input
-                                type="text"
-                                className="form-control"
-                                id="filter_description"
-                                placeholder="Mô tả"
-                                onChange={(e) => setFilterInputs({ ...filterInputs, description: e.target.value })}
-                            />
-                        </div>
-                        <div className="col-xl-4 mb-3">
+                        <div className="col-xl-12 mb-3">
                             <label htmlFor="filter_created_date" className="form-label">
                                 Ngày tạo
                             </label>
