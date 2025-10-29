@@ -229,22 +229,15 @@ export default function VehicleTable({ apiUrl, token, onEdit, refreshFlag, filte
                         <th onClick={() => handleSort('name')} style={{ cursor: 'pointer' }}>
                             Tên {sortField === 'name' && (sortDir === 'asc' ? '▲' : '▼')}
                         </th>
-                        <th onClick={() => handleSort('vehicleTypeName')} style={{ cursor: 'pointer' }}>
-                            loại xe {sortField === 'vehicleTypeName' && (sortDir === 'asc' ? '▲' : '▼')}
+                        <th onClick={() => handleSort('Color')} style={{ cursor: 'pointer' }}>
+                            Màu sắc {sortField === 'Color' && (sortDir === 'asc' ? '▲' : '▼')}
                         </th>
-                        <th onClick={() => handleSort('vehicleStatusName')} style={{ cursor: 'pointer' }}>
-                            trạng thái xe {sortField === 'vehicleStatusName' && (sortDir === 'asc' ? '▲' : '▼')}
+                        <th onClick={() => handleSort('Description')} style={{ cursor: 'pointer' }}>
+                            Mô tả {sortField === 'Description' && (sortDir === 'asc' ? '▲' : '▼')}
                         </th>
-                        <th onClick={() => handleSort('vehicleBranchName')} style={{ cursor: 'pointer' }}>
-                            chi nhánh xe {sortField === 'vehicleBranchName' && (sortDir === 'asc' ? '▲' : '▼')}
+                        <th onClick={() => handleSort('LastModifiedDate')} style={{ cursor: 'pointer' }}>
+                            Ngày sửa đổi cuối cùng {sortField === 'LastModifiedDate' && (sortDir === 'asc' ? '▲' : '▼')}
                         </th>
-                        <th onClick={() => handleSort('vehicleModelName')} style={{ cursor: 'pointer' }}>
-                            mẫu xe {sortField === 'vehicleModelName' && (sortDir === 'asc' ? '▲' : '▼')}
-                        </th>
-                        <th onClick={() => handleSort('color')} style={{ cursor: 'pointer' }}>
-                            Màu sắc {sortField === 'color' && (sortDir === 'asc' ? '▲' : '▼')}
-                        </th>
-
                         <th onClick={() => handleSort('createdDate')} style={{ cursor: 'pointer' }}>
                             Ngày tạo {sortField === 'createdDate' && (sortDir === 'asc' ? '▲' : '▼')}
                         </th>
@@ -269,15 +262,14 @@ export default function VehicleTable({ apiUrl, token, onEdit, refreshFlag, filte
                             <tr key={row.id}>
                                 <td>{(page - 1) * pageSize + index + 1}</td>
                                 <td>{row.name}</td>
-                                <td>{row.vehicleTypeName}</td>
-                                <td>{row.vehicleStatusName}</td>
-                                <td>{row.vehicleBranchName}</td>
-                                <td>{row.vehicleModelName}</td>
                                 <td>
                                     <span className="badge" style={{ background: row.color }}>
                                         &nbsp;&nbsp;&nbsp;
                                     </span>
                                 </td>
+                                <td>{row.description}</td>
+
+                                <td>{moment(row.lastModifiedDate).format('DD/MM/YYYY HH:mm:ss')}</td>
                                 <td>{moment(row.createdDate).format('DD/MM/YYYY HH:mm:ss')}</td>
 
                                 <td className="text-end">
