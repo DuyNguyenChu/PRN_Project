@@ -33,6 +33,7 @@ namespace api.Mappers
                 Name = dto.Name,
                 Description = dto.Description,
                 CreatedBy = dto.CreatedBy,
+                LastModifiedDate = DateTimeOffset.UtcNow,
                 CreatedDate = DateTimeOffset.Now,
                 IsDeleted = false
             };

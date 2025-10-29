@@ -4,7 +4,7 @@ import axios from 'axios';
 import { useFormValidation } from '../validator/useFormValidation'; // Sửa lại đường dẫn nếu cần
 import { required, maxLength } from '../validator/validators'; // Sửa lại đường dẫn nếu cần
 
-function VehicleBranchFormPopup({ item, onClose, apiUrl, token, onSuccess, showConfirmModal, showNotifyModal }) {
+function VehicleModelFormPopup({ item, onClose, apiUrl, token, onSuccess, showConfirmModal, showNotifyModal }) {
     const initialState = {
         name: item?.name || '',
         description: item?.description || '',
@@ -58,13 +58,15 @@ function VehicleBranchFormPopup({ item, onClose, apiUrl, token, onSuccess, showC
         });
     };
 
+    console.log('item.lastModifiedDate:', item?.lastModifiedDate);
+
     return (
         <div className="popup-overlay">
             <div className="popup-content p-4 rounded shadow bg-white">
-                <h5>{item ? 'Cập nhật Xe' : 'Thêm Xe'}</h5>
+                <h5>{item ? 'Cập nhật mẫu Xe' : 'Thêm mẫu Xe'}</h5>
 
                 <div className="form-group mt-3">
-                    <label>Tên Chi nhánh xe</label>
+                    <label>Tên mẫu xe</label>
                     <input
                         type="text"
                         className={`form-control ${errors.name ? 'is-invalid' : ''}`} // Thêm class is-invalid khi có lỗi
@@ -80,7 +82,7 @@ function VehicleBranchFormPopup({ item, onClose, apiUrl, token, onSuccess, showC
                     <label>Mô tả</label>
                     <input
                         type="text"
-                        className={`form-control ${errors.description ? 'is-invalid' : ''}`} // Thêm class is-invalid khi có lỗi
+                        className={`form-control ${errors.name ? 'is-invalid' : ''}`} // Thêm class is-invalid khi có lỗi
                         name="description" // Rất quan trọng: Thêm thuộc tính `name`
                         value={values.description} // Sử dụng `values.name`
                         onChange={handleChange} // Sử dụng `handleChange`
@@ -116,4 +118,4 @@ function VehicleBranchFormPopup({ item, onClose, apiUrl, token, onSuccess, showC
     );
 }
 
-export default VehicleBranchFormPopup;
+export default VehicleModelFormPopup;
