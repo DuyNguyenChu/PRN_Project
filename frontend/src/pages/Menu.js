@@ -195,7 +195,7 @@ export default function Menu({
     const handleEdit = (item, readOnly = false) => {
         setCurrentItem(item);
         setShowModal(true);
-        setIsPopupReadOnly(readOnly); 
+        setIsPopupReadOnly(readOnly);
     };
 
     const handleCloseModal = () => {
@@ -244,133 +244,147 @@ export default function Menu({
 
     // --- Render ---
     return (
-        <div className="card">
-            <div className="card-header border-0 pt-6">
-                <div className="card-title">
-                    {loadingTypes ? (
-                        <span className="text-muted">Đang tải loại menu...</span>
-                    ) : (
-                        <select
-                            className="form-select form-control min-w-200px"
-                            value={selectedMenuType}
-                            onChange={(e) => setSelectedMenuType(e.target.value)}
-                            disabled={menuTypes.length === 0}
-                        >
-                            {menuTypes.length === 0 ? (
-                                <option value="">Không có loại menu</option>
-                            ) : (
-                                menuTypes.map((type) => (
-                                    <option key={type.id} value={type.id}>
-                                        {type.name}
-                                    </option>
-                                ))
-                            )}
-                        </select>
+        <div className="container-fluid pt-4 px-4">
+            <div className="card">
+                <div className="card-header border-0 pt-6">
+                    <div className="card-title">
+                        {loadingTypes ? (
+                            <span className="text-muted">Đang tải loại menu...</span>
+                        ) : (
+                            <select
+                                className="form-select form-control min-w-200px"
+                                value={selectedMenuType}
+                                onChange={(e) => setSelectedMenuType(e.target.value)}
+                                disabled={menuTypes.length === 0}
+                            >
+                                {menuTypes.length === 0 ? (
+                                    <option value="">Không có loại menu</option>
+                                ) : (
+                                    menuTypes.map((type) => (
+                                        <option key={type.id} value={type.id}>
+                                            {type.name}
+                                        </option>
+                                    ))
+                                )}
+                            </select>
+                        )}
+                    </div>
+                    {showAddButton && (
+                        <div className="card-toolbar">
+                            <button
+                                type="button"
+                                className="btn btn-primary"
+                                onClick={handleAdd}
+                                disabled={loadingTypes || !selectedMenuType}
+                            >
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    width="16"
+                                    height="16"
+                                    fill="currentColor"
+                                    className="bi bi-plus-lg me-1"
+                                    viewBox="0 0 16 16"
+                                >
+                                    <path
+                                        fillRule="evenodd"
+                                        d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2z"
+                                    />
+                                </svg>
+                                Thêm mới
+                            </button>
+                        </div>
                     )}
                 </div>
-                {showAddButton && (
-                    <div className="card-toolbar">
-                        <button
-                            type="button"
-                            className="btn btn-primary"
-                            onClick={handleAdd}
-                            disabled={loadingTypes || !selectedMenuType}
-                        >
-                            <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                width="16"
-                                height="16"
-                                fill="currentColor"
-                                className="bi bi-plus-lg me-1"
-                                viewBox="0 0 16 16"
-                            >
-                                <path
-                                    fillRule="evenodd"
-                                    d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2z"
-                                />
-                            </svg>
-                            Thêm mới
-                        </button>
-                    </div>
+
+                <div className="card-body py-4">
+                    {loadingMenus ? (
+                        <div className="text-center p-5">Đang tải danh sách menu...</div>
+                    ) : allMenus.length === 0 ? (
+                        <div className="text-center p-5 text-muted">Không có menu nào cho loại này.</div>
+                    ) : (
+                        <div className="menu-tree-container">
+                            <MenuTree
+                                menus={allMenus}
+                                parentId={null}
+                                menuId={MENU_MANAGEMENT_ID}
+                                onEdit={handleEdit}
+                                onDelete={handleDeleteClick}
+                                allowUpdate={allowUpdate}
+                                allowDelete={allowDelete}
+                            />
+                        </div>
+                    )}
+                </div>
+
+                {/* (SỬA) Render Modal Add/Edit VÀ TRUYỀN HÀM NỘI BỘ */}
+                {showModal && (
+                    <MenuFormPopup
+                        item={currentItem}
+                        allMenus={allMenus}
+                        menuType={selectedMenuType}
+                        apiUrl={apiUrl}
+                        actionApiUrl={actionApiUrl}
+                        token={token}
+                        menuId={MENU_MANAGEMENT_ID}
+                        onClose={handleCloseModal}
+                        onSuccess={handleSuccess}
+                        showConfirmModal={internalShowConfirmModal} // Truyền hàm nội bộ
+                        showNotifyModal={internalShowNotifyModal} // Truyền hàm nội bộ
+                        isReadOnly={isPopupReadOnly}
+                    />
                 )}
-            </div>
 
-            <div className="card-body py-4">
-                {loadingMenus ? (
-                    <div className="text-center p-5">Đang tải danh sách menu...</div>
-                ) : allMenus.length === 0 ? (
-                    <div className="text-center p-5 text-muted">Không có menu nào cho loại này.</div>
-                ) : (
-                    <div className="menu-tree-container">
-                        <MenuTree menus={allMenus} parentId={null} menuId={MENU_MANAGEMENT_ID} onEdit={handleEdit} onDelete={handleDeleteClick} allowUpdate={allowUpdate} allowDelete={allowDelete}/>
-                    </div>
-                )}
-            </div>
-
-            {/* (SỬA) Render Modal Add/Edit VÀ TRUYỀN HÀM NỘI BỘ */}
-            {showModal && (
-                <MenuFormPopup
-                    item={currentItem}
-                    allMenus={allMenus}
-                    menuType={selectedMenuType}
-                    apiUrl={apiUrl}
-                    actionApiUrl={actionApiUrl}
-                    token={token}
-                    menuId={MENU_MANAGEMENT_ID}
-                    onClose={handleCloseModal}
-                    onSuccess={handleSuccess}
-                    showConfirmModal={internalShowConfirmModal} // Truyền hàm nội bộ
-                    showNotifyModal={internalShowNotifyModal} // Truyền hàm nội bộ
-                    isReadOnly={isPopupReadOnly} 
-                />
-            )}
-
-            {/* (SỬA) THÊM JSX CỦA 2 MODAL NỘI BỘ */}
-            {/* (Giống RoleList.js) */}
-            {confirmState.show && (
-                <div className="modal fade show d-block" style={{ background: 'rgba(0,0,0,0.4)' }}>
-                    <div className="modal-dialog modal-dialog-centered">
-                        <div className="modal-content">
-                            <div className="modal-header">
-                                <h5 className="modal-title">Xác nhận</h5>
-                            </div>
-                            <div className="modal-body">
-                                <p>{confirmState.message}</p>
-                            </div>
-                            <div className="modal-footer">
-                                <button className="btn btn-secondary" onClick={handleCloseConfirm}>
-                                    Hủy
-                                </button>
-                                <button className="btn btn-danger" onClick={handleDoConfirm}>
-                                    Xác nhận
-                                </button>
+                {/* (SỬA) THÊM JSX CỦA 2 MODAL NỘI BỘ */}
+                {/* (Giống RoleList.js) */}
+                {confirmState.show && (
+                    <div className="modal fade show d-block" style={{ background: 'rgba(0,0,0,0.4)' }}>
+                        <div className="modal-dialog modal-dialog-centered">
+                            <div className="modal-content">
+                                <div className="modal-header">
+                                    <h5 className="modal-title">Xác nhận</h5>
+                                </div>
+                                <div className="modal-body">
+                                    <p>{confirmState.message}</p>
+                                </div>
+                                <div className="modal-footer">
+                                    <button className="btn btn-secondary" onClick={handleCloseConfirm}>
+                                        Hủy
+                                    </button>
+                                    <button className="btn btn-danger" onClick={handleDoConfirm}>
+                                        Xác nhận
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            )}
+                )}
 
-            {notifyState.show && (
-                <div className="modal fade show d-block" style={{ background: 'rgba(0,0,0,0.4)' }}>
-                    <div className="modal-dialog modal-dialog-centered">
-                        <div className="modal-content">
-                            <div className="modal-header">
-                                <h5 className={`modal-title ${notifyState.isSuccess ? 'text-success' : 'text-danger'}`}>
-                                    {notifyState.isSuccess ? 'Thành công' : 'Thất bại'}
-                                </h5>
-                            </div>
-                            <div className="modal-body">
-                                <p>{notifyState.message}</p>
-                            </div>
-                            <div className="modal-footer">
-                                <button className="btn btn-primary" onClick={handleCloseNotify}>
-                                    Đóng
-                                </button>
+                {notifyState.show && (
+                    <div className="modal fade show d-block" style={{ background: 'rgba(0,0,0,0.4)' }}>
+                        <div className="modal-dialog modal-dialog-centered">
+                            <div className="modal-content">
+                                <div className="modal-header">
+                                    <h5
+                                        className={`modal-title ${
+                                            notifyState.isSuccess ? 'text-success' : 'text-danger'
+                                        }`}
+                                    >
+                                        {notifyState.isSuccess ? 'Thành công' : 'Thất bại'}
+                                    </h5>
+                                </div>
+                                <div className="modal-body">
+                                    <p>{notifyState.message}</p>
+                                </div>
+                                <div className="modal-footer">
+                                    <button className="btn btn-primary" onClick={handleCloseNotify}>
+                                        Đóng
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            )}
+                )}
+            </div>
         </div>
     );
 }
