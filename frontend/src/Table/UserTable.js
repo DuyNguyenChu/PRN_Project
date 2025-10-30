@@ -2,7 +2,35 @@ import { useEffect, useState, useCallback, useRef } from 'react';
 import moment from 'moment';
 import axios from 'axios';
 
-export default function ActionTable({ apiUrl, token, onEdit, refreshFlag, filters }) {
+/**
+ * Tính toán màu chữ (đen/trắng) tương phản tốt nhất với màu nền
+ * @param {string} hexColor - Màu nền dạng hex (ví dụ: "#00b315")
+ * @returns {string} - Trả về "#FFF" (trắng) hoặc "#000" (đen)
+ */
+function getContrastColor(hexColor) {
+    if (!hexColor) return '#000';
+    try {
+        // Xóa dấu #
+        const hex = hexColor.replace('#', '');
+        
+        // Chuyển đổi hex sang RGB
+        const r = parseInt(hex.substring(0, 2), 16);
+        const g = parseInt(hex.substring(2, 4), 16);
+        const b = parseInt(hex.substring(4, 6), 16);
+
+        // Công thức tính độ sáng YIQ
+        const yiq = ((r * 299) + (g * 587) + (b * 114)) / 1000;
+        
+        // Trả về màu tương phản
+        return (yiq >= 128) ? '#000' : '#FFF';
+    } catch (e) {
+        console.error("Lỗi chuyển đổi màu:", e);
+        return '#000';
+    }
+}
+
+
+export default function UserTable({ apiUrl, token, onEdit, refreshFlag, filters }) {
     const [data, setData] = useState([]);
     const [totalRecords, setTotalRecords] = useState(0);
     const [page, setPage] = useState(1);
@@ -35,57 +63,29 @@ export default function ActionTable({ apiUrl, token, onEdit, refreshFlag, filter
     const fetchData = useCallback(async () => {
         setLoading(true);
         try {
+            // Cập nhật mảng columns để khớp với API mới
             const requestBody = {
                 draw: page,
                 columns: [
-                    {
-                        data: 'id',
-                        name: '',
-                        searchable: true,
-                        orderable: true,
-                        search: { value: '', regex: false, fixed: [] },
-                    },
-                    {
-                        data: 'name',
-                        name: '',
-                        searchable: true,
-                        orderable: true,
-                        search: { value: '', regex: false, fixed: [] },
-                    },
-                    {
-                        data: 'description',
-                        name: '',
-                        searchable: true,
-                        orderable: true,
-                        search: { value: '', regex: false, fixed: [] },
-                    },
-                    {
-                        data: 'createdDate',
-                        name: '',
-                        searchable: true,
-                        orderable: true,
-                        search: { value: '', regex: false, fixed: [] },
-                    },
-                    {
-                        data: 'id',
-                        name: '',
-                        searchable: true,
-                        orderable: true,
-                        search: { value: '', regex: false, fixed: [] },
-                    },
+                    { data: 'id', name: '', searchable: true, orderable: true, search: { value: '', regex: false, fixed: [] } },
+                    { data: 'firstName', name: '', searchable: true, orderable: true, search: { value: '', regex: false, fixed: [] } }, // Sửa: Cột 1 là firstName
+                    { data: 'email', name: '', searchable: true, orderable: true, search: { value: '', regex: false, fixed: [] } }, // Sửa: Cột 2 là email
+                    { data: 'phoneNumber', name: '', searchable: true, orderable: true, search: { value: '', regex: false, fixed: [] } }, // Sửa: Cột 3 là phoneNumber
+                    { data: 'userStatusName', name: '', searchable: true, orderable: true, search: { value: '', regex: false, fixed: [] } }, // Sửa: Cột 4 là userStatusName
+                    { data: 'createdDate', name: '', searchable: true, orderable: true, search: { value: '', regex: false, fixed: [] } }, // Sửa: Cột 5 là createdDate
+                    { data: 'id', name: '', searchable: false, orderable: false, search: { value: '', regex: false, fixed: [] } }, // Cột 6 (Roles) không tìm/sắp xếp
+                    { data: 'id', name: '', searchable: false, orderable: false, search: { value: '', regex: false, fixed: [] } }, // Cột 7 (Thao tác)
                 ],
                 order: [
                     {
+                        // Cập nhật index cho sortField
                         column:
-                            sortField === 'id'
-                                ? 0
-                                : sortField === 'name'
-                                ? 1
-                                : sortField === 'description'
-                                ? 2
-                                : sortField === 'createdDate'
-                                ? 3
-                                : 0,
+                            sortField === 'firstName' ? 1 :
+                            sortField === 'email' ? 2 :
+                            sortField === 'phoneNumber' ? 3 :
+                            sortField === 'userStatusName' ? 4 :
+                            sortField === 'createdDate' ? 5 :
+                            0, // Mặc định sort theo id (cột 0) nếu không khớp
                         dir: sortDir,
                         name: '',
                     },
@@ -96,19 +96,16 @@ export default function ActionTable({ apiUrl, token, onEdit, refreshFlag, filter
             };
 
             if (filters) {
-                // Lọc theo tên
-                if (filters.name) {
-                    requestBody.columns[1].search.value = filters.name;
-                }
-                // Lọc theo mô tả
-                if (filters.description) {
-                    requestBody.columns[2].search.value = filters.description;
-                }
+                // TODO: Cập nhật logic filter dựa trên các trường mới (nếu cần)
+                // Ví dụ lọc theo email (cột 2)
+                // if (filters.email) {
+                //     requestBody.columns[2].search.value = filters.email;
+                // }
 
                 // Lọc theo ngày tạo (đã được format thành chuỗi)
                 if (filters.createdDate) {
-                    // Cột `createdDate` có index là 3 trong mảng `columns`
-                    requestBody.columns[3].search.value = filters.createdDate;
+                    // Cột `createdDate` có index là 5
+                    requestBody.columns[5].search.value = filters.createdDate;
                 }
             }
 
@@ -132,7 +129,7 @@ export default function ActionTable({ apiUrl, token, onEdit, refreshFlag, filter
         } finally {
             setLoading(false);
         }
-    }, [apiUrl, token, page, pageSize, search, sortDir, filters, sortField]);
+    }, [apiUrl, token, page, pageSize, search, sortDir, filters]); // Giữ nguyên dependencies
 
     useEffect(() => {
         fetchData();
@@ -187,7 +184,7 @@ export default function ActionTable({ apiUrl, token, onEdit, refreshFlag, filter
                 <input
                     type="text"
                     className="form-control w-auto"
-                    placeholder="Tìm kiếm..."
+                    placeholder="Tìm kiếm"
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
                 />
@@ -196,14 +193,22 @@ export default function ActionTable({ apiUrl, token, onEdit, refreshFlag, filter
 
             <table className="table table-hover">
                 <thead>
+                    {/* Cập nhật các cột tiêu đề */}
                     <tr className="text-uppercase text-gray-500 fs-7">
-                        <th>STT</th>
-                        <th onClick={() => handleSort('name')} style={{ cursor: 'pointer' }}>
-                            Tên {sortField === 'name' && (sortDir === 'asc' ? '▲' : '▼')}
+                        <th style={{width: '5%'}}>STT</th>
+                        <th onClick={() => handleSort('firstName')} style={{ cursor: 'pointer' }}>
+                            Tên {sortField === 'firstName' && (sortDir === 'asc' ? '▲' : '▼')}
                         </th>
-                        <th onClick={() => handleSort('description')} style={{ cursor: 'pointer' }}>
-                            Mô tả {sortField === 'description' && (sortDir === 'asc' ? '▲' : '▼')}
+                        <th onClick={() => handleSort('email')} style={{ cursor: 'pointer' }}>
+                            Email {sortField === 'email' && (sortDir === 'asc' ? '▲' : '▼')}
                         </th>
+                        <th onClick={() => handleSort('phoneNumber')} style={{ cursor: 'pointer' }}>
+                            SĐT {sortField === 'phoneNumber' && (sortDir === 'asc' ? '▲' : '▼')}
+                        </th>
+                        <th onClick={() => handleSort('userStatusName')} style={{ cursor: 'pointer' }}>
+                            Trạng thái {sortField === 'userStatusName' && (sortDir === 'asc' ? '▲' : '▼')}
+                        </th>
+                        <th>Vai trò</th>
                         <th onClick={() => handleSort('createdDate')} style={{ cursor: 'pointer' }}>
                             Ngày tạo {sortField === 'createdDate' && (sortDir === 'asc' ? '▲' : '▼')}
                         </th>
@@ -213,13 +218,13 @@ export default function ActionTable({ apiUrl, token, onEdit, refreshFlag, filter
                 <tbody>
                     {loading ? (
                         <tr>
-                            <td colSpan={5} className="text-center">
+                            <td colSpan={8} className="text-center"> {/* Cập nhật colSpan */}
                                 Đang tải...
                             </td>
                         </tr>
                     ) : data.length === 0 ? (
                         <tr>
-                            <td colSpan={5} className="text-center">
+                            <td colSpan={8} className="text-center"> {/* Cập nhật colSpan */}
                                 Không có dữ liệu
                             </td>
                         </tr>
@@ -227,11 +232,28 @@ export default function ActionTable({ apiUrl, token, onEdit, refreshFlag, filter
                         data.map((row, index) => (
                             <tr key={row.id}>
                                 <td>{(page - 1) * pageSize + index + 1}</td>
-                                <td>{row.name}</td>
+                                <td>{`${row.firstName} ${row.lastName}`}</td>
+                                <td>{row.email}</td>
+                                <td>{row.phoneNumber}</td>
                                 <td>
-                                    <span className="badge" style={{ background: row.description }}>
-                                        &nbsp;&nbsp;&nbsp;
+                                    {/* Pill trạng thái với màu động */}
+                                    <span 
+                                        className="badge" 
+                                        style={{ 
+                                            backgroundColor: row.userStatusColor,
+                                            color: getContrastColor(row.userStatusColor)
+                                        }}
+                                    >
+                                        {row.userStatusName}
                                     </span>
+                                </td>
+                                <td>
+                                    {/* Danh sách pill roles */}
+                                    {row.roles.map(role => (
+                                        <span key={role.id} className="badge bg-secondary me-1">
+                                            {role.name}
+                                        </span>
+                                    ))}
                                 </td>
                                 <td>{moment(row.createdDate).format('DD/MM/YYYY HH:mm:ss')}</td>
                                 <td className="text-end">
@@ -247,6 +269,7 @@ export default function ActionTable({ apiUrl, token, onEdit, refreshFlag, filter
                     )}
                 </tbody>
             </table>
+            
             {/* Modal xác nhận xóa */}
             {showConfirm && (
                 <div className="modal fade show d-block" style={{ background: 'rgba(0,0,0,0.4)' }}>
@@ -256,7 +279,7 @@ export default function ActionTable({ apiUrl, token, onEdit, refreshFlag, filter
                                 <h5 className="modal-title">Xác nhận xóa</h5>
                             </div>
                             <div className="modal-body">
-                                <p>Bạn có chắc muốn xóa hành động này không?</p>
+                                <p>Bạn có chắc muốn xóa người dùng này không?</p>
                             </div>
                             <div className="modal-footer">
                                 <button className="btn btn-secondary" onClick={closeConfirm}>
@@ -294,14 +317,14 @@ export default function ActionTable({ apiUrl, token, onEdit, refreshFlag, filter
                 </div>
             )}
 
+            {/* Phân trang (Giữ nguyên) */}
             <div className="d-flex justify-content-between align-items-center mt-3">
-                {/* chọn số bản ghi mỗi trang */}
                 <select
                     className="form-select w-auto"
                     value={pageSize}
                     onChange={(e) => {
                         setPageSize(Number(e.target.value));
-                        setPage(1); // reset về trang đầu
+                        setPage(1);
                     }}
                 >
                     {[5, 10, 20, 50].map((n) => (
@@ -310,15 +333,10 @@ export default function ActionTable({ apiUrl, token, onEdit, refreshFlag, filter
                         </option>
                     ))}
                 </select>
-
-                {/* nhóm nút phân trang */}
                 <div className="btn-group" role="group" aria-label="Pagination buttons">
-                    {/* Trang đầu */}
                     <button className="btn btn-outline-primary" disabled={page === 1} onClick={() => setPage(1)}>
                         «
                     </button>
-
-                    {/* Trang trước */}
                     <button
                         className="btn btn-outline-primary"
                         disabled={page === 1}
@@ -326,22 +344,15 @@ export default function ActionTable({ apiUrl, token, onEdit, refreshFlag, filter
                     >
                         ‹
                     </button>
-
-                    {/* Số trang hiển thị giới hạn */}
                     {(() => {
                         const totalPages = Math.ceil(totalRecords / pageSize);
-                        const maxVisible = 5; // số nút tối đa hiển thị
+                        const maxVisible = 5;
                         let start = Math.max(1, page - Math.floor(maxVisible / 2));
                         let end = Math.min(totalPages, start + maxVisible - 1);
-
-                        // đảm bảo hiển thị 5 nút khi gần cuối danh sách
                         if (end - start < maxVisible - 1) {
                             start = Math.max(1, end - maxVisible + 1);
                         }
-
                         const buttons = [];
-
-                        // Nút đầu tiên "1 ..."
                         if (start > 1) {
                             buttons.push(
                                 <button key={1} className="btn btn-outline-primary" onClick={() => setPage(1)}>
@@ -355,8 +366,6 @@ export default function ActionTable({ apiUrl, token, onEdit, refreshFlag, filter
                                     </button>,
                                 );
                         }
-
-                        // Các nút giữa
                         for (let i = start; i <= end; i++) {
                             buttons.push(
                                 <button
@@ -368,8 +377,6 @@ export default function ActionTable({ apiUrl, token, onEdit, refreshFlag, filter
                                 </button>,
                             );
                         }
-
-                        // Nút cuối "... N"
                         if (end < totalPages) {
                             if (end < totalPages - 1)
                                 buttons.push(
@@ -387,11 +394,8 @@ export default function ActionTable({ apiUrl, token, onEdit, refreshFlag, filter
                                 </button>,
                             );
                         }
-
                         return buttons;
                     })()}
-
-                    {/* Trang sau */}
                     <button
                         className="btn btn-outline-primary"
                         disabled={page >= Math.ceil(totalRecords / pageSize)}
@@ -399,8 +403,6 @@ export default function ActionTable({ apiUrl, token, onEdit, refreshFlag, filter
                     >
                         ›
                     </button>
-
-                    {/* Trang cuối */}
                     <button
                         className="btn btn-outline-primary"
                         disabled={page >= Math.ceil(totalRecords / pageSize)}
@@ -413,3 +415,4 @@ export default function ActionTable({ apiUrl, token, onEdit, refreshFlag, filter
         </div>
     );
 }
+

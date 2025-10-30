@@ -19,6 +19,9 @@ import VehicleRegistration from '../pages/VehicleRegistration';
 import VehicleBranch from '../pages/VehicleBranch';
 import VehicleStatus from '../pages/VehicleStatus';
 import VehicleModel from '../pages/VehicleModel';
+import Profile from '../pages/Profile';
+import User from '../pages/User';
+import Menu from '../pages/Menu';
 
 import MainLayout from '../Layout/MainLayout';
 import AuthLayout from '../Layout/AuthLayout';
@@ -89,6 +92,9 @@ function AppRoutes() {
                 <Route path="/VehicleBranch" element={<VehicleBranch />} />
                 <Route path="/VehicleStatus" element={<VehicleStatus />} />
                 <Route path="/VehicleModel" element={<VehicleModel />} />
+                <Route path="/profile" element={<Profile />} />
+                <Route path="/user" element={<User />} />
+                <Route path="/menu" element={<Menu />} />
             </Route>
 
             {/* Nếu người dùng gõ một đường dẫn không tồn tại, chuyển về trang login */}

@@ -72,5 +72,6 @@ export const useFormValidation = (initialState, validationRules) => {
         handleChange,
         validateForm,
         isSubmitDisabled,
+        setValues,
     };
 };

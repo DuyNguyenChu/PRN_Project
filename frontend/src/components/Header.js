@@ -1,5 +1,5 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { NavLink,useNavigate } from 'react-router-dom';
 import { API_URL } from '~/api/api';
 
 export default function Header({ onToggleSidebar }) {
@@ -153,9 +153,9 @@ export default function Header({ onToggleSidebar }) {
                         <span className="d-none d-lg-inline-flex">John Doe</span>
                     </a>
                     <div className="dropdown-menu dropdown-menu-end bg-light border-0 rounded-0 rounded-bottom m-0">
-                        <a href="#" className="dropdown-item">
+                        <NavLink to="/profile" className="dropdown-item">
                             My Profile
-                        </a>
+                        </NavLink>
                         <a href="#" className="dropdown-item">
                             Settings
                         </a>
