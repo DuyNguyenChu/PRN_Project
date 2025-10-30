@@ -56,7 +56,7 @@ namespace api.Helpers
         public static bool IsValidUsername(string input)
         {
             if (string.IsNullOrWhiteSpace(input)) return false;
-            var regex = new Regex(@"^[a-zA-Z0-9]{6,30}$");
+            var regex = new Regex(@"(^[a-zA-Z0-9_-]{6,30}$)|(^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$)");
             return regex.IsMatch(input);
         }
 

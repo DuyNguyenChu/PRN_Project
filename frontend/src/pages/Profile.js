@@ -3,7 +3,7 @@ import axios from 'axios';
 import { API_URL } from '~/api/api';
 // (MỚI) Import hook và validators
 import { useFormValidation } from '../validator/useFormValidation';
-import { required, maxLength, minLength, isNumber } from '../validator/validators';
+import { required, maxLength, minLength, phoneValidator } from '../validator/validators';
 
 // (MỚI) SVG Icons cho con mắt
 const EyeIcon = () => (
@@ -49,7 +49,7 @@ export default function Profile() {
     const profileValidationRules = {
         firstName: [required, maxLength(50)], // Ví dụ maxLength 50
         lastName: [required, maxLength(50)],
-        phoneNumber: [maxLength(10), isNumber], // Ví dụ maxLength 15
+        phoneNumber: [maxLength(10), phoneValidator], // Ví dụ maxLength 15
         // gender và email không cần validation ở đây
     };
     const profileForm = useFormValidation(profileInitialState, profileValidationRules);

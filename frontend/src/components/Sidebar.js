@@ -164,7 +164,7 @@ export default function Sidebar() {
             {/* ... (Phần Brand và User Profile giữ nguyên) ... */}
             <NavLink to="/dashboard" className="navbar-brand mx-4 mb-3">
                 <h3 className="text-primary">
-                    <i className="fa fa-hashtag me-2"></i>G - CAR
+                    <i className="fa fa-car me-2"></i>G-CAR
                 </h3>
             </NavLink>
             <div className="d-flex align-items-center ms-4 mb-4">
