@@ -227,8 +227,8 @@ namespace api.Service
                 .Select(x => x.Id)
                 .ToList();
 
-            if (!listRoleIds.Any(x => x != CommonConstants.Role.END_USER && x != CommonConstants.Role.DRIVER))
-                return ApiResponse.Forbidden(ErrorMessagesConstants.GetMessage(ApiCodeConstants.Auth.RequiredAdminUser), ApiCodeConstants.Auth.RequiredAdminUser);
+            //if (!listRoleIds.Any(x => x != CommonConstants.Role.END_USER && x != CommonConstants.Role.DRIVER))
+            //    return ApiResponse.Forbidden(ErrorMessagesConstants.GetMessage(ApiCodeConstants.Auth.RequiredAdminUser), ApiCodeConstants.Auth.RequiredAdminUser);
             //}
 
             //if (!PasswordHelper.VerifyPassword(obj.Password, user.PasswordHash))
