@@ -305,7 +305,7 @@ namespace api.Service
         public async Task<ApiResponse> SoftDeleteAsync(int id)
         {
             //Không cho xoá những role mặc định
-            if (id <= CommonConstants.Role.END_USER)
+            if (id <= CommonConstants.Role.ADMIN)
                 return ApiResponse.Forbidden(ErrorMessagesConstants.GetMessage(ApiCodeConstants.Common.Forbidden), ApiCodeConstants.Common.Forbidden);
 
             var isDeleted = await _roleRepository.SoftDeleteAsync(id);
