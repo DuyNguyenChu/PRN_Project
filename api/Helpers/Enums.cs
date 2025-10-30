@@ -31,10 +31,10 @@ namespace api.Helpers
 
         public enum Action
         {
-            CREATE = 1,
-            READ,
-            UPDATE,
-            DELETE,
+            CREATE = 3,
+            READ = 2,
+            UPDATE = 4,
+            DELETE = 9,
             EXPORT,
             APPROVE
         }
