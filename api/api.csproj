@@ -42,6 +42,10 @@
 
   <ItemGroup>
     <Folder Include="Data\" />
+    <Folder Include="Dtos\MaintenanceRecord\" />
+    <Folder Include="Dtos\FuelLog\" />
+    <Folder Include="Validator\FuelLog\" />
+    <Folder Include="Validator\MaintenanceRecord\" />
   </ItemGroup>
 
 </Project>
