@@ -14,10 +14,9 @@ const PERMISSIONS_API_URL = `${API_URL}/User/permissions`;
  * (Component này được gọi đệ quy, nhưng API của bạn chỉ có 2 cấp)
  */
 function SidebarMenuItem({ item, location }) {
-    
     // Logic 1: Menu này có con không?
     const hasChildren = item.child && item.child.length > 0;
-    
+
     // Logic 2: Menu này có phải là dropdown không?
     // (Là dropdown nếu có con HOẶC nếu url = #)
     const isDropdown = hasChildren || item.url === '#';
@@ -29,7 +28,7 @@ function SidebarMenuItem({ item, location }) {
         // (Active nếu route hiện tại là 1 trong các 'url' của con)
         let isActive = false;
         if (hasChildren) {
-            const childPaths = item.child.map(child => child.url);
+            const childPaths = item.child.map((child) => child.url);
             isActive = childPaths.includes(location.pathname);
         }
 
@@ -49,20 +48,14 @@ function SidebarMenuItem({ item, location }) {
                     {/* (SỬA) Tự động render các con */}
                     {item.child
                         .sort((a, b) => a.sortOrder - b.sortOrder) // Sắp xếp con
-                        .map(childItem => (
-                            <NavLink 
-                                key={childItem.id} 
-                                to={childItem.url} 
-                                className="dropdown-item"
-                            >
+                        .map((childItem) => (
+                            <NavLink key={childItem.id} to={childItem.url} className="dropdown-item">
                                 {childItem.name}
                             </NavLink>
-                        ))
-                    }
+                        ))}
                 </div>
             </div>
         );
-
     } else {
         // --- TRƯỜNG HỢP 2: RENDER LINK ĐƠN ---
         return (
@@ -74,7 +67,6 @@ function SidebarMenuItem({ item, location }) {
     }
 }
 
-
 // --- Component Sidebar Chính ---
 export default function Sidebar() {
     const location = useLocation();
@@ -84,34 +76,32 @@ export default function Sidebar() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
+    const userDataString = localStorage.getItem('userData');
+    const userData = JSON.parse(userDataString);
+
     // (SỬA) Thêm useEffect để gọi API
     useEffect(() => {
         const fetchMenus = async () => {
             setLoading(true);
             try {
-                // 1. Lấy token từ localStorage
-                const userDataString = localStorage.getItem('userData');
-                const userData = JSON.parse(userDataString);
                 const token = userData?.resources?.accessToken;
                 if (!token) {
-                    throw new Error("Không tìm thấy token.");
+                    throw new Error('Không tìm thấy token.');
                 }
-
 
                 // 3. Gọi API
                 const res = await axios.get(MENU_API_URL, {
                     headers: {
                         'Content-Type': 'application/json',
-                        Authorization: `Bearer ${token}`
-                    }
+                        Authorization: `Bearer ${token}`,
+                    },
                 });
                 localStorage.setItem('menus', JSON.stringify(res.data.resources || []));
 
                 setMenus(res.data.resources || []);
-                
             } catch (err) {
-                console.error("Lỗi tải sidebar menu:", err);
-                setError(err.message || "Lỗi tải menu.");
+                console.error('Lỗi tải sidebar menu:', err);
+                setError(err.message || 'Lỗi tải menu.');
             } finally {
                 setLoading(false);
             }
@@ -120,28 +110,28 @@ export default function Sidebar() {
         // (MỚI) Hàm lấy Permissions và lưu vào localStorage
         const fetchUserPermissions = async () => {
             try {
-               // 1. Lấy token
-               const userDataString = localStorage.getItem('userData');
-               const userData = JSON.parse(userDataString);
-               const token = userData?.resources?.accessToken;
-               if (!token) {
-                   throw new Error("Không tìm thấy token cho permissions.");
-               }
+                // 1. Lấy token
+                const userDataString = localStorage.getItem('userData');
+                const userData = JSON.parse(userDataString);
+                const token = userData?.resources?.accessToken;
+                if (!token) {
+                    throw new Error('Không tìm thấy token cho permissions.');
+                }
 
-               // 2. Gọi API Permissions (Giả định là GET)
-               const res = await axios.get(PERMISSIONS_API_URL, {
-                   headers: {
-                       Authorization: `Bearer ${token}`
-                   }
-               });
+                // 2. Gọi API Permissions (Giả định là GET)
+                const res = await axios.get(PERMISSIONS_API_URL, {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                });
 
-               // 3. Lưu vào localStorage
-               const permissionsData = res.data.resources || [];
-               localStorage.setItem('Permissions', JSON.stringify(permissionsData));
-           } catch (err) {
-               localStorage.setItem('Permissions', '[]'); // Lưu mảng rỗng nếu lỗi
-           }
-       };
+                // 3. Lưu vào localStorage
+                const permissionsData = res.data.resources || [];
+                localStorage.setItem('Permissions', JSON.stringify(permissionsData));
+            } catch (err) {
+                localStorage.setItem('Permissions', '[]'); // Lưu mảng rỗng nếu lỗi
+            }
+        };
 
         fetchMenus();
         fetchUserPermissions();
@@ -174,7 +164,7 @@ export default function Sidebar() {
             {/* ... (Phần Brand và User Profile giữ nguyên) ... */}
             <NavLink to="/dashboard" className="navbar-brand mx-4 mb-3">
                 <h3 className="text-primary">
-                    <i className="fa fa-hashtag me-2"></i>G - CAR
+                    <i className="fa fa-car me-2"></i>G-CAR
                 </h3>
             </NavLink>
             <div className="d-flex align-items-center ms-4 mb-4">
@@ -188,11 +178,20 @@ export default function Sidebar() {
                     <div className="bg-success rounded-circle border border-2 border-white position-absolute end-0 bottom-0 p-1"></div>
                 </div>
                 <div className="ms-3">
-                    <h6 className="mb-0">Jhon Doe</h6>
-                    <span>Admin</span>
+                    <h6 className="mb-0">{userData.resources.userInfo.fullName}</h6>
+                    <span>
+                        {
+                            // 1. Dùng .map() để tạo mảng tên: [{...}] -> ["Admin", "User"]
+                            userData.resources.userInfo.roles
+                                .map((role) => role.name)
+
+                                // 2. Dùng .join() để biến mảng thành chuỗi: ["Admin", "User"] -> "Admin, User"
+                                .join(', ')
+                        }
+                    </span>
                 </div>
             </div>
-            
+
             {/* (SỬA) Thay thế toàn bộ nav-links bằng logic động */}
             <div className="navbar-nav w-100">
                 {loading && (
@@ -200,26 +199,20 @@ export default function Sidebar() {
                         <i className="fa fa-spinner fa-spin me-2"></i>Đang tải...
                     </div>
                 )}
-                
+
                 {error && (
                     <div className="nav-item nav-link text-danger">
-                        <i className="fa fa-exclamation-triangle me-2"></i>{error}
+                        <i className="fa fa-exclamation-triangle me-2"></i>
+                        {error}
                     </div>
                 )}
 
-                {!loading && !error && (
+                {!loading &&
+                    !error &&
                     menus
                         .sort((a, b) => a.sortOrder - b.sortOrder) // Sắp xếp menu cấp 1
-                        .map(item => (
-                            <SidebarMenuItem 
-                                key={item.id} 
-                                item={item} 
-                                location={location} 
-                            />
-                        ))
-                )}
+                        .map((item) => <SidebarMenuItem key={item.id} item={item} location={location} />)}
             </div>
         </nav>
     );
 }
-

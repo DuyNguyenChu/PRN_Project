@@ -56,3 +56,14 @@ export const emailValidator = (value) => {
     }
     return null;
 };
+
+export const phoneValidator = (value) => {
+    if (!value) {
+        return null; // Bỏ qua nếu rỗng
+    }
+    const phoneRegex = /^(0[3|5|7|8|9])+([0-9]{8})\b/;
+    if (!phoneRegex.test(value)) {
+        return 'Số điện thoại không hợp lệ (gồm 10 số, bắt đầu bằng 0).';
+    }
+    return null;
+};

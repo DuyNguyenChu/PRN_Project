@@ -77,7 +77,7 @@ export default function Login() {
                     <div className="bg-light rounded p-4 p-sm-5 my-4 mx-3">
                         <div className="d-flex align-items-center justify-content-between mb-3">
                             <h3 className="text-primary">
-                                <i className="fa fa-hashtag me-2"></i>DASHMIN
+                                <i className="fa fa-car me-2"></i>G-CAR
                             </h3>
                             <h3>Đăng nhập</h3>
                         </div>

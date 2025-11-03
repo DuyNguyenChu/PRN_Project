@@ -1,10 +1,12 @@
 import React from 'react';
-import { NavLink,useNavigate } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import { API_URL } from '~/api/api';
 
 export default function Header({ onToggleSidebar }) {
     const navigate = useNavigate();
 
+    const userDataString = localStorage.getItem('userData');
+    const userData = JSON.parse(userDataString);
     // Hàm xử lý đăng xuất
     const handleLogout = async (event) => {
         // Ngăn chặn hành vi mặc định của thẻ <a>
@@ -150,15 +152,12 @@ export default function Header({ onToggleSidebar }) {
                             alt=""
                             style={{ width: '40px', height: '40px' }}
                         />
-                        <span className="d-none d-lg-inline-flex">John Doe</span>
+                        <span className="d-none d-lg-inline-flex">{userData.resources.userInfo.fullName}</span>
                     </a>
                     <div className="dropdown-menu dropdown-menu-end bg-light border-0 rounded-0 rounded-bottom m-0">
                         <NavLink to="/profile" className="dropdown-item">
                             My Profile
                         </NavLink>
-                        <a href="#" className="dropdown-item">
-                            Settings
-                        </a>
                         <a href="#" className="dropdown-item" onClick={handleLogout}>
                             Log Out
                         </a>
