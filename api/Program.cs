@@ -249,6 +249,7 @@ builder.Services.AddScoped<IVehicleAssignmentService, VehicleAssignmentService>(
 builder.Services.AddScoped<IVehicleInspectionService, VehicleInspectionService>();
 builder.Services.AddScoped<IVehicleInsuranceService, VehicleInsuranceService>();
 builder.Services.AddScoped<IVehicleTypeService, VehicleTypeService>();
+builder.Services.AddScoped<IFuelLogService, FuelLogService>();
 //Repository
 builder.Services.AddScoped<IMenuRepository, api.Repositories.MenuRepository>();
 builder.Services.AddScoped<IPermissionRepository, api.Repositories.PermissionRepository>();
@@ -269,6 +270,8 @@ builder.Services.AddScoped<IVehicleAssignmentRepository, VehicleAssignmentReposi
 builder.Services.AddScoped<IVehicleInspectionRepository, VehicleInspectionRepository>();
 builder.Services.AddScoped<IVehicleInsuranceRepository, VehicleInsuranceRepository>();
 builder.Services.AddScoped<IVehicleTypeRepository, VehicleTypeRepository>();
+builder.Services.AddScoped<IFuelLogRepository, FuelLogRepository>();
+builder.Services.AddScoped<ITripRepository, TripRepository>();
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
 
 // Logging
