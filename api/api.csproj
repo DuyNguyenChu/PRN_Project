@@ -42,8 +42,6 @@
 
   <ItemGroup>
     <Folder Include="Data\" />
-    <Folder Include="Dtos\MaintenanceRecord\" />
-    <Folder Include="Validator\MaintenanceRecord\" />
   </ItemGroup>
 
   <ItemGroup>

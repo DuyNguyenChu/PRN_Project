@@ -6,7 +6,6 @@ using api.Interface.Repository;
 using api.Interface.Services;
 using api.Mappers;
 using api.Models;
-using api.Extensions; // Giả sử GetCurrentUserId/GetDriverId ở đây
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 
@@ -50,7 +49,7 @@ namespace api.Service
             int currentDriverId = GetCurrentDriverId();
 
             if (currentDriverId == 0)
-                return ApiResponse.Forbidden<string>("Người dùng không phải là lái xe."); // [cite: 1749]
+                return ApiResponse.Forbidden<string>("Người dùng không phải là lái xe."); 
 
             var model = obj.ToFuelLogFromCreateDto(currentUserId);
 
@@ -58,7 +57,7 @@ namespace api.Service
             {
                 var trip = await _tripRepository.FirstOrDefaultAsync(x => x.Id == obj.TripId);
                 if (trip == null || trip.DriverId != currentDriverId)
-                    return ApiResponse.BadRequest<string>(null, "Chuyến đi không hợp lệ."); // 
+                    return ApiResponse.BadRequest<string>(null, "Chuyến đi không hợp lệ."); 
 
                 model.DriverId = trip.DriverId;
                 model.VehicleId = trip.VehicleId;
@@ -67,13 +66,13 @@ namespace api.Service
             {
                 model.DriverId = currentDriverId;
                 if (obj.VehicleId <= 0)
-                    return ApiResponse.BadRequest<string>(null, "Cần cung cấp thông tin xe."); // 
+                    return ApiResponse.BadRequest<string>(null, "Cần cung cấp thông tin xe."); 
             }
 
             await _fuelLogRepository.CreateAsync(model);
-            await _unitOfWork.CommitAsync(); //
+            await _unitOfWork.CommitAsync(); 
 
-            return ApiResponse.Created(model.Id); // 
+            return ApiResponse.Created(model.Id); 
         }
 
         public async Task<ApiResponse> UpdateAsync(UpdateFuelLogDto obj)
@@ -81,22 +80,22 @@ namespace api.Service
             int currentUserId = GetCurrentUserId();
             int currentDriverId = GetCurrentDriverId();
             if (currentDriverId == 0)
-                return ApiResponse.Forbidden<string>("Người dùng không phải là lái xe."); // [cite: 1749]
+                return ApiResponse.Forbidden<string>("Người dùng không phải là lái xe."); 
 
             var existData = await _fuelLogRepository
-                .FirstOrDefaultAsync(x => x.Id == obj.Id && x.Status == (int)ApprovalStatus.Pending); // [cite: 2209]
+                .FirstOrDefaultAsync(x => x.Id == obj.Id && x.Status == (int)ApprovalStatus.Pending); 
 
             if (existData == null)
-                return ApiResponse.BadRequest<string>(null, "Không tìm thấy nhật ký nhiên liệu hoặc không thể cập nhật."); // 
+                return ApiResponse.BadRequest<string>(null, "Không tìm thấy nhật ký nhiên liệu hoặc không thể cập nhật.");
 
             if (currentDriverId != existData.DriverId)
-                return ApiResponse.Forbidden<string>("Bạn không có quyền cập nhật nhật ký này."); // [cite: 1749]
+                return ApiResponse.Forbidden<string>("Bạn không có quyền cập nhật nhật ký này."); 
 
             if (obj.TripId.HasValue)
             {
                 var trip = await _tripRepository.FirstOrDefaultAsync(x => x.Id == obj.TripId);
                 if (trip == null || trip.DriverId != existData.DriverId)
-                    return ApiResponse.BadRequest<string>(null, "Chuyến đi không hợp lệ."); // 
+                    return ApiResponse.BadRequest<string>(null, "Chuyến đi không hợp lệ.");
 
                 existData.DriverId = trip.DriverId;
                 existData.VehicleId = trip.VehicleId;
@@ -104,42 +103,42 @@ namespace api.Service
 
             obj.ToFuelLogFromUpdateDto(existData, currentUserId);
             await _fuelLogRepository.UpdateAsync(existData);
-            await _unitOfWork.CommitAsync(); //
+            await _unitOfWork.CommitAsync(); 
 
-            return ApiResponse.Success(); // 
+            return ApiResponse.Success(); 
         }
 
         public async Task<ApiResponse> RejectAsync(RejectFuelLogDto obj)
         {
             int currentUserId = GetCurrentUserId();
             var existData = await _fuelLogRepository
-                .FirstOrDefaultAsync(x => x.Id == obj.Id && x.Status == (int)ApprovalStatus.Pending); // [cite: 2209]
+                .FirstOrDefaultAsync(x => x.Id == obj.Id && x.Status == (int)ApprovalStatus.Pending); 
 
             if (existData == null)
-                return ApiResponse.BadRequest<string>(null, "Không tìm thấy nhật ký hoặc đã được xử lý."); // 
+                return ApiResponse.BadRequest<string>(null, "Không tìm thấy nhật ký hoặc đã được xử lý."); 
 
             obj.ToFuelLogFromRejectDto(existData, currentUserId);
             await _fuelLogRepository.UpdateAsync(existData);
-            await _unitOfWork.CommitAsync(); //
+            await _unitOfWork.CommitAsync(); 
 
-            return ApiResponse.Success(); // 
+            return ApiResponse.Success(); 
         }
 
         public async Task<ApiResponse> ApproveAsync(int id)
         {
             int currentUserId = GetCurrentUserId();
             var existData = await _fuelLogRepository
-                .FirstOrDefaultAsync(x => x.Id == id && x.Status == (int)ApprovalStatus.Pending); // [cite: 2209]
+                .FirstOrDefaultAsync(x => x.Id == id && x.Status == (int)ApprovalStatus.Pending); 
 
             if (existData == null)
-                return ApiResponse.BadRequest<string>(null, "Không tìm thấy nhật ký hoặc đã được xử lý."); // 
+                return ApiResponse.BadRequest<string>(null, "Không tìm thấy nhật ký hoặc đã được xử lý."); 
 
             var dto = new ApprovalFuelLogDto { Id = id };
             dto.ToFuelLogFromApprovalDto(existData, currentUserId);
             await _fuelLogRepository.SoftDeleteAsync(id);
-            await _unitOfWork.CommitAsync(); //
+            await _unitOfWork.CommitAsync(); 
 
-            return ApiResponse.Success(); // 
+            return ApiResponse.Success(); 
         }
 
         public async Task<ApiResponse> GetByIdAsync(int id)
