@@ -78,5 +78,13 @@ namespace api.Controllers
             var data = await _maintenanceRecordService.GetServiceTypes();
             return BaseResult(data);
         }
+
+        [HttpDelete("{id}")]
+        [Authorize]
+        public async Task<IActionResult> SoftDeleteAsync(int id)
+        {
+            var result = await _maintenanceRecordService.SoftDeleteAsync(id);
+            return BaseResult(result);
+        }
     }
 }

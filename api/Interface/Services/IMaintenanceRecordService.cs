@@ -13,5 +13,6 @@ namespace api.Interface.Services
         Task<ApiResponse> RejectAsync(RejectMaintenanceRecordDto obj);
         Task<ApiResponse> ApproveAsync(int id);
         Task<ApiResponse> GetServiceTypes();
+        Task<ApiResponse> SoftDeleteAsync(int id);
     }
 }

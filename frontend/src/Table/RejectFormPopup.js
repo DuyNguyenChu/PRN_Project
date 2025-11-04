@@ -1,8 +1,7 @@
 import React from 'react';
 import axios from 'axios';
 import { useFormValidation } from '../validator/useFormValidation'; // Sửa lại đường dẫn nếu cần
-// THAY ĐỔI: Chỉ import 'required'
-import { required } from '../validator/validators'; 
+import { required, maxLength } from '../validator/validators'; // Sửa lại đường dẫn nếu cần
 
 function RejectFormPopup({ item, onClose, apiUrl, token, onSuccess, showConfirmModal, showNotifyModal }) {
     
@@ -10,9 +9,8 @@ function RejectFormPopup({ item, onClose, apiUrl, token, onSuccess, showConfirmM
         rejectReason: '',
     };
 
-    // THAY ĐỔI: Chỉ giữ lại 'required'
     const validationRules = {
-        rejectReason: [required],
+        rejectReason: [required, maxLength(500)],
     };
 
     const { values, errors, handleChange, validateForm, isSubmitDisabled } = useFormValidation(

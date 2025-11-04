@@ -1,5 +1,6 @@
 ﻿using api.Dtos.MaintenanceRecord;
 using api.DTParameters;
+using api.Extensions;
 using api.Helpers;
 using api.Interface;
 using api.Interface.Repository;
@@ -35,13 +36,16 @@ namespace api.Service
 
         private int GetCurrentUserId()
         {
-            var idClaim = _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier);
-            return int.TryParse(idClaim?.Value, out var id) ? id : 0;
+            int currentUserId = _httpContextAccessor.HttpContext?.GetCurrentUserId() ?? 0;
+
+            return currentUserId;
         }
 
         private int GetCurrentDriverId()
         {
-            var driverIdClaim = _httpContextAccessor.HttpContext?.User?.FindFirst("DriverId");
+
+            var driverIdClaim = _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimNames.DRIVER_ID);
+
             return int.TryParse(driverIdClaim?.Value, out var id) ? id : 0;
         }
 
@@ -257,6 +261,28 @@ namespace api.Service
             var data = CommonConstants.ServiceType
                 .Select(x => new { Id = x.Key, Name = x.Value }); 
             return await Task.FromResult(ApiResponse.Success(data));
+        }
+        public async Task<ApiResponse> SoftDeleteAsync(int id)
+        {
+            int currentUserId = GetCurrentUserId();
+            var existData = await _maintenanceRecordRepository
+                .FirstOrDefaultAsync(x => x.Id == id && x.Status == (int)ApprovalStatus.Pending);
+            if (existData == null)
+                return ApiResponse.BadRequest<string>(null, "Không tìm thấy bản ghi hoặc không thể xóa.");
+             if (existData.DriverId != GetCurrentDriverId()) 
+                return ApiResponse.Forbidden<string>("Bạn không có quyền xóa bản ghi này.");
+            try
+            {
+                await _maintenanceRecordRepository.SoftDeleteAsync(id);
+                await _unitOfWork.CommitAsync();
+                await _maintenanceRecordDetailRepository.SoftDeleteAsync(x => x.RecordId == id);
+                await _unitOfWork.CommitAsync();
+                return ApiResponse.Success();
+            }
+            catch (Exception ex)
+            {
+                return ApiResponse.InternalServerError();
+            }
         }
     }
 }
