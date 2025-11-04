@@ -22,6 +22,7 @@ import VehicleModel from '../pages/VehicleModel';
 import Profile from '../pages/Profile';
 import User from '../pages/User';
 import Menu from '../pages/Menu';
+import FuelLog from '~/pages/FuelLog';
 
 import MainLayout from '../Layout/MainLayout';
 import AuthLayout from '../Layout/AuthLayout';
@@ -95,6 +96,7 @@ function AppRoutes() {
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/user" element={<User />} />
                 <Route path="/menu" element={<Menu />} />
+                <Route path="/fuelLog" element={<FuelLog />} />
             </Route>
 
             {/* Nếu người dùng gõ một đường dẫn không tồn tại, chuyển về trang login */}

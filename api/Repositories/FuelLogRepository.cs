@@ -31,16 +31,14 @@ namespace api.Repositories
             var keyword = parameters.Search?.Value;
             var orderCriteria = string.Empty;
             var orderAscendingDirection = true;
-
             if (parameters.Order != null && parameters.Order.Any())
             {
-                // Đảm bảo rằng tên cột khớp với tên thuộc tính trong FuelLogAggregate
                 orderCriteria = parameters.Columns[parameters.Order[0].Column].Data;
                 orderAscendingDirection = parameters.Order[0].Dir.ToString().ToLower() == "asc";
             }
             else
             {
-                orderCriteria = "CreatedDate"; // Sắp xếp mặc định theo ngày tạo
+                orderCriteria = "CreatedDate";
                 orderAscendingDirection = false;
             }
 
@@ -48,15 +46,16 @@ namespace api.Repositories
                         join v in _context.Vehicles on fl.VehicleId equals v.Id
                         join vm in _context.VehicleModels on v.VehicleModelId equals vm.Id
                         join d in _context.Drivers on fl.DriverId equals d.Id
-                        join du in _context.Users on d.Id equals du.DriverId // Join User thông qua DriverId trên User
+                        join du in _context.Users on d.Id equals du.DriverId into dug
+                        from du in dug.DefaultIfEmpty()
                         join t in _context.Trips on fl.TripId equals t.Id into tg
                         from t in tg.DefaultIfEmpty()
-                        join u in _context.Users on fl.ApprovedBy equals u.Id into ug 
+                        join u in _context.Users on fl.ApprovedBy equals u.Id into ug
                         from u in ug.DefaultIfEmpty()
                         where !fl.IsDeleted &&
                               !v.IsDeleted &&
                               !d.IsDeleted &&
-                              !du.IsDeleted &&
+                              (du == null || !du.IsDeleted) && 
                               !vm.IsDeleted &&
                               (t == null || !t.IsDeleted) &&
                               (u == null || !u.IsDeleted)
@@ -65,9 +64,9 @@ namespace api.Repositories
                             Id = fl.Id,
                             VehicleId = fl.VehicleId,
                             VehicleModelName = vm.Name,
-                            VehicleRegistrationNumber = v.RegistrationNumber, // Đã đổi
+                            VehicleRegistrationNumber = v.RegistrationNumber,
                             DriverId = fl.DriverId,
-                            DriverName = du.FirstName + " " + du.LastName,
+                            DriverName = du != null ? du.FirstName + " " + du.LastName : "[Không có User]",
                             TripId = fl.TripId,
                             TripCode = t != null ? t.Description : null,
                             Odometer = fl.Odometer,
@@ -75,35 +74,34 @@ namespace api.Repositories
                             UnitPrice = fl.UnitPrice,
                             Quantity = fl.Quantity,
                             TotalCost = fl.TotalCost,
-                            GasStation = fl.GasStation, 
+                            GasStation = fl.GasStation,
                             Notes = fl.Notes,
                             Status = fl.Status,
-                            ApprovedBy = fl.ApprovedBy, 
-                            ApprovedByName = u != null ? u.FirstName + " " + u.LastName : null, 
+                            ApprovedBy = fl.ApprovedBy,
+                            ApprovedByName = u != null ? u.FirstName + " " + u.LastName : null,
                             ApprovedDate = fl.ApprovedDate,
                             RejectReason = fl.RejectReason,
-                            CreatedDate = fl.CreatedDate 
+                            CreatedDate = fl.CreatedDate
                         };
 
             var totalRecord = await query.CountAsync();
 
-            if (!string.IsNullOrEmpty(keyword))
-            {
-                keyword = keyword.ToLower();
-                query = query
-                    .Where(x => x.FuelType.ToLower().Contains(keyword) ||
-                          x.CreatedDate.DateTime.ToVietnameseDateTime().Contains(keyword) ||
-                          x.VehicleModelName.ToLower().Contains(keyword) ||
-                          x.VehicleRegistrationNumber.ToLower().Contains(keyword) ||
-                          x.DriverName.ToLower().Contains(keyword) ||
-                          (x.TripCode != null && x.TripCode.Contains(keyword)) ||
-                          x.GasStation.ToLower().Contains(keyword) ||
-                          x.TotalCost.ToString().Contains(keyword) ||
-                          x.Odometer.ToString().Contains(keyword)
-                    );
-            }
+          if (!string.IsNullOrEmpty(keyword))
+    {
+        query = query
+            .Where(x => 
+                EF.Functions.Collate(x.FuelType, SQLParams.Latin_General).Contains(keyword) ||
+                x.CreatedDate.ToVietnameseDateTimeOffset().Contains(keyword) || 
+                EF.Functions.Collate(x.VehicleModelName, SQLParams.Latin_General).Contains(keyword) ||
+                EF.Functions.Collate(x.VehicleRegistrationNumber, SQLParams.Latin_General).Contains(keyword) ||
+                EF.Functions.Collate(x.DriverName, SQLParams.Latin_General).Contains(keyword) ||
+                (x.TripCode != null && EF.Functions.Collate(x.TripCode, SQLParams.Latin_General).Contains(keyword)) ||
+                EF.Functions.Collate(x.GasStation, SQLParams.Latin_General).Contains(keyword) 
+                
+            );
+    }
 
-            // Lọc theo cột (nếu có)
+            // === SỬA LỖI TÌM KIẾM THEO CỘT ===
             if (parameters.Columns != null)
             {
                 foreach (var column in parameters.Columns)
@@ -111,15 +109,18 @@ namespace api.Repositories
                     var search = column.Search?.Value;
                     if (string.IsNullOrEmpty(search)) continue;
 
+                    // KHÔNG dùng search.ToLower()
                     switch (column.Data)
                     {
                         case "tripCode":
-                            query = query.Where(r => r.TripCode != null && r.TripCode.ToLower().Contains(search.ToLower()));
+                            query = query.Where(r => r.TripCode != null &&
+                                EF.Functions.Collate(r.TripCode, SQLParams.Latin_General).Contains(search));
                             break;
                         case "gasStation":
-                            query = query.Where(r => r.GasStation.ToLower().Contains(search.ToLower()));
+                            query = query.Where(r =>
+                                EF.Functions.Collate(r.GasStation, SQLParams.Latin_General).Contains(search));
                             break;
-                        case "createdDate": // Đã đổi từ refuelingDate
+                        case "createdDate": // Phần này đã đúng, không thay đổi
                             if (search.Contains(" - "))
                             {
                                 var dates = search.Split(" - ");
@@ -137,7 +138,7 @@ namespace api.Repositories
                 }
             }
 
-            // Lọc nâng cao
+            // Lọc nâng cao (Không thay đổi)
             if (parameters.VehicleIds.Any())
                 query = query.Where(x => parameters.VehicleIds.Contains(x.VehicleId));
             if (parameters.DriverIds.Any())
@@ -149,7 +150,8 @@ namespace api.Repositories
             if (parameters.TripIds.Any())
                 query = query.Where(x => x.TripId.HasValue && parameters.TripIds.Contains(x.TripId.Value));
 
-            // Sắp xếp
+            // Sắp xếp (Không thay đổi)
+            // Logic này sẽ hoạt động trở lại vì `query` đã hợp lệ
             query = orderAscendingDirection ? query.OrderByDynamic(orderCriteria, LinqExtensions.Order.Asc) : query.OrderByDynamic(orderCriteria, LinqExtensions.Order.Desc);
 
             var records = await query
@@ -157,7 +159,7 @@ namespace api.Repositories
                 .Take(parameters.Length)
                 .ToListAsync();
 
-            // Gán tên hiển thị
+            // Gán tên hiển thị (Không thay đổi)
             foreach (var item in records)
             {
                 item.FuelTypeName = CommonConstants.GetFuelTypeName(item.FuelType);
@@ -170,8 +172,8 @@ namespace api.Repositories
             {
                 draw = parameters.Draw,
                 data = records,
-                recordsFiltered = await query.CountAsync(),
-                recordsTotal = totalRecord
+                recordsFiltered = await query.CountAsync(), // Đếm sau khi lọc
+                recordsTotal = totalRecord // Đếm trước khi lọc
             };
         }
     }

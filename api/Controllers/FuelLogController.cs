@@ -41,7 +41,7 @@ namespace api.Controllers
             return BaseResult(data);
         }
 
-        [HttpPost("paged")]
+        [HttpPost("paged-advanced")]
         [Authorize]
         public async Task<IActionResult> GetPagedAsync([FromBody] FuelLogDTParameters parameters)
         {

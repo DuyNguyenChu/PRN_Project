@@ -1,5 +1,6 @@
 ﻿using api.Dtos.FuelLog;
 using api.DTParameters; // Sẽ được chuyển sang api.Extensions
+using api.Extensions;
 using api.Helpers;
 using api.Interface;
 using api.Interface.Repository;
@@ -32,16 +33,19 @@ namespace api.Service
 
         private int GetCurrentUserId()
         {
-            var idClaim = _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier);
-            return int.TryParse(idClaim?.Value, out var id) ? id : 0;
+            int currentUserId = _httpContextAccessor.HttpContext?.GetCurrentUserId() ?? 0;
+
+            return currentUserId;
         }
 
         private int GetCurrentDriverId()
         {
-            var driverIdClaim = _httpContextAccessor.HttpContext?.User?.FindFirst("DriverId");
+           
+            var driverIdClaim = _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimNames.DRIVER_ID);
+
             return int.TryParse(driverIdClaim?.Value, out var id) ? id : 0;
         }
-
+       
 
         public async Task<ApiResponse> CreateAsync(CreateFuelLogDto obj)
         {
@@ -88,7 +92,8 @@ namespace api.Service
             if (existData == null)
                 return ApiResponse.BadRequest<string>(null, "Không tìm thấy nhật ký nhiên liệu hoặc không thể cập nhật.");
 
-            if (currentDriverId != existData.DriverId)
+            Console.WriteLine($"ExistData CreatedBy: {existData.CreatedBy}, CurrentUserId: {currentUserId}");
+            if (currentUserId != existData.CreatedBy)
                 return ApiResponse.Forbidden<string>("Bạn không có quyền cập nhật nhật ký này."); 
 
             if (obj.TripId.HasValue)
@@ -135,7 +140,7 @@ namespace api.Service
 
             var dto = new ApprovalFuelLogDto { Id = id };
             dto.ToFuelLogFromApprovalDto(existData, currentUserId);
-            await _fuelLogRepository.SoftDeleteAsync(id);
+            await _fuelLogRepository.UpdateAsync(existData);
             await _unitOfWork.CommitAsync(); 
 
             return ApiResponse.Success(); 
@@ -203,13 +208,15 @@ namespace api.Service
 
         public async Task<ApiResponse> SoftDeleteAsync(int id)
         {
+            int currentUserId = GetCurrentUserId();
             var existData = await _fuelLogRepository.GetByIdAsync(id);
             if (existData == null)
-                return ApiResponse.NotFound(); 
+                return ApiResponse.NotFound();
+            if (currentUserId != existData.CreatedBy)
+                return ApiResponse.Forbidden<string>("Bạn không có quyền xoá nhật ký này.");
 
             existData.UpdatedBy = GetCurrentUserId();
             existData.LastModifiedDate = DateTimeOffset.Now;
-            // Use repository's SoftDeleteAsync method instead of non-existent SoftDelete
             await _fuelLogRepository.SoftDeleteAsync(id);
 
             await _unitOfWork.CommitAsync();
