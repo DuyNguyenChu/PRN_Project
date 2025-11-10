@@ -251,6 +251,8 @@ builder.Services.AddScoped<IVehicleInsuranceService, VehicleInsuranceService>();
 builder.Services.AddScoped<IVehicleTypeService, VehicleTypeService>();
 builder.Services.AddScoped<IFuelLogService, FuelLogService>();
 builder.Services.AddScoped<IMaintenanceRecordService, MaintenanceRecordService>();
+builder.Services.AddScoped<ITripRequestStatusService, TripRequestStatusService>();
+builder.Services.AddScoped<ITripStatusService, TripStatusService>();
 //Repository
 builder.Services.AddScoped<IMenuRepository, api.Repositories.MenuRepository>();
 builder.Services.AddScoped<IPermissionRepository, api.Repositories.PermissionRepository>();
@@ -276,6 +278,8 @@ builder.Services.AddScoped<ITripRepository, TripRepository>();
 builder.Services.AddScoped<IMaintenanceRecordRepository, MaintenanceRecordRepository>();
 builder.Services.AddScoped<IMaintenanceRecordDetailRepository, MaintenanceRecordDetailRepository>();
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
+builder.Services.AddScoped<ITripRequestStatusRepository, TripRequestStatusRepository>();
+builder.Services.AddScoped<ITripStatusRepository, TripStatusRepository>();
 
 // Logging
 builder.Logging.AddConsole();
