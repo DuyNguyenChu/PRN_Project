@@ -39,7 +39,7 @@ namespace api.Service
         private readonly ILogger<AuthService> _logger;
         //private readonly IFileUploadRepository _fileUploadRepository;
 
-        public AuthService(IUserRepository userRepository,ITokenProviderService tokenProviderService, IUserRoleRepository userRoleRepository, IPermissionRepository permissionRepository, IHttpContextAccessor httpContextAccessor, IMenuRepository menuRepository, IRoleRepository roleRepository, ILoggerFactory loggerFactory)
+        public AuthService(IUserRepository userRepository, ITokenProviderService tokenProviderService, IUserRoleRepository userRoleRepository, IPermissionRepository permissionRepository, IHttpContextAccessor httpContextAccessor, IMenuRepository menuRepository, IRoleRepository roleRepository, ILoggerFactory loggerFactory)
         {
             _userRepository = userRepository;
             //_userSessionRepository = userSessionRepository;
@@ -211,25 +211,25 @@ namespace api.Service
             var user = userInfo.User;
             var listRoleIds = new List<int>();
             var listRoles = new List<DataItem<int>>();
-            if (isForAdmin)
-            {
-                listRoles = await (from a in _userRoleRepository.GetAll()
-                                   join b in _roleRepository.GetAll() on a.RoleId equals b.Id
-                                   where a.UserId == user.Id
-                                   select new DataItem<int>
-                                   {
-                                       Id = a.RoleId,
-                                       Name = b.Name
-                                   })
-                                .ToListAsync();
+            //if (isForAdmin)
+            //{
+            listRoles = await (from a in _userRoleRepository.GetAll()
+                               join b in _roleRepository.GetAll() on a.RoleId equals b.Id
+                               where a.UserId == user.Id
+                               select new DataItem<int>
+                               {
+                                   Id = a.RoleId,
+                                   Name = b.Name
+                               })
+                            .ToListAsync();
 
-                listRoleIds = listRoles
-                    .Select(x => x.Id)
-                    .ToList();
+            listRoleIds = listRoles
+                .Select(x => x.Id)
+                .ToList();
 
-                if (!listRoleIds.Any(x => x != CommonConstants.Role.END_USER && x != CommonConstants.Role.DRIVER))
-                    return ApiResponse.Forbidden(ErrorMessagesConstants.GetMessage(ApiCodeConstants.Auth.RequiredAdminUser), ApiCodeConstants.Auth.RequiredAdminUser);
-            }
+            //if (!listRoleIds.Any(x => x != CommonConstants.Role.END_USER && x != CommonConstants.Role.DRIVER))
+            //    return ApiResponse.Forbidden(ErrorMessagesConstants.GetMessage(ApiCodeConstants.Auth.RequiredAdminUser), ApiCodeConstants.Auth.RequiredAdminUser);
+            //}
 
             //if (!PasswordHelper.VerifyPassword(obj.Password, user.PasswordHash))
             //{
@@ -337,6 +337,7 @@ namespace api.Service
                         Roles = listRoles,
                         Permissions = permissions,
                         Menus = menus,
+                        DriverId = userInfo.DriverId
                     }
                 };
 

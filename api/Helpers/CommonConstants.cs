@@ -92,10 +92,10 @@ namespace api.Helpers
 
         public static class Role
         {
-            public const int ADMIN = 1001;
-            public const int END_USER = 1002;
-            public const int DRIVER = 1003;
-            public const int DISPATCHER = 1004;
+            public const int ADMIN = 1;
+            public const int END_USER = 3;
+            public const int DRIVER = 4;
+            public const int DISPATCHER = 2;
             public const int EXECUTIVE = 1005;
         }
 
