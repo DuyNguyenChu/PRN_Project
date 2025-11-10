@@ -337,6 +337,7 @@ namespace api.Service
                         Roles = listRoles,
                         Permissions = permissions,
                         Menus = menus,
+                        DriverId = userInfo.DriverId
                     }
                 };
 
