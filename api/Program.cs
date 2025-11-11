@@ -37,7 +37,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 
 //
-builder.WebHost.UseUrls("http://localhost:5180", "http://0.0.0.0:5180");
+//builder.WebHost.UseUrls("http://localhost:5180", "http://0.0.0.0:5180");
 
 
 //
@@ -253,6 +253,8 @@ builder.Services.AddScoped<IFuelLogService, FuelLogService>();
 builder.Services.AddScoped<IMaintenanceRecordService, MaintenanceRecordService>();
 builder.Services.AddScoped<ITripRequestStatusService, TripRequestStatusService>();
 builder.Services.AddScoped<ITripStatusService, TripStatusService>();
+builder.Services.AddScoped<ITripRequestService, TripRequestService>();
+//builder.Services.AddScoped<ITripService, TripService>();
 //Repository
 builder.Services.AddScoped<IMenuRepository, api.Repositories.MenuRepository>();
 builder.Services.AddScoped<IPermissionRepository, api.Repositories.PermissionRepository>();
@@ -280,6 +282,8 @@ builder.Services.AddScoped<IMaintenanceRecordDetailRepository, MaintenanceRecord
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
 builder.Services.AddScoped<ITripRequestStatusRepository, TripRequestStatusRepository>();
 builder.Services.AddScoped<ITripStatusRepository, TripStatusRepository>();
+builder.Services.AddScoped<ITripRequestRepository, TripRequestRepository>();
+builder.Services.AddScoped<IDriverRepository, DriverRepository>();
 
 // Logging
 builder.Logging.AddConsole();
