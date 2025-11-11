@@ -45,10 +45,10 @@ namespace api.Helpers
 
         public static class Action
         {
-            public const int CREATE = 1001;
-            public const int READ = 1002;
-            public const int UPDATE = 1003;
-            public const int DELETE = 1004;
+            public const int CREATE = 3;
+            public const int READ = 2;
+            public const int UPDATE = 4;
+            public const int DELETE = 9;
             public const int EXPORT = 1005;
             public const int APPROVE = 1006;
         }
