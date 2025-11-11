@@ -12,7 +12,7 @@ namespace api.Helpers
 {
     public static class CommonConstants
     {
-        public const int ADMIN_USER = 1001;
+        public const int ADMIN_USER = 3;
 
         public static class MenuType
         {

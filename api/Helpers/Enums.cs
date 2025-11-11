@@ -107,9 +107,9 @@ namespace api.Helpers
         public enum Role
         {
             ADMIN = 1,
-            USER,
-            DRIVER,
-            DISPATCHER,
+            USER = 3,
+            DRIVER = 4,
+            DISPATCHER = 2,
             EXECUTIVE
         }
 
