@@ -62,7 +62,7 @@ export default function Header({ onToggleSidebar }) {
                 <input className="form-control border-0" type="search" placeholder="Search" />
             </form>
             <div className="navbar-nav align-items-center ms-auto">
-                <div className="nav-item dropdown">
+                {/* <div className="nav-item dropdown">
                     <a href="#" className="nav-link dropdown-toggle" data-bs-toggle="dropdown">
                         <i className="fa fa-envelope me-lg-2"></i>
                         <span className="d-none d-lg-inline-flex">Message</span>
@@ -143,7 +143,7 @@ export default function Header({ onToggleSidebar }) {
                             See all notifications
                         </a>
                     </div>
-                </div>
+                </div> */}
                 <div className="nav-item dropdown">
                     <a href="#" className="nav-link dropdown-toggle" data-bs-toggle="dropdown">
                         <img
