@@ -19,6 +19,11 @@ import VehicleRegistration from '../pages/VehicleRegistration';
 import VehicleBranch from '../pages/VehicleBranch';
 import VehicleStatus from '../pages/VehicleStatus';
 import VehicleModel from '../pages/VehicleModel';
+import VehicleInspection from '../pages/VehicleInspection';
+import VehicleInsurance from '../pages/VehicleInsurance';
+import VehicleType from '../pages/VehicleType';
+import VehicleAccident from '../pages/VehicleAccident';
+import VehicleAssignment from '../pages/VehicleAssignment';
 import Profile from '../pages/Profile';
 import User from '../pages/User';
 import Menu from '../pages/Menu';
@@ -94,6 +99,11 @@ function AppRoutes() {
                 <Route path="/VehicleBranch" element={<VehicleBranch />} />
                 <Route path="/VehicleStatus" element={<VehicleStatus />} />
                 <Route path="/VehicleModel" element={<VehicleModel />} />
+                <Route path="/VehicleInspection" element={<VehicleInspection />} />
+                <Route path="/VehicleInsurance" element={<VehicleInsurance />} />
+                <Route path="/VehicleType" element={<VehicleType />} />
+                <Route path="/VehicleAccident" element={<VehicleAccident />} />
+                <Route path="/VehicleAssignment" element={<VehicleAssignment />} />
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/user" element={<User />} />
                 <Route path="/menu" element={<Menu />} />

@@ -21,7 +21,7 @@ namespace api.Repository
 
         public async Task<IEnumerable<VehicleAccident>> GetAllAsync()
         {
-            return await _context.VehicleAccidents.ToListAsync();
+            return await _context.VehicleAccidents.Where(v => !v.IsDeleted).ToListAsync();
         }
 
         public async Task<VehicleAccident?> GetByIdAsync(int id)

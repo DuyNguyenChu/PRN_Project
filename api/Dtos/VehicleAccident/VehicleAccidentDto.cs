@@ -18,6 +18,6 @@ namespace api.Dtos.VehicleAccident
         public int? CreatedBy { get; set; }
         public DateTimeOffset CreatedDate { get; set; }
         public DateTimeOffset? LastModifiedDate { get; set; }
-        public int? UpdatedBy { get; set; }
+        public int? UpdatedBy { get; set; }    
     }
 }
