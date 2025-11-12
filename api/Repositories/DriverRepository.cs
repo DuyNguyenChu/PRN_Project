@@ -63,7 +63,7 @@ namespace api.Repositories
                             FullName = user.FirstName + " " + user.LastName,
                             Email = user.Email,
                             PhoneNumber = user.PhoneNumber,
-                            AvatarId = user.AvatarId,
+                            //AvatarId = user.AvatarId,
                             // AvatarUrl = avatar != null ? _storageService.GetOriginalUrl(avatar.FileKey) : null,
                             CreatedDate = driver.CreatedDate
                         };

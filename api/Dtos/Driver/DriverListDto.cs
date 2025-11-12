@@ -4,15 +4,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace api.ViewModel
+namespace api.Dtos.Driver
 {
-    public class DriverAggregate
+    public class DriverListDto
     {
         public int Id { get; set; }
         public int? ExperienceYears { get; set; }
         public string LicenseNumber { get; set; } = null!;
         public string LicenseClass { get; set; } = null!;
-        public string LicenseClassName { get; set; } = null!;
         public int DriverStatusId { get; set; }
         public string DriverStatusName { get; set; } = null!;
         public string DriverStatusColor { get; set; } = null!;
@@ -24,6 +23,5 @@ namespace api.ViewModel
         //public string? AvatarUrl { get; set; }
         public DateTimeOffset CreatedDate { get; set; }
     }
-
 
 }
