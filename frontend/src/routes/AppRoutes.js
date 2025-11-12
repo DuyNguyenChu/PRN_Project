@@ -31,6 +31,7 @@ import FuelLog from '~/pages/FuelLog';
 import MaintenanceRecord from '~/pages/MaintenanceRecord';
 import TripRequestStatus from '~/pages/TripRequestStatus';
 import TripStatus from '~/pages/TripStatus';
+import TripRequest from '~/pages/TripRequest';
 
 import MainLayout from '../Layout/MainLayout';
 import AuthLayout from '../Layout/AuthLayout';
@@ -113,6 +114,7 @@ function AppRoutes() {
                 <Route path="/maintenanceRecord" element={<MaintenanceRecord />} />
                 <Route path="/tripRequestStatus" element={<TripRequestStatus />} />
                 <Route path="/tripStatus" element={<TripStatus />} />
+                <Route path="/tripRequest" element={<TripRequest />} />
             </Route>
 
             {/* Nếu người dùng gõ một đường dẫn không tồn tại, chuyển về trang login */}

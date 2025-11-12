@@ -204,8 +204,8 @@ namespace api.Helpers
             public const int ARRIVED_AT_DESTINATION = 11;
             public const int COMPLETED = 12;
             public const int CANCELLED_BY_USER = 13;
-            public const int CANCELLED_BY_ADMIN = 1011;
-            public const int CANCELLED_BY_DRIVER = 1012;
+            public const int CANCELLED_BY_ADMIN = 14;
+            public const int CANCELLED_BY_DRIVER = 15;
         }
 
         public static class NotificationCategory

@@ -7,7 +7,7 @@ function TripStatusFormPopup({ item, onClose, apiUrl, token, onSuccess, showConf
     const initialState = {
         name: item?.name || '',
         color: item?.color || '#000000',
-        desctiption: item?.description || '',
+        description: item?.description || '',
     };
 
     const validationRules = {
@@ -85,12 +85,14 @@ function TripStatusFormPopup({ item, onClose, apiUrl, token, onSuccess, showConf
                     <label>Mô tả</label>
                     <input
                         type="text"
-                        className={`form-control ${errors.description ? 'is-invalid' : ''}`} // Thêm class is-invalid khi có lỗi
-                        name="description" // Rất quan trọng: Thêm thuộc tính `name`
-                        value={values.description} // Sử dụng `values.name`
-                        onChange={handleChange} // Sử dụng `handleChange`
+                        // Sửa "errors.desctiptions" thành "errors.description"
+                        className={`form-control ${errors.description ? 'is-invalid' : ''}`} // <-- SỬA Ở ĐÂY
+                        name="description" // (Giữ nguyên)
+                        // Sửa "values.descriptions" thành "values.description"
+                        value={values.description} // <-- SỬA Ở ĐÂY
+                        onChange={handleChange}
                     />
-                    {/* Bước 5: Hiển thị lỗi */}
+                    {/* Sửa cả hai chỗ: "errors.desctiption" và "errors.desctiptions" */}
                     {errors.description && <div className="text-danger mt-1">{errors.description}</div>}
                 </div>
 
