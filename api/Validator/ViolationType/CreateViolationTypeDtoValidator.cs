@@ -1,4 +1,4 @@
-﻿using api.Dtos.DriverStatus;
+﻿using api.Dtos.ViolationType;
 using api.Dtos.Trip;
 using api.Extensions;
 using api.Helpers;
@@ -9,11 +9,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace api.Validator.DriverStatus
+namespace api.Validator.ViolationTypes
 {
-    internal class UpdateDriverStatusDtoValidator : AbstractValidator<UpdateDriverStatusDto>
+    public class CreateViolationTypeDtoValidator : AbstractValidator<CreateViolationTypeDto>
     {
-        public UpdateDriverStatusDtoValidator()
+        public CreateViolationTypeDtoValidator()
         {
             RuleFor(x => x.Name)
                 .NotNull()
@@ -25,19 +25,10 @@ namespace api.Validator.DriverStatus
                 .MaximumLength(255)
                 .WithName("Tên")
                 .WithMessage(ErrorMessagesConstants.GetMessage(ApiCodeConstants.Common.MaxLengthMessage));
+
             RuleFor(x => x.Description)
                 .MaximumLength(500)
                 .WithName("Mô tả")
-                .WithMessage(ErrorMessagesConstants.GetMessage(ApiCodeConstants.Common.MaxLengthMessage));
-            RuleFor(x => x.Color)
-                .NotNull()
-                .WithName("Màu sắc")
-                .WithMessage(ErrorMessagesConstants.GetMessage(ApiCodeConstants.Common.RequiredMessage))
-                .NotEmpty()
-                .WithName("Màu sắc")
-                .WithMessage(ErrorMessagesConstants.GetMessage(ApiCodeConstants.Common.RequiredMessage))
-                .MaximumLength(50)
-                .WithName("Màu sắc")
                 .WithMessage(ErrorMessagesConstants.GetMessage(ApiCodeConstants.Common.MaxLengthMessage));
         }
     }

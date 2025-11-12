@@ -4,7 +4,7 @@ using api.Helpers;
 
 namespace api.Mappers
 {
-    public static class DriverStatusMapping
+    public static class DriverStatusMapper
     {
         public static DriverStatus ToEntity(this CreateDriverStatusDto dto)
         {
