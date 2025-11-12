@@ -257,7 +257,7 @@ builder.Services.AddScoped<ITripRequestService, TripRequestService>();
 builder.Services.AddScoped<ITripService, TripService>();
 builder.Services.AddScoped<ITripExpenseService, TripExpenseService>();
 builder.Services.AddScoped<IDriverService, DriverService>();
-//builder.Services.AddScoped<IDriverViolationService, DriverViolationService>();
+builder.Services.AddScoped<IDriverViolationService, DriverViolationService>();
 //Repository
 builder.Services.AddScoped<IMenuRepository, api.Repositories.MenuRepository>();
 builder.Services.AddScoped<IPermissionRepository, api.Repositories.PermissionRepository>();
