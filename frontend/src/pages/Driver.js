@@ -2,8 +2,8 @@
 import { useState, useRef, useEffect } from 'react';
 import axios from 'axios';
 import '../styles/css/Driver.css';
-import DriverTable from '../Table/DriverTable'; // Sửa
-import DriverFormPopup from '../Table/DriverFormPopup'; // Sửa
+import DriverTable from '../Table/DriverTable';
+import DriverFormPopup from '../Table/DriverFormPopup';
 import ConfirmModal from '../Table/ConfirmModal';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
@@ -11,24 +11,15 @@ import { API_URL } from '~/api/api';
 import moment from 'moment';
 import { canView } from '~/utils/permissionUtils';
 import { useNavigate } from 'react-router-dom';
-import { PERMISSION_IDS } from '~/utils/menuIdForPermission'; // Sửa: Dùng file constants
+import { PERMISSION_IDS } from '~/utils/menuIdForPermission';
 
-// THÊM: Hardcode Hạng bằng lái xe (theo C# CommonConstants)
-const LICENSE_CLASSES = [
-    { id: 'A1', name: 'A1' },
-    { id: 'B1', name: 'B1' },
-    { id: 'B2', name: 'B2' },
-    { id: 'C', name: 'C' },
-    { id: 'D', name: 'D' },
-    { id: 'E', name: 'E' },
-    { id: 'F', name: 'F' },
-];
+// XÓA: Hằng số LICENSE_CLASSES đã bị xóa
 
 export default function Driver() {
     const [showFilter, setShowFilter] = useState(false);
     const toggleFilter = () => setShowFilter(!showFilter);
 
-    const apiUrl = `${API_URL}/Driver`; // Sửa: URL API
+    const apiUrl = `${API_URL}/Driver`;
     const userDataString = localStorage.getItem('userData');
 
     const userData = JSON.parse(userDataString);
@@ -43,7 +34,7 @@ export default function Driver() {
 
     const [showConfirm, setShowConfirm] = useState(false);
     const [confirmMessage, setConfirmMessage] = useState('');
-    const [confirmAction, setConfirmAction] = useState(() => {}); // Đổi tên: confirmUser -> confirmAction
+    const [confirmAction, setConfirmAction] = useState(() => {});
 
     const [notifyMessage, setNotifyMessage] = useState('');
     const [showNotify, setShowNotify] = useState(false);
@@ -54,11 +45,12 @@ export default function Driver() {
     const [startDate, endDate] = dateRange;
     const [appliedFilters, setAppliedFilters] = useState({});
     const [filterInputs, setFilterInputs] = useState({
-        experienceYears: '', // Sẽ là chuỗi "1,2,3"
-        licenseClasses: [], // Mảng string
-        driverStatusIds: [], // Mảng number
+        experienceYears: '',
+        licenseClasses: [],
+        driverStatusIds: [],
     });
     const [statusOptions, setStatusOptions] = useState([]);
+    const [licenseClassOptions, setLicenseClassOptions] = useState([]); // THÊM
     const [loadingFilters, setLoadingFilters] = useState(true);
     // --- Kết thúc State Bộ lọc ---
 
@@ -68,8 +60,7 @@ export default function Driver() {
     const [isAllowedToView, setIsAllowedToView] = useState(false);
 
     useEffect(() => {
-        // SỬA: Dùng ID của trang Driver
-        if (!canView(PERMISSION_IDS.DRIVER_LIST)) { // Giả sử bạn có ID này
+        if (!canView(PERMISSION_IDS.DRIVER_LIST)) {
             console.warn(`Người dùng không có quyền xem trang (ID: ${PERMISSION_IDS.DRIVER_LIST}). Đang chuyển hướng...`);
             setIsAllowedToView(false);
             navigate('/error');
@@ -79,14 +70,21 @@ export default function Driver() {
         setIsAccessChecked(true);
     }, [navigate]);
 
-    // Fetch dữ liệu cho bộ lọc (DriverStatus)
+    // SỬA: Fetch dữ liệu cho bộ lọc (DriverStatus và LicenseClass)
     useEffect(() => {
         const fetchFilterData = async () => {
             if (!token) return;
             setLoadingFilters(true);
             try {
-                const statusRes = await axios.get(`${API_URL}/DriverStatus`, { headers: { Authorization: `Bearer ${token}` } });
+                // Gọi đồng thời 2 API
+                const [statusRes, licenseRes] = await Promise.all([
+                    axios.get(`${API_URL}/driver-status`, { headers: { Authorization: `Bearer ${token}` } }),
+                    axios.get(`${API_URL}/Driver/license-class`, { headers: { Authorization: `Bearer ${token}` } }), // THÊM
+                ]);
+                
                 setStatusOptions(statusRes.data.resources || []);
+                setLicenseClassOptions(licenseRes.data.resources || []); // THÊM
+
             } catch (err) {
                 console.error('Lỗi tải dữ liệu filter:', err);
             } finally {
@@ -106,9 +104,10 @@ export default function Driver() {
         setShowPopup(true);
     };
 
+    // ... (Các hàm handler khác giữ nguyên) ...
     const showConfirmModal = (message, action, onCancel) => {
         setConfirmMessage(message);
-        setConfirmAction(() => action); // Sửa
+        setConfirmAction(() => action);
         setShowConfirm(true);
         setOnCancelConfirm(() => onCancel);
     };
@@ -126,7 +125,6 @@ export default function Driver() {
         setShowNotify(true);
     };
 
-    // --- Logic xử lý Filter ---
     const handleFilterInputChange = (e) => {
         const { name, value } = e.target;
         setFilterInputs((prev) => ({ ...prev, [name]: value }));
@@ -134,12 +132,10 @@ export default function Driver() {
 
     const handleMultiSelectChange = (e) => {
         const { name } = e.target;
-        // Xử lý riêng cho licenseClasses (mảng string)
         if (name === 'licenseClasses') {
             const selectedStrings = Array.from(e.target.selectedOptions, (option) => option.value);
             setFilterInputs((prev) => ({ ...prev, [name]: selectedStrings }));
         } else {
-            // Xử lý cho driverStatusIds (mảng number)
             const selectedIds = Array.from(e.target.selectedOptions, (option) => Number(option.value));
             setFilterInputs((prev) => ({ ...prev, [name]: selectedIds }));
         }
@@ -148,12 +144,10 @@ export default function Driver() {
     const handleApplyFilter = () => {
         const [startDate, endDate] = dateRange;
         const newFilters = {
-            // Chuyển đổi chuỗi experienceYears thành mảng số
             experienceYears: filterInputs.experienceYears
                 .split(',')
                 .map(Number)
-                .filter(n => n > 0 && Number.isInteger(n)), // Lọc số nguyên dương
-            
+                .filter(n => n > 0 && Number.isInteger(n)),
             licenseClasses: filterInputs.licenseClasses,
             driverStatusIds: filterInputs.driverStatusIds,
             createdDate: null,
@@ -180,10 +174,10 @@ export default function Driver() {
         setDateRange([null, null]);
         setAppliedFilters({});
     };
-    // --- Kết thúc Logic Filter ---
 
     const reloadTable = () => setRefreshFlag((prev) => !prev);
-
+    // ... (Kết thúc các hàm handler) ...
+    
     if (!isAccessChecked) {
         return <div className="text-center p-5">Đang kiểm tra quyền truy cập...</div>;
     }
@@ -235,7 +229,8 @@ export default function Driver() {
                                         onChange={handleMultiSelectChange}
                                         style={{ height: '150px' }}
                                     >
-                                        {LICENSE_CLASSES.map((cls) => (
+                                        {/* SỬA: Lấy từ state */}
+                                        {licenseClassOptions.map((cls) => (
                                             <option key={cls.id} value={cls.id}>
                                                 {cls.name}
                                             </option>
@@ -302,15 +297,16 @@ export default function Driver() {
                 </div>
             </div>
 
+            {/* ... (Phần JSX còn lại của Table, Popup, Modal không đổi) ... */}
             <div className="col-sm-12 col-xl-12 py-4">
                 <div className="bg-light rounded h-100 p-4">
                     <div className="d-flex justify-content-between align-items-center mb-4">
-                        <h6 className="mb-4">Danh sách tài xế</h6> {/* Sửa */}
+                        <h6 className="mb-4">Danh sách tài xế</h6>
                         <button type="button" className="btn btn-primary" onClick={handleAdd}>
                             <i className="fa fa-plus me-2"></i>Thêm mới
                         </button>
                     </div>
-                    <DriverTable // Sửa
+                    <DriverTable
                         apiUrl={apiUrl}
                         token={token}
                         onEdit={handleEdit}
@@ -321,7 +317,7 @@ export default function Driver() {
             </div>
             
             {showPopup && (
-                <DriverFormPopup // Sửa
+                <DriverFormPopup
                     item={editingItem}
                     onClose={() => setShowPopup(false)}
                     apiUrl={apiUrl}
@@ -330,7 +326,7 @@ export default function Driver() {
                         reloadTable();
                         setShowPopup(false);
                     }}
-                    showConfirmModal={showConfirmModal} // Sửa
+                    showConfirmModal={showConfirmModal}
                     showNotifyModal={showNotifyModal}
                 />
             )}
@@ -340,7 +336,7 @@ export default function Driver() {
                     message={confirmMessage}
                     onClose={handleCancelConfirm}
                     onConfirm={() => {
-                        confirmAction(); // Sửa
+                        confirmAction();
                         setShowConfirm(false);
                     }}
                 />

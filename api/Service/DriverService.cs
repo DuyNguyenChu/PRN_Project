@@ -122,7 +122,7 @@ namespace api.Service
                 await _userRepository.SaveChangesAsync();
 
                 var model = obj.ToEntity();
-                model.Users.FirstOrDefault().Id = userModel.Id;
+                model.Users.Add(userModel);
 
                 await _driverRepository.CreateAsync(model);
 

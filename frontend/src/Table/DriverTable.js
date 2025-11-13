@@ -62,42 +62,42 @@ export default function DriverTable({ apiUrl, token, onEdit, refreshFlag, filter
                         search: { value: '', regex: false, fixed: [] },
                     },
                     {
-                        data: 'FullName',
+                        data: 'fullName',
                         name: '',
                         searchable: true,
                         orderable: true,
                         search: { value: '', regex: false, fixed: [] },
                     },
                     {
-                        data: 'Email',
+                        data: 'email',
                         name: '',
                         searchable: true,
                         orderable: true,
                         search: { value: '', regex: false, fixed: [] },
                     },
                     {
-                        data: 'PhoneNumber',
+                        data: 'phoneNumber',
                         name: '',
                         searchable: true,
                         orderable: true,
                         search: { value: '', regex: false, fixed: [] },
                     },
                     {
-                        data: 'DriverStatusName',
+                        data: 'driverStatusName',
                         name: '',
                         searchable: true,
                         orderable: true,
                         search: { value: '', regex: false, fixed: [] },
                     },
                     {
-                        data: 'LicenseClass',
+                        data: 'licenseClass',
                         name: '',
                         searchable: true,
                         orderable: true,
                         search: { value: '', regex: false, fixed: [] },
                     },
                     {
-                        data: 'ExperienceYears',
+                        data: 'experienceYears',
                         name: '',
                         searchable: true,
                         orderable: true,
@@ -270,7 +270,6 @@ export default function DriverTable({ apiUrl, token, onEdit, refreshFlag, filter
                     {loading ? (
                         <tr>
                             <td colSpan={9} className="text-center">
-                                {' '}
                                 {/* Sửa: colSpan */}
                                 Đang tải...
                             </td>
@@ -278,7 +277,6 @@ export default function DriverTable({ apiUrl, token, onEdit, refreshFlag, filter
                     ) : data.length === 0 ? (
                         <tr>
                             <td colSpan={9} className="text-center">
-                                {' '}
                                 {/* Sửa: colSpan */}
                                 Không có dữ liệu
                             </td>
@@ -286,33 +284,31 @@ export default function DriverTable({ apiUrl, token, onEdit, refreshFlag, filter
                     ) : (
                         data.map((row, index) => (
                             <tr key={row.Id}>
-                                {' '}
                                 {/* Sửa: Id (viết hoa) */}
                                 <td>{(page - 1) * pageSize + index + 1}</td>
-                                <td>{row.FullName}</td>
-                                <td>{row.Email}</td>
-                                <td>{row.PhoneNumber}</td>
+                                <td>{row.fullName}</td>
+                                <td>{row.email}</td>
+                                <td>{row.phoneNumber}</td>
                                 <td>
                                     {/* Sửa: Pill trạng thái */}
                                     <span
                                         className="badge"
                                         style={{
-                                            backgroundColor: row.DriverStatusColor,
-                                            color: getContrastColor(row.DriverStatusColor),
+                                            backgroundColor: row.driverStatusColor,
+                                            color: getContrastColor(row.driverStatusColor),
                                         }}
                                     >
-                                        {row.DriverStatusName}
+                                        {row.driverStatusName}
                                     </span>
                                 </td>
-                                <td>{row.LicenseClassName}</td> {/* Sửa: Dùng LicenseClassName */}
-                                <td>{row.ExperienceYears}</td>
+                                <td>{row.licenseClassName}</td>
+                                <td>{row.experienceYears}</td>
                                 <td>{moment(row.CreatedDate).format('DD/MM/YYYY HH:mm:ss')}</td>
                                 <td className="text-end">
                                     <button className="btn btn-sm btn-primary me-2" onClick={() => onEdit(row)}>
                                         Sửa
                                     </button>
                                     <button className="btn btn-sm btn-danger" onClick={() => handleDeleteClick(row.Id)}>
-                                        {' '}
                                         {/* Sửa: Id (viết hoa) */}
                                         Xóa
                                     </button>
