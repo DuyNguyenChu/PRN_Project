@@ -17,11 +17,7 @@ public class VehicleAccidentController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetAll()
-    {
-        var vehicleAccidents = await _vehicleAccidentService.GetAllAsync();
-        return Ok(vehicleAccidents);
-    }
+    public async Task<IActionResult> GetAll() => Ok(await _vehicleAccidentService.GetAllAsync());
 
     [HttpGet("{id:int}")]
     public async Task<IActionResult> GetById([FromRoute] int id)

@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import UserStatusTable from '../Table/UserStatusTable';
 import '../styles/css/UserStatus.css';
 import UserStatusFormPopup from '../Table/UserStatusFormPopup';
@@ -7,8 +7,11 @@ import DatePicker from 'react-datepicker'; // Thêm thư viện react-datepicker
 import 'react-datepicker/dist/react-datepicker.css'; // Thêm CSS cho datepicker
 import { API_URL } from '~/api/api';
 import moment from 'moment';
+import { canView, canCreate, canUpdate, canDelete } from '~/utils/permissionUtils';
+import { useNavigate } from 'react-router-dom';
+import { PERMISSION_IDS } from '~/utils/menuIdForPermission';
 
-export default function UserStatus({ permissionFlags }) {
+export default function UserStatus() {
     const [showFilter, setShowFilter] = useState(false);
     const toggleFilter = () => setShowFilter(!showFilter);
 
@@ -45,6 +48,22 @@ export default function UserStatus({ permissionFlags }) {
     const [filterInputs, setFilterInputs] = useState({ name: '' });
 
     const tableRef = useRef();
+
+    const navigate = useNavigate(); // THÊM VÀO
+                    const [isAccessChecked, setIsAccessChecked] = useState(false); // THÊM VÀO
+                    const [isAllowedToView, setIsAllowedToView] = useState(false); // THÊM VÀO
+                    
+                        // THÊM VÀO: useEffect kiểm tra quyền xem trang
+                    useEffect(() => {
+                        if (!canView(PERMISSION_IDS.USER_STATUS)) {
+                            console.warn(`Người dùng không có quyền xem trang Action (ID: ${PERMISSION_IDS.USER_STATUS}). Đang chuyển hướng...`);
+                            setIsAllowedToView(false);
+                            navigate('/error'); // Chuyển hướng đến trang lỗi
+                        } else {
+                            setIsAllowedToView(true);
+                        }
+                        setIsAccessChecked(true);
+                    }, [navigate]);
 
     const handleAdd = () => {
         setEditingItem(null);

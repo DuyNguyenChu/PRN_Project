@@ -37,7 +37,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 
 //
-builder.WebHost.UseUrls("http://localhost:5180", "http://0.0.0.0:5180");
+//builder.WebHost.UseUrls("http://localhost:5180", "http://0.0.0.0:5180");
 
 
 //
@@ -253,6 +253,14 @@ builder.Services.AddScoped<IFuelLogService, FuelLogService>();
 builder.Services.AddScoped<IMaintenanceRecordService, MaintenanceRecordService>();
 builder.Services.AddScoped<ITripRequestStatusService, TripRequestStatusService>();
 builder.Services.AddScoped<ITripStatusService, TripStatusService>();
+builder.Services.AddScoped<ITripRequestService, TripRequestService>();
+builder.Services.AddScoped<ITripService, TripService>();
+builder.Services.AddScoped<ITripExpenseService, TripExpenseService>();
+builder.Services.AddScoped<IDriverService, DriverService>();
+builder.Services.AddScoped<IDriverViolationService, DriverViolationService>();
+builder.Services.AddScoped<IDriverStatusService,DriverStatusService>();
+builder.Services.AddScoped<IExpenseTypeService, ExpenseTypeService>();
+builder.Services.AddScoped<IViolationTypeService, ViolationTypeService>();
 //Repository
 builder.Services.AddScoped<IMenuRepository, api.Repositories.MenuRepository>();
 builder.Services.AddScoped<IPermissionRepository, api.Repositories.PermissionRepository>();
@@ -280,7 +288,13 @@ builder.Services.AddScoped<IMaintenanceRecordDetailRepository, MaintenanceRecord
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
 builder.Services.AddScoped<ITripRequestStatusRepository, TripRequestStatusRepository>();
 builder.Services.AddScoped<ITripStatusRepository, TripStatusRepository>();
-
+builder.Services.AddScoped<ITripRequestRepository, TripRequestRepository>();
+builder.Services.AddScoped<IDriverRepository, DriverRepository>();
+builder.Services.AddScoped<ITripExpenseRepository, TripExpenseRepository>();
+builder.Services.AddScoped<IDriverViolationRepository, DriverViolationRepository>();
+builder.Services.AddScoped<IDriverStatusRepository, DriverStatusRepository>();
+builder.Services.AddScoped<IExpenseTypeRepository, ExpenseTypeRepository>();
+builder.Services.AddScoped<IViolationTypeRepository, ViolationTypeRepository>();
 // Logging
 builder.Logging.AddConsole();
 

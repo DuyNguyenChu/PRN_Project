@@ -12,7 +12,7 @@ namespace api.Helpers
 {
     public static class CommonConstants
     {
-        public const int ADMIN_USER = 1001;
+        public const int ADMIN_USER = 3;
 
         public static class MenuType
         {
@@ -45,10 +45,10 @@ namespace api.Helpers
 
         public static class Action
         {
-            public const int CREATE = 1001;
-            public const int READ = 1002;
-            public const int UPDATE = 1003;
-            public const int DELETE = 1004;
+            public const int CREATE = 3;
+            public const int READ = 2;
+            public const int UPDATE = 4;
+            public const int DELETE = 9;
             public const int EXPORT = 1005;
             public const int APPROVE = 1006;
         }
@@ -176,36 +176,36 @@ namespace api.Helpers
 
         public static class DriverStatus
         {
-            public const int AVAILABLE = 1001;
-            public const int ON_TRIP = 1002;
-            public const int ON_LEAVE = 1003;
-            public const int UNAVAILABLE = 1004;
+            public const int AVAILABLE = 2;
+            public const int ON_TRIP = 3;
+            public const int ON_LEAVE = 4;
+            public const int UNAVAILABLE = 5;
         }
 
         public static class TripRequestStatus
         {
-            public const int PENDING = 1001;
-            public const int APPROVED = 1002;
-            public const int REJECTED = 1003;
-            public const int CANCELLED = 1004;
-            public const int DRAFT = 1005;
+            public const int PENDING = 2;
+            public const int APPROVED = 3;
+            public const int REJECTED = 4;
+            public const int CANCELLED = 5;
+            public const int DRAFT = 6;
             public static readonly int[] CreateAccept = { PENDING, DRAFT };
 
         }
         public static class TripStatus
         {
-            public const int APPROVED = 1001;
-            public const int DISPATCHED = 1002;
-            public const int DRIVER_CONFIRMED = 1003;
-            public const int REJECTED_BY_DRIVER = 1004;
-            public const int MOVING_TO_PICKUP = 1005;
-            public const int ARRIVED_AT_PICKUP = 1006;
-            public const int MOVING_TO_DESTINATION = 1007;
-            public const int ARRIVED_AT_DESTINATION = 1008;
-            public const int COMPLETED = 1009;
-            public const int CANCELLED_BY_USER = 1010;
-            public const int CANCELLED_BY_ADMIN = 1011;
-            public const int CANCELLED_BY_DRIVER = 1012;
+            public const int APPROVED = 2;
+            public const int DISPATCHED = 4;
+            public const int DRIVER_CONFIRMED = 5;
+            public const int REJECTED_BY_DRIVER = 6;
+            public const int MOVING_TO_PICKUP = 8;
+            public const int ARRIVED_AT_PICKUP = 9;
+            public const int MOVING_TO_DESTINATION = 10;
+            public const int ARRIVED_AT_DESTINATION = 11;
+            public const int COMPLETED = 12;
+            public const int CANCELLED_BY_USER = 13;
+            public const int CANCELLED_BY_ADMIN = 14;
+            public const int CANCELLED_BY_DRIVER = 15;
         }
 
         public static class NotificationCategory
