@@ -9,7 +9,9 @@ import Select from 'react-select'; // Thêm react-select cho bộ lọc
 import { API_URL } from '~/api/api';
 import moment from 'moment';
 import axios from 'axios'; // Thêm axios
-// import '../styles/css/FuelLog.css'; // Bạn có thể tạo file CSS mới nếu cần
+import { canView } from '~/utils/permissionUtils'; // Bỏ canCreate, canUpdate, canDelete nếu không dùng
+import { useNavigate } from 'react-router-dom';
+import { PERMISSION_IDS } from '~/utils/menuIdForPermission';
 
 export default function FuelLog({ permissionFlags }) {
     const [showFilter, setShowFilter] = useState(false);
@@ -52,6 +54,21 @@ export default function FuelLog({ permissionFlags }) {
     const [selectedTrips, setSelectedTrips] = useState([]);
     const [selectedFuelTypes, setSelectedFuelTypes] = useState([]);
     const [selectedStatuses, setSelectedStatuses] = useState([]);
+
+    const navigate = useNavigate();
+    const [isAccessChecked, setIsAccessChecked] = useState(false);
+    const [isAllowedToView, setIsAllowedToView] = useState(false);
+
+    useEffect(() => {
+        if (!canView(PERMISSION_IDS.FUEL_LOG)) {
+            console.warn(`Người dùng không có quyền xem trang (ID: ${PERMISSION_IDS.FUEL_LOG}). Đang chuyển hướng...`);
+            setIsAllowedToView(false);
+            navigate('/error');
+        } else {
+            setIsAllowedToView(true);
+        }
+        setIsAccessChecked(true);
+    }, [navigate]);
 
     // State cho bộ lọc đã "Áp dụng"
     const [appliedFilters, setAppliedFilters] = useState({});

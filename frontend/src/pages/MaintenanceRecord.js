@@ -9,6 +9,9 @@ import Select from 'react-select';
 import { API_URL } from '~/api/api';
 import moment from 'moment';
 import axios from 'axios'; 
+import { canView } from '~/utils/permissionUtils'; 
+import { useNavigate } from 'react-router-dom';
+import { PERMISSION_IDS } from '~/utils/menuIdForPermission';
 
 export default function MaintenanceRecord({ permissionFlags }) {
     const [showFilter, setShowFilter] = useState(false);
@@ -53,6 +56,21 @@ export default function MaintenanceRecord({ permissionFlags }) {
 
     // State cho bộ lọc đã "Áp dụng"
     const [appliedFilters, setAppliedFilters] = useState({});
+
+    const navigate = useNavigate();
+    const [isAccessChecked, setIsAccessChecked] = useState(false);
+    const [isAllowedToView, setIsAllowedToView] = useState(false);
+
+    useEffect(() => {
+        if (!canView(PERMISSION_IDS.MAINTENANCE_RECORD)) {
+            console.warn(`Người dùng không có quyền xem trang (ID: ${PERMISSION_IDS.MAINTENANCE_RECORD}). Đang chuyển hướng...`);
+            setIsAllowedToView(false);
+            navigate('/error');
+        } else {
+            setIsAllowedToView(true);
+        }
+        setIsAccessChecked(true);
+    }, [navigate]);
 
     // Fetch dữ liệu cho các dropdown bộ lọc
     useEffect(() => {
