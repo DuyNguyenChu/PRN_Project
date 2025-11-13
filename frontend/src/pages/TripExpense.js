@@ -13,12 +13,12 @@ import { canView } from '~/utils/permissionUtils';
 import { useNavigate } from 'react-router-dom';
 import { PERMISSION_IDS } from '~/utils/menuIdForPermission'; // Sửa: Dùng file constants
 
-// THÊM: Hardcode Trạng thái (dựa trên C# CommonConstants.ApprovalStatuses)
-const APPROVAL_STATUSES = [
-    { id: 1, name: 'Chờ duyệt', color: '#ffc107' }, // Giả sử ID=1
-    { id: 2, name: 'Đã duyệt', color: '#28a745' }, // Giả sử ID=2
-    { id: 3, name: 'Từ chối', color: '#dc3545' }, // Giả sử ID=3
-];
+// BỎ: Hardcode Trạng thái
+// const APPROVAL_STATUSES = [
+//     { id: 1, name: 'Chờ duyệt', color: '#ffc107' }, 
+//     { id: 2, name: 'Đã duyệt', color: '#28a745' }, 
+//     { id: 3, name: 'Từ chối', color: '#dc3545' }, 
+// ];
 
 export default function TripExpense() {
     const [showFilter, setShowFilter] = useState(false);
@@ -67,6 +67,8 @@ export default function TripExpense() {
     const [expenseTypeOptions, setExpenseTypeOptions] = useState([]);
     const [driverOptions, setDriverOptions] = useState([]);
     const [tripOptions, setTripOptions] = useState([]);
+    // THÊM: State cho Status từ API
+    const [statusOptions, setStatusOptions] = useState([]);
     // --- Kết thúc State Bộ lọc ---
 
     const tableRef = useRef();
@@ -93,18 +95,20 @@ export default function TripExpense() {
             if (!token) return;
             setLoadingFilters(true);
             try {
-                // Gọi 4 API để lấy data cho filter
-                const [vehicleRes, typeRes, driverRes, tripRes] = await Promise.all([
+                // SỬA: Gọi 5 API (thêm Status, sửa ExpenseType)
+                const [vehicleRes, typeRes, driverRes, tripRes, statusRes] = await Promise.all([
                     axios.get(`${API_URL}/Vehicle`, { headers: { Authorization: `Bearer ${token}` } }),
-                    axios.get(`${API_URL}/ExpenseType`, { headers: { Authorization: `Bearer ${token}` } }),
+                    axios.get(`${API_URL}/expense-type`, { headers: { Authorization: `Bearer ${token}` } }), // SỬA API
                     axios.get(`${API_URL}/Driver`, { headers: { Authorization: `Bearer ${token}` } }),
                     axios.get(`${API_URL}/Trip`, { headers: { Authorization: `Bearer ${token}` } }),
+                    axios.get(`${API_URL}/TripExpense/status`, { headers: { Authorization: `Bearer ${token}` } }), // THÊM API Status
                 ]);
 
                 setVehicleOptions(vehicleRes.data.resources || []);
                 setExpenseTypeOptions(typeRes.data.resources || []);
                 setDriverOptions(driverRes.data.resources || []);
                 setTripOptions(tripRes.data.resources || []);
+                setStatusOptions(statusRes.data.resources || []); // THÊM: Set state cho Status
 
             } catch (err) {
                 console.error('Lỗi tải dữ liệu filter:', err);
@@ -262,7 +266,8 @@ export default function TripExpense() {
                                     <label htmlFor="filter_statusIds" className="form-label">Trạng thái</label>
                                     <select multiple className="form-select" id="filter_statusIds" name="statusIds"
                                         value={filterInputs.statusIds} onChange={handleMultiSelectChange} style={{ height: '150px' }}>
-                                        {APPROVAL_STATUSES.map((status) => (
+                                        {/* SỬA: Dùng statusOptions từ API */}
+                                        {statusOptions.map((status) => (
                                             <option key={status.id} value={status.id}>{status.name}</option>
                                         ))}
                                     </select>
@@ -281,7 +286,7 @@ export default function TripExpense() {
                                     <select multiple className="form-select" id="filter_driverIds" name="driverIds"
                                         value={filterInputs.driverIds} onChange={handleMultiSelectChange} style={{ height: '150px' }}>
                                         {driverOptions.map((driver) => (
-                                            <option key={driver.Id} value={driver.Id}>{driver.FullName}</option> // Giả sử API /Driver trả về Id và FullName
+                                            <option key={driver.id} value={driver.id}>{driver.fullName}</option> // Giả sử API /Driver trả về Id và FullName
                                         ))}
                                     </select>
                                 </div>
@@ -292,7 +297,7 @@ export default function TripExpense() {
                                     <select multiple className="form-select" id="filter_vehicleIds" name="vehicleIds"
                                         value={filterInputs.vehicleIds} onChange={handleMultiSelectChange} style={{ height: '150px' }}>
                                         {vehicleOptions.map((vehicle) => (
-                                            <option key={vehicle.id} value={vehicle.id}>{vehicle.licensePlate}</option> // Giả sử API /Vehicle trả về id và licensePlate
+                                            <option key={vehicle.id} value={vehicle.id}>{vehicle.name}</option> // Giả sử API /Vehicle trả về id và licensePlate
                                         ))}
                                     </select>
                                 </div>

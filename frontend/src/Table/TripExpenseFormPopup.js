@@ -63,7 +63,7 @@ function TripExpenseFormPopup({ item, onClose, apiUrl, token, onSuccess, showCon
             try {
                 const [tripRes, typeRes] = await Promise.all([
                     axios.get(`${API_URL}/Trip`, { headers: { Authorization: `Bearer ${token}` } }),
-                    axios.get(`${API_URL}/ExpenseType`, { headers: { Authorization: `Bearer ${token}` } }),
+                    axios.get(`${API_URL}/expense-type`, { headers: { Authorization: `Bearer ${token}` } }), // SỬA API
                 ]);
                 setTripOptions(tripRes.data.resources || []);
                 setExpenseTypeOptions(typeRes.data.resources || []);
