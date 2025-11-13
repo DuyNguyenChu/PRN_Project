@@ -75,6 +75,7 @@ namespace api.Service
 
                 // Tạo Trip
                 var model = obj.ToEntity();
+                model.Description = "";
                 await _tripRepository.CreateAsync(model);
                 await _tripRepository.SaveChangesAsync(); // Save để có Id sinh mã
 

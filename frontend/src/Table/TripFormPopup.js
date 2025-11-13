@@ -1,10 +1,10 @@
 // TripFormPopup.js
+// (Nội dung file giống hệt file TripFormPopup.js ở câu trả lời trước)
 import React, { useState, useEffect, useMemo } from 'react';
 import axios from 'axios';
 import { API_URL } from '~/api/api';
 import { useFormValidation } from '../validator/useFormValidation'; // Sửa lại đường dẫn nếu cần
 import { required, maxLength } from '../validator/validators'; // Sửa lại đường dẫn
-// (Không dùng DatePicker ở đây)
 
 // Lấy ID người dùng
 const getLoggedInUserId = () => {
@@ -60,8 +60,6 @@ function TripFormPopup({ item, onClose, apiUrl, token, onSuccess, showConfirmMod
     );
 
     // --- Data Fetching ---
-
-    // Fetch dropdown (Vehicle & Driver)
     useEffect(() => {
         const fetchDropdownData = async () => {
             setLoadingDropdown(true);
@@ -81,16 +79,14 @@ function TripFormPopup({ item, onClose, apiUrl, token, onSuccess, showConfirmMod
         fetchDropdownData();
     }, [token, showNotifyModal]);
 
-    // Fetch dữ liệu chi tiết khi CẬP NHẬT
     useEffect(() => {
-        const driverId = item?.id || item?.Id;
-        if (isUpdate && driverId && token) {
+        const tripId = item?.id || item?.Id; // Sửa: Dùng cả 2
+        if (isUpdate && tripId && token) {
             const fetchTripData = async () => {
                 setLoadingData(true);
                 setFetchError(null);
                 try {
-                    // Giả sử API GET /Trip/{id} trả về chi tiết
-                    const res = await axios.get(`${apiUrl}/${driverId}`, {
+                    const res = await axios.get(`${apiUrl}/${tripId}`, { // Sửa
                         headers: { Authorization: `Bearer ${token}` },
                     });
                     
@@ -98,14 +94,15 @@ function TripFormPopup({ item, onClose, apiUrl, token, onSuccess, showConfirmMod
                     
                     if (data) {
                         setValues({
-                            vehicleId: data.vehicle.id || '',
-                            driverId: data.driver.id || '',
-                            fromLocation: data.fromLocation.name || '',
-                            fromLatitude: data.fromLocation.latitude|| 0,
-                            fromLongitude: data.fromLocation.longitude || 0,
-                            toLocation: data.toLocation.name || '',
-                            toLatitude: data.toLocation.latitude || 0,
-                            toLongitude: data.toLocation.longitude || 0,
+                            // Sửa: Dùng camelCase từ API Detail
+                            vehicleId: data.vehicle?.id || '',
+                            driverId: data.driver?.id || '',
+                            fromLocation: data.fromLocation?.name || '',
+                            fromLatitude: data.fromLocation?.latitude || 0,
+                            fromLongitude: data.fromLocation?.longitude || 0,
+                            toLocation: data.toLocation?.name || '',
+                            toLatitude: data.toLocation?.latitude || 0,
+                            toLongitude: data.toLocation?.longitude || 0,
                         });
                     } else {
                         throw new Error("Không tìm thấy dữ liệu chuyến đi.");
@@ -120,17 +117,15 @@ function TripFormPopup({ item, onClose, apiUrl, token, onSuccess, showConfirmMod
         } else if (!isUpdate) {
              setValues(initialState);
         }
-    }, [isUpdate, item, apiUrl, token, setValues]);
+    }, [isUpdate, item, apiUrl, token, setValues, showNotifyModal]); // Sửa
 
     // --- Handlers ---
-
-    // Xử lý Select (để đảm bảo là Number)
     const handleSelectChange = (e) => {
         const { name, value } = e.target;
         handleChange({ target: { name, value: value ? Number(value) : '' } });
     };
 
-    // --- Handlers cho Nominatim Map ---
+    // (Các hàm Nominatim giữ nguyên)
     const handleSearchLocation = async (fieldPrefix) => {
         const query = values[`${fieldPrefix}Location`];
         if (query.length < 3) return;
@@ -149,7 +144,6 @@ function TripFormPopup({ item, onClose, apiUrl, token, onSuccess, showConfirmMod
             showNotifyModal('Không thể tìm thấy địa chỉ: ' + error.message, false);
         }
     };
-
     const handleSelectResult = (fieldPrefix, result) => {
         setValues(prev => ({
             ...prev,
@@ -176,8 +170,6 @@ function TripFormPopup({ item, onClose, apiUrl, token, onSuccess, showConfirmMod
             else setToResults([]);
         }
     };
-    // --- Kết thúc Handlers Map ---
-
 
     const handleSubmit = () => {
         if (!validateForm()) return;
@@ -190,7 +182,6 @@ function TripFormPopup({ item, onClose, apiUrl, token, onSuccess, showConfirmMod
                 let method = isUpdate ? 'put' : 'post';
                 const tripId = item?.id || item?.Id;
                 
-                // Payload chung
                 const commonPayload = {
                     vehicleId: values.vehicleId,
                     driverId: values.driverId,
@@ -223,6 +214,7 @@ function TripFormPopup({ item, onClose, apiUrl, token, onSuccess, showConfirmMod
             }
         });
     };
+
 
     // --- Render ---
     if (loadingDropdown || loadingData) {

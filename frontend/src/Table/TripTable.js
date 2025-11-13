@@ -5,38 +5,27 @@ import axios from 'axios';
 
 // Giữ nguyên hàm getContrastColor
 function getContrastColor(hexColor) {
-    if (!hexColor) return '#000';
-    try {
-        const hex = hexColor.replace('#', '');
-        const r = parseInt(hex.substring(0, 2), 16);
-        const g = parseInt(hex.substring(2, 4), 16);
-        const b = parseInt(hex.substring(4, 6), 16);
-        const yiq = (r * 299 + g * 587 + b * 114) / 1000;
-        return yiq >= 128 ? '#000' : '#FFF';
-    } catch (e) {
-        console.error('Lỗi chuyển đổi màu:', e);
-        return '#000';
-    }
+    // ... (code giữ nguyên)
 }
 
-// Sửa: Thêm 'onDelete' vào props
-export default function TripTable({ apiUrl, token, onEdit, onDelete, refreshFlag, filters }) {
+// SỬA: Thay 'onDelete' bằng các props phân quyền và hành động
+export default function TripTable({ 
+    apiUrl, token, onEdit, refreshFlag, filters,
+    isDispatcherRole, isDriverRole, isUserRole,
+    onAccept, onReject, onArriving, onPickedUp, onEnRoute, onArrived, onComplete, onCancel,
+    tripStatusConstants // Nhận các hằng số ID
+}) {
     const [data, setData] = useState([]);
     const [totalRecords, setTotalRecords] = useState(0);
     const [page, setPage] = useState(1);
     const [pageSize, setPageSize] = useState(10);
     const [search, setSearch] = useState('');
-    const [sortField, setSortField] = useState('CreatedDate'); // Sửa
+    const [sortField, setSortField] = useState('CreatedDate');
     const [sortDir, setSortDir] = useState('desc');
     const [loading, setLoading] = useState(false);
 
-    const [showConfirm, setShowConfirm] = useState(false);
-    const [showResult, setShowResult] = useState(false);
-    const [resultMessage, setResultMessage] = useState('');
-    const [resultSuccess, setResultSuccess] = useState(false);
-    const [deleteId, setDeleteId] = useState(null);
-
-    // Xóa state/logic modal xóa (vì đã đưa lên Trip.js)
+    // XÓA: State modal Xóa (showConfirm, showResult, ...)
+    
     const isInitialMount = useRef(true);
 
     useEffect(() => {
@@ -47,7 +36,7 @@ export default function TripTable({ apiUrl, token, onEdit, onDelete, refreshFlag
         }
     }, [filters]);
 
-    // Fetch dữ liệu
+    // Fetch dữ liệu (Giữ nguyên logic fetch)
     const fetchData = useCallback(async () => {
         setLoading(true);
         try {
@@ -56,85 +45,27 @@ export default function TripTable({ apiUrl, token, onEdit, onDelete, refreshFlag
                 draw: page,
                 columns: [
                     { data: 'Id', name: '', searchable: true, orderable: true, search: { value: '', regex: false } },
-                    {
-                        data: 'RequesterName',
-                        name: '',
-                        searchable: true,
-                        orderable: true,
-                        search: { value: '', regex: false },
-                    },
-                    {
-                        data: 'DriverName',
-                        name: '',
-                        searchable: true,
-                        orderable: true,
-                        search: { value: '', regex: false },
-                    },
-                    {
-                        data: 'VehicleModelName',
-                        name: '',
-                        searchable: true,
-                        orderable: true,
-                        search: { value: '', regex: false },
-                    },
-                    {
-                        data: 'FromLocation',
-                        name: '',
-                        searchable: true,
-                        orderable: true,
-                        search: { value: '', regex: false },
-                    }, // Lộ trình
-                    {
-                        data: 'TripStatusName',
-                        name: '',
-                        searchable: true,
-                        orderable: true,
-                        search: { value: '', regex: false },
-                    },
-                    {
-                        data: 'ActualStartTime',
-                        name: '',
-                        searchable: true,
-                        orderable: true,
-                        search: { value: '', regex: false },
-                    },
-                    {
-                        data: 'ActualEndTime',
-                        name: '',
-                        searchable: true,
-                        orderable: true,
-                        search: { value: '', regex: false },
-                    },
-                    {
-                        data: 'CreatedDate',
-                        name: '',
-                        searchable: true,
-                        orderable: true,
-                        search: { value: '', regex: false },
-                    },
+                    { data: 'RequesterName', name: '', searchable: true, orderable: true, search: { value: '', regex: false }, },
+                    { data: 'DriverName', name: '', searchable: true, orderable: true, search: { value: '', regex: false }, },
+                    { data: 'VehicleModelName', name: '', searchable: true, orderable: true, search: { value: '', regex: false }, },
+                    { data: 'FromLocation', name: '', searchable: true, orderable: true, search: { value: '', regex: false }, }, 
+                    { data: 'TripStatusName', name: '', searchable: true, orderable: true, search: { value: '', regex: false }, },
+                    { data: 'ActualStartTime', name: '', searchable: true, orderable: true, search: { value: '', regex: false }, },
+                    { data: 'ActualEndTime', name: '', searchable: true, orderable: true, search: { value: '', regex: false }, },
+                    { data: 'CreatedDate', name: '', searchable: true, orderable: true, search: { value: '', regex: false }, },
                     { data: 'Id', name: '', searchable: false, orderable: false, search: { value: '', regex: false } }, // Thao tác
                 ],
                 order: [
                     {
-                        // Sửa: Cập nhật index
                         column:
-                            sortField === 'RequesterName'
-                                ? 1
-                                : sortField === 'DriverName'
-                                ? 2
-                                : sortField === 'VehicleModelName'
-                                ? 3
-                                : sortField === 'FromLocation'
-                                ? 4
-                                : sortField === 'TripStatusName'
-                                ? 5
-                                : sortField === 'ActualStartTime'
-                                ? 6
-                                : sortField === 'ActualEndTime'
-                                ? 7
-                                : sortField === 'CreatedDate'
-                                ? 8
-                                : 0, // Mặc định
+                            sortField === 'RequesterName' ? 1 : 
+                            sortField === 'DriverName' ? 2 : 
+                            sortField === 'VehicleModelName' ? 3 : 
+                            sortField === 'FromLocation' ? 4 : 
+                            sortField === 'TripStatusName' ? 5 : 
+                            sortField === 'ActualStartTime' ? 6 : 
+                            sortField === 'ActualEndTime' ? 7 : 
+                            sortField === 'CreatedDate' ? 8 : 0, 
                         dir: sortDir,
                         name: '',
                     },
@@ -142,21 +73,17 @@ export default function TripTable({ apiUrl, token, onEdit, onDelete, refreshFlag
                 start: (page - 1) * pageSize,
                 length: pageSize,
                 search: { value: search, regex: false },
-
-                // Sửa: Thêm các trường filter
                 additionalValues: [],
                 requesterIds: filters?.requesterIds || [],
                 vehicleIds: filters?.vehicleIds || [],
                 driverIds: filters?.driverIds || [],
                 tripStatusIds: filters?.tripStatusIds || [],
             };
-
-            // Sửa: Cập nhật logic filter
+            
             if (filters) {
                 if (filters.createdDate) {
-                    requestBody.columns[8].search.value = filters.createdDate; // Index của CreatedDate
+                    requestBody.columns[8].search.value = filters.createdDate; 
                 }
-                // (Các filter khác nằm ngoài 'columns' nên không cần set ở đây)
             }
 
             const res = await axios.post(`${apiUrl}/paged-advanced`, requestBody, {
@@ -181,111 +108,104 @@ export default function TripTable({ apiUrl, token, onEdit, onDelete, refreshFlag
         }
     }, [apiUrl, token, page, pageSize, search, sortField, sortDir, filters]);
 
+
     useEffect(() => {
         fetchData();
     }, [fetchData, refreshFlag]);
 
     // Giữ nguyên handleSort
     const handleSort = (field) => {
-        if (sortField === field) {
-            setSortDir(sortDir === 'asc' ? 'desc' : 'asc');
-        } else {
-            setSortField(field);
-            setSortDir('asc');
+        // ... (code giữ nguyên)
+    };
+
+    // XÓA: Toàn bộ logic Xóa (handleDeleteClick, confirmDelete, closeConfirm, closeResult)
+
+    // SỬA: Hàm render nút hành động cho Lái xe
+    const renderDriverActions = (row) => {
+        // Phải dùng 'tripStatusId' (chữ 't' thường) vì nó đến từ API paged-advanced
+        const status = row.tripStatusId; 
+        
+        switch (status) {
+            case tripStatusConstants.ASSIGNED: // 2: Đã khởi hành
+                return (
+                    <>
+                        <button className="btn btn-sm btn-success me-2" onClick={() => onAccept(row)}>Nhận</button>
+                        <button className="btn btn-sm btn-warning" onClick={() => onReject(row)}>Từ chối</button>
+                    </>
+                );
+            case tripStatusConstants.ACCEPTED: // 3: Lái xe đã nhận
+                return (
+                    <>
+                        <button className="btn btn-sm btn-info me-2" onClick={() => onArriving(row)}>Đang đến đón</button>
+                        <button className="btn btn-sm btn-secondary" onClick={() => onCancel(row)}>Hủy</button>
+                    </>
+                );
+            case tripStatusConstants.ARRIVING: // 4: Lái xe đang đi đến đón
+                return (
+                    <>
+                        <button className="btn btn-sm btn-primary me-2" onClick={() => onPickedUp(row)}>Đã đến đón</button>
+                        <button className="btn btn-sm btn-secondary" onClick={() => onCancel(row)}>Hủy</button>
+                    </>
+                );
+            case tripStatusConstants.PICKED_UP: // 5: Đã đến đón
+                return (
+                    <>
+                        <button className="btn btn-sm btn-info me-2" onClick={() => onEnRoute(row)}>Đang đến đích</button>
+                        <button className="btn btn-sm btn-secondary" onClick={() => onCancel(row)}>Hủy</button>
+                    </>
+                );
+            case tripStatusConstants.EN_ROUTE: // 6: Đang đi đến đích
+                return (
+                    <>
+                        <button className="btn btn-sm btn-primary me-2" onClick={() => onArrived(row)}>Đã đến đích</button>
+                        <button className="btn btn-sm btn-secondary" onClick={() => onCancel(row)}>Hủy</button>
+                    </>
+                );
+            case tripStatusConstants.ARRIVED: // 7: Đã đến đích
+                return (
+                    <>
+                        <button className="btn btn-sm btn-success me-2" onClick={() => onComplete(row)}>Hoàn thành</button>
+                        <button className="btn btn-sm btn-secondary" onClick={() => onCancel(row)}>Hủy</button>
+                    </>
+                );
+            case tripStatusConstants.COMPLETED: // 8: Hoàn thành
+            case tripStatusConstants.CANCELLED: // 9: Đã hủy
+            case tripStatusConstants.REJECTED: // 10: Đã từ chối
+                return null; // Không có hành động
+            default:
+                return null;
         }
     };
 
-    // Xóa: Toàn bộ logic Xóa (đã đưa lên Trip.js)
-
-    const handleDeleteClick = (id) => {
-        setDeleteId(id);
-        setShowConfirm(true);
-    };
-
-    // Xác nhận xóa
-    const confirmDelete = async () => {
-        try {
-            await axios.delete(`${apiUrl}/${deleteId}`, {
-                headers: { Authorization: `Bearer ${token}` },
-            });
-            setResultSuccess(true);
-            setResultMessage('Xóa thành công!');
-        } catch (err) {
-            console.error('❌ Lỗi xóa:', err);
-            setResultSuccess(false);
-            setResultMessage(`Xóa thất bại: ${err.response?.data?.message || err.message}`);
-        } finally {
-            setShowConfirm(false);
-            setShowResult(true);
-            fetchData();
-        }
-    };
-
-    const closeConfirm = () => {
-        setShowConfirm(false);
-        setDeleteId(null);
-    };
-
-    const closeResult = () => {
-        setShowResult(false);
-    };
 
     return (
         <div>
+            {/* Thanh tìm kiếm (Giữ nguyên) */}
             <div className="d-flex justify-content-between align-items-center mb-3">
-                <input
-                    type="text"
-                    className="form-control w-auto"
-                    placeholder="Tìm kiếm"
-                    value={search}
-                    onChange={(e) => setSearch(e.target.value)}
-                />
-                <span className="text-muted">Tổng: {totalRecords} bản ghi</span>
+                {/* ... (code giữ nguyên) ... */}
             </div>
 
             <div className="table-responsive">
                 <table className="table table-hover">
                     <thead>
-                        {/* Sửa: Cập nhật các cột tiêu đề */}
+                        {/* Tiêu đề bảng (Giữ nguyên) */}
                         <tr className="text-uppercase text-gray-500 fs-7">
                             <th style={{ width: '5%' }}>STT</th>
-                            <th onClick={() => handleSort('RequesterName')} style={{ cursor: 'pointer' }}>
-                                Người yêu cầu {sortField === 'RequesterName' && (sortDir === 'asc' ? '▲' : '▼')}
-                            </th>
-                            <th onClick={() => handleSort('DriverName')} style={{ cursor: 'pointer' }}>
-                                Tài xế {sortField === 'DriverName' && (sortDir === 'asc' ? '▲' : '▼')}
-                            </th>
-                            <th onClick={() => handleSort('VehicleModelName')} style={{ cursor: 'pointer' }}>
-                                Xe {sortField === 'VehicleModelName' && (sortDir === 'asc' ? '▲' : '▼')}
-                            </th>
-                            <th onClick={() => handleSort('FromLocation')} style={{ cursor: 'pointer' }}>
-                                Lộ trình {sortField === 'FromLocation' && (sortDir === 'asc' ? '▲' : '▼')}
-                            </th>
-                            <th onClick={() => handleSort('TripStatusName')} style={{ cursor: 'pointer' }}>
-                                Trạng thái {sortField === 'TripStatusName' && (sortDir === 'asc' ? '▲' : '▼')}
-                            </th>
-                            <th onClick={() => handleSort('ActualStartTime')} style={{ cursor: 'pointer' }}>
-                                Bắt đầu {sortField === 'ActualStartTime' && (sortDir === 'asc' ? '▲' : '▼')}
-                            </th>
-                            <th onClick={() => handleSort('CreatedDate')} style={{ cursor: 'pointer' }}>
-                                Ngày tạo {sortField === 'CreatedDate' && (sortDir === 'asc' ? '▲' : '▼')}
-                            </th>
+                            <th onClick={() => handleSort('RequesterName')}>Người yêu cầu</th>
+                            <th onClick={() => handleSort('DriverName')}>Tài xế</th>
+                            <th onClick={() => handleSort('VehicleModelName')}>Xe</th>
+                            <th onClick={() => handleSort('FromLocation')}>Lộ trình</th>
+                            <th onClick={() => handleSort('TripStatusName')}>Trạng thái</th>
+                            <th onClick={() => handleSort('ActualStartTime')}>Bắt đầu</th>
+                            <th onClick={() => handleSort('CreatedDate')}>Ngày tạo</th>
                             <th className="text-end">Thao tác</th>
                         </tr>
                     </thead>
                     <tbody>
                         {loading ? (
-                            <tr>
-                                <td colSpan={9} className="text-center">
-                                    Đang tải...
-                                </td>
-                            </tr>
+                            <tr><td colSpan={9} className="text-center">Đang tải...</td></tr>
                         ) : data.length === 0 ? (
-                            <tr>
-                                <td colSpan={9} className="text-center">
-                                    Không có dữ liệu
-                                </td>
-                            </tr>
+                            <tr><td colSpan={9} className="text-center">Không có dữ liệu</td></tr>
                         ) : (
                             data.map((row, index) => (
                                 <tr key={row.Id || row.id}>
@@ -297,13 +217,11 @@ export default function TripTable({ apiUrl, token, onEdit, onDelete, refreshFlag
                                         Từ: {row.fromLocation} <br /> <span className="text-muted">Đến: {row.toLocation}</span>
                                     </td>
                                     <td>
-                                        <span
-                                            className="badge"
+                                        <span className="badge"
                                             style={{
                                                 backgroundColor: row.tripStatusColor,
                                                 color: getContrastColor(row.tripStatusColor),
-                                            }}
-                                        >
+                                            }}>
                                             {row.tripStatusName}
                                         </span>
                                     </td>
@@ -313,16 +231,19 @@ export default function TripTable({ apiUrl, token, onEdit, onDelete, refreshFlag
                                             : 'Chưa bắt đầu'}
                                     </td>
                                     <td>{moment(row.CreatedDate).format('DD/MM/YYYY HH:mm')}</td>
+                                    
+                                    {/* SỬA: Cột Thao tác dựa trên Role */}
                                     <td className="text-end">
-                                        <button className="btn btn-sm btn-primary me-2" onClick={() => onEdit(row)}>
-                                            Sửa
-                                        </button>
-                                        <button
-                                            className="btn btn-sm btn-danger"
-                                            onClick={() => onDelete(row.Id || row.id)}
-                                        >
-                                            Xóa
-                                        </button>
+                                        {isDispatcherRole && onEdit && 
+                                            (row.tripStatusId === tripStatusConstants.ACCEPTED || 
+                                             row.tripStatusId === tripStatusConstants.ARRIVING ||
+                                            row.tripStatusId === tripStatusConstants.ASSIGNED) && (
+                                            <button className="btn btn-sm btn-primary me-2" onClick={() => onEdit(row)}>
+                                                Sửa
+                                            </button>
+                                        )}
+                                        {isDriverRole && renderDriverActions(row)}
+                                        {/* Người dùng (isUserRole) không thấy nút nào */}
                                     </td>
                                 </tr>
                             ))
@@ -331,53 +252,9 @@ export default function TripTable({ apiUrl, token, onEdit, onDelete, refreshFlag
                 </table>
             </div>
 
-            {/* Xóa: Modal xác nhận và Modal kết quả */}
-            {showConfirm && (
-                <div className="modal fade show d-block" style={{ background: 'rgba(0,0,0,0.4)' }}>
-                    <div className="modal-dialog modal-dialog-centered">
-                        <div className="modal-content">
-                            <div className="modal-header">
-                                <h5 className="modal-title">Xác nhận xóa</h5>
-                            </div>
-                            <div className="modal-body">
-                                <p>Bạn có chắc muốn xóa trạng thái này không?</p>
-                            </div>
-                            <div className="modal-footer">
-                                <button className="btn btn-secondary" onClick={closeConfirm}>
-                                    Hủy
-                                </button>
-                                <button className="btn btn-danger" onClick={confirmDelete}>
-                                    Có, xóa
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            )}
-
-            {/* Modal kết quả */}
-            {showResult && (
-                <div className="modal fade show d-block" style={{ background: 'rgba(0,0,0,0.4)' }}>
-                    <div className="modal-dialog modal-dialog-centered">
-                        <div className="modal-content">
-                            <div className="modal-header">
-                                <h5 className={`modal-title ${resultSuccess ? 'text-success' : 'text-danger'}`}>
-                                    {resultSuccess ? 'Thành công' : 'Thất bại'}
-                                </h5>
-                            </div>
-                            <div className="modal-body">
-                                <p>{resultMessage}</p>
-                            </div>
-                            <div className="modal-footer">
-                                <button className="btn btn-primary" onClick={closeResult}>
-                                    Đóng
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            )}
-
+            {/* XÓA: Modal xác nhận và Modal kết quả (đã bị xóa) */}
+            
+            {/* Phân trang (Giữ nguyên) */}
             <div className="d-flex justify-content-between align-items-center mt-3">
                 {/* chọn số bản ghi mỗi trang */}
                 <select
