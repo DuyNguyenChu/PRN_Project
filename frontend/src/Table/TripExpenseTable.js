@@ -234,23 +234,23 @@ export default function TripExpenseTable({ apiUrl, token, onEdit, refreshFlag, f
                             data.map((row, index) => (
                                 <tr key={row.Id}>
                                     <td>{(page - 1) * pageSize + index + 1}</td>
-                                    <td>{row.DriverName}</td>
-                                    <td>{`${row.VehicleBrandName} ${row.VehicleModelName}`}</td>
-                                    <td>{row.ExpenseTypeName}</td>
-                                    <td>{row.Amount.toLocaleString('vi-VN')} đ</td>
+                                    <td>{row.driverName}</td>
+                                    <td>{`${row.vehicleBrandName} ${row.vehicleModelName}`}</td>
+                                    <td>{row.expenseTypeName}</td>
+                                    <td>{row.amount} đ</td>
                                     <td>
                                         {/* Sửa: Pill trạng thái (API đã trả về) */ }
                                         <span 
                                             className="badge" 
                                             style={{ 
-                                                backgroundColor: row.StatusColor,
-                                                color: getContrastColor(row.StatusColor)
+                                                backgroundColor: row.statusColor,
+                                                color: getContrastColor(row.statusColor)
                                             }}
                                         >
-                                            {row.StatusName}
+                                            {row.statusName}
                                         </span>
                                     </td>
-                                    <td>{moment(row.ExpenseDate).format('DD/MM/YYYY')}</td>
+                                    <td>{moment(row.expenseDate).format('DD/MM/YYYY')}</td>
                                     <td>{moment(row.CreatedDate).format('DD/MM/YYYY HH:mm')}</td>
                                     <td className="text-end">
                                         <button className="btn btn-sm btn-primary me-2" onClick={() => onEdit(row)}>
