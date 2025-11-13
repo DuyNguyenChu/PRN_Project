@@ -35,6 +35,8 @@ import TripRequest from '~/pages/TripRequest';
 import Driver from '~/pages/Driver';
 import TripExpense from '~/pages/TripExpense';
 import DriverStatus from '~/pages/DriverStatus';
+import ExpenseType from '~/pages/ExpenseType';
+import ViolationType from '~/pages/ViolationType';
 import MainLayout from '../Layout/MainLayout';
 import AuthLayout from '../Layout/AuthLayout';
 
@@ -120,6 +122,8 @@ function AppRoutes() {
                 <Route path="/driver" element={<Driver />} />
                 <Route path="/tripExpense" element={<TripExpense />} />
                 <Route path="/driverStatus" element={<DriverStatus />} />
+                <Route path="/expenseType" element={<ExpenseType />} />
+                <Route path="/violationType" element={<ViolationType />} />
                 
             </Route>
 

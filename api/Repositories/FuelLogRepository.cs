@@ -1,8 +1,8 @@
 ﻿using api.Dtos.FuelLog;
 using api.DTParameters;
-using api.Extensions; 
+using api.Extensions;
 using api.Helpers;
-using api.Interface; 
+using api.Interface;
 using api.Interface.Repository;
 using api.Models;
 using api.ViewModel;
@@ -55,7 +55,7 @@ namespace api.Repositories
                         where !fl.IsDeleted &&
                               !v.IsDeleted &&
                               !d.IsDeleted &&
-                              (du == null || !du.IsDeleted) && 
+                              (du == null || !du.IsDeleted) &&
                               !vm.IsDeleted &&
                               (t == null || !t.IsDeleted) &&
                               (u == null || !u.IsDeleted)
@@ -86,22 +86,21 @@ namespace api.Repositories
 
             var totalRecord = await query.CountAsync();
 
-          if (!string.IsNullOrEmpty(keyword))
-    {
-        query = query
-            .Where(x => 
-                EF.Functions.Collate(x.FuelType, SQLParams.Latin_General).Contains(keyword) ||
-                x.CreatedDate.ToVietnameseDateTimeOffset().Contains(keyword) || 
-                EF.Functions.Collate(x.VehicleModelName, SQLParams.Latin_General).Contains(keyword) ||
-                EF.Functions.Collate(x.VehicleRegistrationNumber, SQLParams.Latin_General).Contains(keyword) ||
-                EF.Functions.Collate(x.DriverName, SQLParams.Latin_General).Contains(keyword) ||
-                (x.TripCode != null && EF.Functions.Collate(x.TripCode, SQLParams.Latin_General).Contains(keyword)) ||
-                EF.Functions.Collate(x.GasStation, SQLParams.Latin_General).Contains(keyword) 
-                
-            );
-    }
+            if (!string.IsNullOrEmpty(keyword))
+            {
+                query = query
+                    .Where(x =>
+                        EF.Functions.Collate(x.FuelType, SQLParams.Latin_General).Contains(keyword) ||
+                        x.CreatedDate.ToVietnameseDateTimeOffset().Contains(keyword) ||
+                        EF.Functions.Collate(x.VehicleModelName, SQLParams.Latin_General).Contains(keyword) ||
+                        EF.Functions.Collate(x.VehicleRegistrationNumber, SQLParams.Latin_General).Contains(keyword) ||
+                        EF.Functions.Collate(x.DriverName, SQLParams.Latin_General).Contains(keyword) || 
+                        (x.TripCode != null && EF.Functions.Collate(x.TripCode, SQLParams.Latin_General).Contains(keyword)) ||
+                        EF.Functions.Collate(x.GasStation, SQLParams.Latin_General).Contains(keyword)
 
-            // === SỬA LỖI TÌM KIẾM THEO CỘT ===
+                    );
+            }
+
             if (parameters.Columns != null)
             {
                 foreach (var column in parameters.Columns)
@@ -109,9 +108,13 @@ namespace api.Repositories
                     var search = column.Search?.Value;
                     if (string.IsNullOrEmpty(search)) continue;
 
-                    // KHÔNG dùng search.ToLower()
                     switch (column.Data)
                     {
+                        case "driverName":
+                            query = query.Where(r =>
+                                EF.Functions.Collate(r.DriverName, SQLParams.Latin_General).Contains(search));
+                            break;
+
                         case "tripCode":
                             query = query.Where(r => r.TripCode != null &&
                                 EF.Functions.Collate(r.TripCode, SQLParams.Latin_General).Contains(search));
@@ -120,7 +123,7 @@ namespace api.Repositories
                             query = query.Where(r =>
                                 EF.Functions.Collate(r.GasStation, SQLParams.Latin_General).Contains(search));
                             break;
-                        case "createdDate": // Phần này đã đúng, không thay đổi
+                        case "createdDate": 
                             if (search.Contains(" - "))
                             {
                                 var dates = search.Split(" - ");
@@ -138,20 +141,17 @@ namespace api.Repositories
                 }
             }
 
-            // Lọc nâng cao (Không thay đổi)
             if (parameters.VehicleIds.Any())
                 query = query.Where(x => parameters.VehicleIds.Contains(x.VehicleId));
-            if (parameters.DriverIds.Any())
-                query = query.Where(x => parameters.DriverIds.Contains(x.DriverId));
+
+         
+
             if (parameters.FuelTypes.Any())
                 query = query.Where(x => parameters.FuelTypes.Contains(x.FuelType));
             if (parameters.StatusIds.Any())
                 query = query.Where(x => parameters.StatusIds.Contains(x.Status));
-            if (parameters.TripIds.Any())
-                query = query.Where(x => x.TripId.HasValue && parameters.TripIds.Contains(x.TripId.Value));
 
-            // Sắp xếp (Không thay đổi)
-            // Logic này sẽ hoạt động trở lại vì `query` đã hợp lệ
+           
             query = orderAscendingDirection ? query.OrderByDynamic(orderCriteria, LinqExtensions.Order.Asc) : query.OrderByDynamic(orderCriteria, LinqExtensions.Order.Desc);
 
             var records = await query
@@ -159,7 +159,6 @@ namespace api.Repositories
                 .Take(parameters.Length)
                 .ToListAsync();
 
-            // Gán tên hiển thị (Không thay đổi)
             foreach (var item in records)
             {
                 item.FuelTypeName = CommonConstants.GetFuelTypeName(item.FuelType);
@@ -172,8 +171,8 @@ namespace api.Repositories
             {
                 draw = parameters.Draw,
                 data = records,
-                recordsFiltered = await query.CountAsync(), // Đếm sau khi lọc
-                recordsTotal = totalRecord // Đếm trước khi lọc
+                recordsFiltered = await query.CountAsync(), 
+                recordsTotal = totalRecord 
             };
         }
     }

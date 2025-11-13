@@ -11,7 +11,6 @@ namespace api.Mappers
             return new MaintenanceRecord
             {
                 VehicleId = obj.VehicleId,
-                TripId = obj.TripId,
                 Odometer = obj.Odometer,
                 ServiceType = obj.ServiceType,
                 ServiceProvider = obj.ServiceProvider,
@@ -27,7 +26,6 @@ namespace api.Mappers
         public static void ToMaintenanceRecordFromUpdateDto(this UpdateMaintenanceRecordDto obj, MaintenanceRecord existData, int updaterId)
         {
             existData.VehicleId = obj.VehicleId;
-            existData.TripId = obj.TripId;
             existData.Odometer = obj.Odometer;
             existData.ServiceType = obj.ServiceType;
             existData.ServiceProvider = obj.ServiceProvider;

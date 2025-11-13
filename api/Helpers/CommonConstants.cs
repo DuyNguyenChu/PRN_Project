@@ -231,11 +231,11 @@ namespace api.Helpers
 
         public static class ExpenseType
         {
-            public const int TOLL_FEE = 1001; // cầu đường
-            public const int PARKING_FEE = 1002; // đỗ xe
-            public const int ACCOMMODATION = 1003; // lưu trú
-            public const int MEAL = 1004; // ăn uống
-            public const int OTHER = 1005; // khác
+            public const int TOLL_FEE = 1; // cầu đường
+            public const int PARKING_FEE = 2; // đỗ xe
+            public const int ACCOMMODATION = 3; // lưu trú
+            public const int MEAL = 4; // ăn uống
+            public const int OTHER = 5; // khác
 
         }
 

@@ -21,7 +21,7 @@ export default function FuelLogTable({ apiUrl, token, onEdit, onDelete, onApprov
         } else {
             setPage(1);
         }
-    }, [filters, search]);
+    }, [filters, search]); // <--- SỬA LỖI Ở ĐÂY
 
     const formatCurrency = (value) => {
         if (value === null || value === undefined) return '';
@@ -60,9 +60,8 @@ export default function FuelLogTable({ apiUrl, token, onEdit, onDelete, onApprov
                     statusName: 8,
                 }[sortField] || 5; // Mặc định là createdDate
 
-            // === [THAY ĐỔI QUAN TRỌNG] ===
             // Áp dụng bộ lọc cột từ `filters` (cho thanh lọc)
-            // Gán giá trị driverName vào đúng
+            // [THAY ĐỔI] Thêm filter cho driverName (column index 2)
             if (filters.driverName) columns[2].search.value = filters.driverName;
             if (filters.tripCode) columns[3].search.value = filters.tripCode;
             if (filters.gasStation) columns[4].search.value = filters.gasStation;
@@ -78,6 +77,8 @@ export default function FuelLogTable({ apiUrl, token, onEdit, onDelete, onApprov
 
                 // Bộ lọc nâng cao (từ FuelLogDTParameters)
                 vehicleIds: filters.vehicleIds || [],
+                // [THAY ĐỔI] Đã xóa driverIds
+                // [THAY ĐỔI] Đã xóa tripIds
                 fuelTypes: filters.fuelTypes || [],
                 statusIds: filters.statusIds || [],
             };
