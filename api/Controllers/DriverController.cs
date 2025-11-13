@@ -154,6 +154,13 @@ namespace api.Controllers
             var result = await _driverService.GetLicenseClass();
             return BaseResult(result);
         }
+
+        [HttpGet("available-driver")]
+        public async Task<IActionResult> GetAvailableDriverAsync()
+        {
+            var result = await _driverService.GetDriverAvailableAsync();
+            return BaseResult(result);
+        }
     }
 
 }

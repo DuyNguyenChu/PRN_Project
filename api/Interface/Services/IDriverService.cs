@@ -23,6 +23,7 @@ namespace api.Interface.Services
         //Task<ApiResponse> GetTripExpensesAsync(TripExpenseFilter filter);
         //Task<ApiResponse> GetMaintenanceRecordsAsync(MaintenanceRecordFilter filter);
         Task<ApiResponse> GetLicenseClass();
+        Task<ApiResponse> GetDriverAvailableAsync();
     }
 
 }

@@ -2,10 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using api.Dtos.Driver;
 using api.Dtos.Vehicle;
+using api.Helpers;
 using api.Interface.Repository;
 using api.Interface.Services;
 using api.Mappers;
+using api.Repositories;
 
 namespace api.Service
 {
@@ -68,6 +71,16 @@ namespace api.Service
             _vehicleRepository.Update(existing);
             await _vehicleRepository.SaveChangesAsync();
             return true;
+        }
+
+        public async Task<ApiResponse> GetVehicleAvailableAsync()
+        {
+            var vehicles = await _vehicleRepository.GetAllAsync();
+            var data = vehicles.Where(v => !v.IsDeleted && v.VehicleStatusId == CommonConstants.VehicleStatus.AVAILABLE)
+                .Select(v => v.ToEntityDto());
+
+
+            return ApiResponse.Success(data);
         }
     }
 }

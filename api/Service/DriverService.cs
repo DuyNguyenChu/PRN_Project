@@ -635,6 +635,33 @@ namespace api.Service
 
             return ApiResponse.Success(data);
         }
+
+        public async Task<ApiResponse> GetDriverAvailableAsync()
+        {
+            var data = await _driverRepository
+                .FindByCondition(x => !x.IsDeleted)
+                .Where(d => d.DriverStatusId == CommonConstants.DriverStatus.AVAILABLE)
+                .Select(x => new DriverListDto
+                {
+                    Id = x.Id,
+                    ExperienceYears = x.ExperienceYear,
+                    LicenseNumber = x.LicenseNumber,
+                    LicenseClass = x.LicenseClass,
+                    DriverStatusId = x.DriverStatusId,
+                    DriverStatusName = x.DriverStatus.Name,
+                    DriverStatusColor = x.DriverStatus.Color,
+                    UserId = x.Users.FirstOrDefault().Id,
+                    FullName = x.Users.FirstOrDefault().FirstName + " " + x.Users.FirstOrDefault().LastName,
+                    Email = x.Users.FirstOrDefault().Email,
+                    PhoneNumber = x.Users.FirstOrDefault().PhoneNumber,
+                    //AvatarId = x.User.AvatarId,
+                    //AvatarUrl = x.User.Avatar == null ? null : _storageService.GetOriginalUrl(x.User.Avatar.FileKey),
+                    CreatedDate = x.CreatedDate
+                })
+                .ToListAsync();
+
+            return ApiResponse.Success(data);
+        }
     }
 
 }

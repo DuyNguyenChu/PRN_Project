@@ -167,11 +167,11 @@ namespace api.Helpers
 
         public static class VehicleStatus
         {
-            public const int AVAILABLE = 1001;
-            public const int IN_USE = 1002;
-            public const int IN_MAINTENANCE = 1003;
-            public const int BROKEN = 1004;
-            public const int UNAVAILABLE = 1005;
+            public const int AVAILABLE = 1;
+            public const int IN_USE = 2;
+            public const int IN_MAINTENANCE = 3;
+            public const int BROKEN = 5;
+            public const int UNAVAILABLE = 4;
         }
 
         public static class DriverStatus
