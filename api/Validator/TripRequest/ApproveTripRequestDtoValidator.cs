@@ -36,33 +36,6 @@ namespace api.Validator.TripRequest
                .NotEmpty()
                .WithName("Xe")
                .WithMessage(ErrorMessagesConstants.GetMessage(ApiCodeConstants.Common.RequiredMessage));
-
-            RuleFor(x => x.ScheduledStartTime)
-               .NotNull()
-               .WithName("Thời gian dự kiến xuất phát")
-               .WithMessage(ErrorMessagesConstants.GetMessage(ApiCodeConstants.Common.RequiredMessage))
-               .NotEmpty()
-               .WithName("Thời gian dự kiến xuất phát")
-               .WithMessage(ErrorMessagesConstants.GetMessage(ApiCodeConstants.Common.RequiredMessage))
-               .LessThan(x => x.ScheduledEndTime)
-               .WithName("Thời gian dự kiến xuất phát")
-               .WithMessage(ErrorMessagesConstants.GetMessage(ApiCodeConstants.Common.LessThanMessage));
-
-            RuleFor(x => x.ScheduledEndTime)
-               .NotNull()
-               .WithName("Thời gian dự kiến hoàn thành")
-               .WithMessage(ErrorMessagesConstants.GetMessage(ApiCodeConstants.Common.RequiredMessage))
-               .NotEmpty()
-               .WithName("Thời gian dự kiến hoàn thành")
-               .WithMessage(ErrorMessagesConstants.GetMessage(ApiCodeConstants.Common.RequiredMessage))
-               .GreaterThan(x => x.ScheduledStartTime)
-               .WithName("Thời gian dự kiến hoàn thành")
-               .WithMessage(ErrorMessagesConstants.GetMessage(ApiCodeConstants.Common.GreaterThanMessage));
-
-            RuleFor(x => x.Notes)
-               .MaximumLength(1000)
-               .WithName("Ghi chú")
-               .WithMessage(ErrorMessagesConstants.GetMessage(ApiCodeConstants.Common.MaxLengthMessage));
         }
     }
 }

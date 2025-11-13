@@ -25,16 +25,11 @@ export default function ApproveTripRequestPopup({ item, apiUrl, token, onClose, 
     const initialState = {
         driverId: '',
         vehicleId: '',
-        scheduledStartTime: new Date(),
-        scheduledEndTime: new Date(new Date().getTime() + 2 * 60 * 60 * 1000), // Mặc định 2 tiếng sau
-        notes: '',
     };
 
     const validationRules = {
         driverId: [required],
         vehicleId: [required],
-        scheduledStartTime: [required],
-        scheduledEndTime: [required],
     };
 
     const { values, errors, setValues, handleChange, validateForm, isSubmitDisabled } = useFormValidation(
@@ -61,10 +56,6 @@ export default function ApproveTripRequestPopup({ item, apiUrl, token, onClose, 
         };
         fetchDropdownData();
     }, [token, showNotifyModal]);
-
-    const handleDateChange = (date, name) => {
-        handleChange({ target: { name, value: date } });
-    };
 
     const handleSelectChange = (e) => {
         const { name, value } = e.target;
@@ -142,36 +133,6 @@ export default function ApproveTripRequestPopup({ item, apiUrl, token, onClose, 
                                 ))}
                             </select>
                             {errors.vehicleId && <div className="text-danger mt-1">{errors.vehicleId}</div>}
-                        </div>
-                        <div className="col-md-6">
-                            <label>Giờ bắt đầu dự kiến</label>
-                            <DatePicker
-                                selected={values.scheduledStartTime}
-                                onChange={(date) => handleDateChange(date, 'scheduledStartTime')}
-                                showTimeSelect
-                                className={`form-control ${errors.scheduledStartTime ? 'is-invalid' : ''}`}
-                                dateFormat="dd/MM/yyyy HH:mm"
-                            />
-                        </div>
-                         <div className="col-md-6">
-                            <label>Giờ kết thúc dự kiến</label>
-                            <DatePicker
-                                selected={values.scheduledEndTime}
-                                onChange={(date) => handleDateChange(date, 'scheduledEndTime')}
-                                showTimeSelect
-                                className={`form-control ${errors.scheduledEndTime ? 'is-invalid' : ''}`}
-                                dateFormat="dd/MM/yyyy HH:mm"
-                            />
-                        </div>
-                        <div className="col-12">
-                            <label>Ghi chú (Tùy chọn)</label>
-                            <textarea
-                                className="form-control"
-                                name="notes"
-                                rows="2"
-                                value={values.notes}
-                                onChange={handleChange}
-                            ></textarea>
                         </div>
                     </div>
                 )}

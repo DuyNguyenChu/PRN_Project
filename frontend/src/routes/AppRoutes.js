@@ -39,6 +39,7 @@ import ExpenseType from '~/pages/ExpenseType';
 import ViolationType from '~/pages/ViolationType';
 import MainLayout from '../Layout/MainLayout';
 import AuthLayout from '../Layout/AuthLayout';
+import Trip from '~/pages/Trip';
 
 function AppRoutes() {
     /**
@@ -124,7 +125,7 @@ function AppRoutes() {
                 <Route path="/driverStatus" element={<DriverStatus />} />
                 <Route path="/expenseType" element={<ExpenseType />} />
                 <Route path="/violationType" element={<ViolationType />} />
-                
+                <Route path="/trip" element={<Trip />} />
             </Route>
 
             {/* Nếu người dùng gõ một đường dẫn không tồn tại, chuyển về trang login */}
