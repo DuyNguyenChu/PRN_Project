@@ -176,10 +176,10 @@ namespace api.Helpers
 
         public static class DriverStatus
         {
-            public const int AVAILABLE = 1001;
-            public const int ON_TRIP = 1002;
-            public const int ON_LEAVE = 1003;
-            public const int UNAVAILABLE = 1004;
+            public const int AVAILABLE = 2;
+            public const int ON_TRIP = 3;
+            public const int ON_LEAVE = 4;
+            public const int UNAVAILABLE = 5;
         }
 
         public static class TripRequestStatus

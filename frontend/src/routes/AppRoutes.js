@@ -34,7 +34,7 @@ import TripStatus from '~/pages/TripStatus';
 import TripRequest from '~/pages/TripRequest';
 import Driver from '~/pages/Driver';
 import TripExpense from '~/pages/TripExpense';
-
+import DriverStatus from '~/pages/DriverStatus';
 import MainLayout from '../Layout/MainLayout';
 import AuthLayout from '../Layout/AuthLayout';
 
@@ -119,6 +119,8 @@ function AppRoutes() {
                 <Route path="/tripRequest" element={<TripRequest />} />
                 <Route path="/driver" element={<Driver />} />
                 <Route path="/tripExpense" element={<TripExpense />} />
+                <Route path="/driverStatus" element={<DriverStatus />} />
+                
             </Route>
 
             {/* Nếu người dùng gõ một đường dẫn không tồn tại, chuyển về trang login */}
