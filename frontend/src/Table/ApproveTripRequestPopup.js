@@ -75,8 +75,6 @@ export default function ApproveTripRequestPopup({ item, apiUrl, token, onClose, 
                         id: item.id, // ID của TripRequest
                         driverId: values.driverId,
                         vehicleId: values.vehicleId,
-                        scheduledStartTime: values.scheduledStartTime.toISOString(),
-                        scheduledEndTime: values.scheduledEndTime.toISOString(),
                         notes: values.notes,
                         approvalBy: loggedInUserId,
                     };
