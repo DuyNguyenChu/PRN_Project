@@ -22,7 +22,7 @@ function MaintenanceRecordFormPopup({
     showConfirmModal, 
     showNotifyModal,
     vehicleList,
-    tripList,
+    // [THAY ĐỔI] Đã xóa tripList
     serviceTypeList 
 }) {
     
@@ -31,7 +31,8 @@ function MaintenanceRecordFormPopup({
     // --- State cho Form chính ---
     const initialState = {
         vehicleId: findOption(vehicleList, item?.vehicleId),
-        tripId: findOption(tripList, item?.tripId),
+        // [THAY ĐỔI] Đã xóa tripId
+        // tripId: findOption(tripList, item?.tripId),
         odometer: item?.odometer || '',
         serviceType: findOption(serviceTypeList, item?.serviceType),
         serviceProvider: item?.serviceProvider || '',
@@ -54,9 +55,8 @@ function MaintenanceRecordFormPopup({
     );
     
     // --- State cho Form chi tiết (nested) ---
-    // (item?.details được truyền từ `handleEdit` ở file MaintenanceRecord.js)
     const [details, setDetails] = useState(item?.details || []); 
-    const [detailError, setDetailError] = useState(null); // Lỗi khi chưa thêm chi tiết nào
+    const [detailError, setDetailError] = useState(null); 
     const [totalCost, setTotalCost] = useState(0);
 
     // State cho 1 dòng chi tiết mới
@@ -66,7 +66,6 @@ function MaintenanceRecordFormPopup({
         unitPrice: 0
     });
     const [newDetailErrors, setNewDetailErrors] = useState({});
-
 
     const [id, setId] = useState(item?.id || null);
     const isReadOnly = item && item.status !== PENDING_STATUS;
@@ -96,10 +95,9 @@ function MaintenanceRecordFormPopup({
         if (!validateNewDetail()) return;
 
         setDetails(prev => [...prev, newDetail]);
-        // Reset form chi tiết
         setNewDetail({ description: '', quantity: 1, unitPrice: 0 });
         setNewDetailErrors({});
-        setDetailError(null); // Xóa lỗi "chưa có chi tiết"
+        setDetailError(null); 
     };
 
     const handleRemoveDetail = (indexToRemove) => {
@@ -110,7 +108,6 @@ function MaintenanceRecordFormPopup({
     const handleSubmit = () => {
         const isFormValid = validateForm();
         
-        // Kiểm tra lỗi riêng của list
         if (details.length === 0) {
             setDetailError("Phải có ít nhất một chi tiết bảo dưỡng.");
             return;
@@ -125,9 +122,10 @@ function MaintenanceRecordFormPopup({
                 const payload = {
                     ...values,
                     vehicleId: values.vehicleId?.value || 0, 
-                    tripId: values.tripId?.value || null, 
+                    // [THAY ĐỔI] Đã xóa tripId
+                    // tripId: values.tripId?.value || null, 
                     serviceType: values.serviceType?.value || '', 
-                    details: details // Gửi kèm danh sách chi tiết
+                    details: details 
                 };
 
                 if (item) {
@@ -146,13 +144,13 @@ function MaintenanceRecordFormPopup({
 
     return (
         <div className="popup-overlay">
-            {/* Tăng kích thước popup */}
             <div className="popup-content p-4 rounded shadow bg-white" style={{maxWidth: '900px', width: '100%'}}>
                 <h5>{isReadOnly ? 'Chi tiết bảo dưỡng' : (item ? 'Cập nhật bảo dưỡng' : 'Thêm mới bảo dưỡng')}</h5>
                 
                 {/* Form chính */}
                 <div className="row mt-3">
-                    <div className="col-md-4">
+                    {/* [THAY ĐỔI] Sửa layout cột */}
+                    <div className="col-md-8"> 
                         <div className="form-group mb-3">
                             <label>Xe (*)</label>
                             <Select 
@@ -166,19 +164,9 @@ function MaintenanceRecordFormPopup({
                             {errors.vehicleId && <div className="text-danger mt-1">{errors.vehicleId}</div>}
                         </div>
                     </div>
-                     <div className="col-md-4">
-                        <div className="form-group mb-3">
-                            <label>Chuyến đi (Nếu có)</label>
-                            <Select 
-                                options={tripList} 
-                                value={values.tripId}
-                                onChange={option => handleChange({ target: { name: 'tripId', value: option } })}
-                                isClearable 
-                                isDisabled={isReadOnly}
-                                placeholder="Chọn chuyến đi..."
-                            />
-                        </div>
-                    </div>
+                    
+                    {/* [THAY ĐỔI] Đã xóa cột Chuyến đi */}
+
                     <div className="col-md-4">
                         <div className="form-group mb-3">
                             <label>Số Odometer (*)</label>
@@ -267,7 +255,7 @@ function MaintenanceRecordFormPopup({
                     </div>
                 </div>
 
-                {/* Form Chi Tiết */}
+                {/* Form Chi Tiết (Không thay đổi) */}
                 <hr />
                 <h6 className="mb-3">Chi tiết bảo dưỡng</h6>
                 <div className="table-responsive" style={{maxHeight: '250px', overflowY: 'auto'}}>
@@ -302,7 +290,6 @@ function MaintenanceRecordFormPopup({
                                 </tr>
                             ))}
                         </tbody>
-                        {/* Form thêm chi tiết (chỉ hiện khi không read-only) */}
                         {!isReadOnly && (
                             <tfoot>
                                 <tr>
@@ -351,11 +338,10 @@ function MaintenanceRecordFormPopup({
                     </table>
                 </div>
                 {detailError && <div className="text-danger mt-2">{detailError}</div>}
-
-                {/* Tổng tiền */}
+                
                 <h5 className="text-end mt-3">Tổng chi phí: {formatCurrency(totalCost)}</h5>
 
-                {/* Nút bấm */}
+                {/* Nút bấm (Không thay đổi) */}
                 <div className="text-end mt-4">
                     <button className="btn btn-secondary me-2" onClick={onClose}>
                         {isReadOnly ? 'Đóng' : 'Hủy'}

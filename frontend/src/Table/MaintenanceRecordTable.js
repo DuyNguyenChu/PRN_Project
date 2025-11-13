@@ -2,7 +2,6 @@ import { useEffect, useState, useCallback, useRef } from 'react';
 import moment from 'moment';
 import axios from 'axios';
 
-// Giả định Status = 0 là "Chờ duyệt"
 const PENDING_STATUS = 0;
 
 export default function MaintenanceRecordTable({ 
@@ -20,7 +19,7 @@ export default function MaintenanceRecordTable({
     const [page, setPage] = useState(1);
     const [pageSize, setPageSize] = useState(10);
     const [search, setSearch] = useState('');
-    const [sortField, setSortField] = useState('startTime'); // Sửa sort mặc định
+    const [sortField, setSortField] = useState('startTime'); 
     const [sortDir, setSortDir] = useState('desc');
     const [loading, setLoading] = useState(false);
     const isInitialMount = useRef(true);
@@ -41,7 +40,6 @@ export default function MaintenanceRecordTable({
     const fetchData = useCallback(async () => {
         setLoading(true);
         try {
-            // Các cột này ánh xạ 1:1 với MaintenanceRecordAggregate
             const columns = [
                 { data: 'id', name: '', searchable: true, orderable: true, search: { value: '', regex: false } }, // 0
                 { data: 'vehicleRegistrationNumber', name: '', searchable: true, orderable: true, search: { value: '', regex: false } }, // 1
@@ -67,8 +65,10 @@ export default function MaintenanceRecordTable({
                 statusName: 8,
             }[sortField] || 5; 
 
-            // Áp dụng bộ lọc cột từ `filters`
-            if (filters.tripCode) columns[3].search.value = filters.tripCode;
+            // [THAY ĐỔI] Áp dụng bộ lọc cột từ `filters`
+            if (filters.driverName) columns[2].search.value = filters.driverName;
+            // [THAY ĐỔI] Đã xóa filter tripCode
+            // if (filters.tripCode) columns[3].search.value = filters.tripCode;
             if (filters.serviceProvider) columns[4].search.value = filters.serviceProvider;
             if (filters.startTime) columns[5].search.value = filters.startTime;
             
@@ -80,14 +80,14 @@ export default function MaintenanceRecordTable({
                 length: pageSize,
                 search: { value: search, regex: false },
 
-                // Bộ lọc nâng cao (từ MaintenanceRecordDTParameters)
+                // [THAY ĐỔI] Cập nhật bộ lọc nâng cao
                 vehicleIds: filters.vehicleIds || [],
-                driverIds: filters.driverIds || [],
-                tripIds: filters.tripIds || [],
+                // driverIds: Đã xóa
+                // tripIds: Đã xóa
                 statusIds: filters.statusIds || [],
             };
 
-            const res = await axios.post(`${apiUrl}/paged`, requestBody, { // Dùng /paged
+            const res = await axios.post(`${apiUrl}/paged`, requestBody, { 
                 headers: {
                     'Content-Type': 'application/json',
                     Authorization: `Bearer ${token}`,
@@ -218,7 +218,6 @@ export default function MaintenanceRecordTable({
             </div>
 
             {/* Pagination Controls */}
-            {/* (Copy code phân trang từ FuelLogTable.js vào đây) */}
              <div className="d-flex justify-content-between align-items-center mt-3">
                 <select
                     className="form-select w-auto"

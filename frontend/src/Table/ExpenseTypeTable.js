@@ -2,8 +2,7 @@ import { useEffect, useState, useCallback, useRef } from 'react';
 import moment from 'moment';
 import axios from 'axios';
 
-export default function ExpenseTypeTable({ apiUrl, token, onEdit, refreshFlag, filters }) {
-    // THAY ĐỔI
+export default function FuelLogTable({ apiUrl, token, onEdit, onDelete, onApprove, onReject, refreshFlag, filters }) {
     const [data, setData] = useState([]);
     const [totalRecords, setTotalRecords] = useState(0);
     const [page, setPage] = useState(1);
@@ -13,96 +12,76 @@ export default function ExpenseTypeTable({ apiUrl, token, onEdit, refreshFlag, f
     const [sortDir, setSortDir] = useState('desc');
     const [loading, setLoading] = useState(false);
 
-    const [showConfirm, setShowConfirm] = useState(false);
-    const [showResult, setShowResult] = useState(false);
-    const [resultMessage, setResultMessage] = useState('');
-    const [resultSuccess, setResultSuccess] = useState(false);
-    const [deleteId, setDeleteId] = useState(null);
-
     const isInitialMount = useRef(true);
 
+    // Reset về trang 1 khi filter hoặc search thay đổi
     useEffect(() => {
         if (isInitialMount.current) {
             isInitialMount.current = false;
         } else {
             setPage(1);
         }
-    }, [filters, search]);
+    }, [filters, search]); // <--- SỬA LỖI Ở ĐÂY
 
+    const formatCurrency = (value) => {
+        if (value === null || value === undefined) return '';
+        return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(value);
+    };
+
+    // Fetch dữ liệu
     const fetchData = useCallback(async () => {
         setLoading(true);
         try {
+            // Định nghĩa các cột theo FuelLogAggregate
+            const columns = [
+                { data: 'id', name: '', searchable: true, orderable: true, search: { value: '', regex: false } }, // 0
+                { data: 'vehicleRegistrationNumber', name: '', searchable: true, orderable: true, search: { value: '', regex: false } }, // 1
+                { data: 'driverName', name: '', searchable: true, orderable: true, search: { value: '', regex: false } }, // 2
+                { data: 'tripCode', name: '', searchable: true, orderable: true, search: { value: '', regex: false } }, // 3
+                { data: 'gasStation', name: '', searchable: true, orderable: true, search: { value: '', regex: false } }, // 4
+                { data: 'createdDate', name: '', searchable: true, orderable: true, search: { value: '', regex: false } }, // 5
+                { data: 'fuelTypeName', name: '', searchable: true, search: { value: '', regex: false } }, // 6
+                { data: 'totalCost', name: '', searchable: true, orderable: true, search: { value: '', regex: false } }, // 7
+                { data: 'statusName', name: '', searchable: true, search: { value: '', regex: false } }, // 8
+                { data: 'id', name: '', searchable: false, orderable: false, search: { value: '', regex: false } }, // 9 (Actions)
+            ];
+
+            // Map sortField to column index
+            const sortColumnIndex =
+                {
+                    id: 0,
+                    vehicleRegistrationNumber: 1,
+                    driverName: 2,
+                    tripCode: 3,
+                    gasStation: 4,
+                    createdDate: 5,
+                    fuelTypeName: 6,
+                    totalCost: 7,
+                    statusName: 8,
+                }[sortField] || 5; // Mặc định là createdDate
+
+            // Áp dụng bộ lọc cột từ `filters` (cho thanh lọc)
+            // [THAY ĐỔI] Thêm filter cho driverName (column index 2)
+            if (filters.driverName) columns[2].search.value = filters.driverName;
+            if (filters.tripCode) columns[3].search.value = filters.tripCode;
+            if (filters.gasStation) columns[4].search.value = filters.gasStation;
+            if (filters.createdDate) columns[5].search.value = filters.createdDate;
+
             const requestBody = {
                 draw: page,
-                columns: [
-                    {
-                        data: 'id',
-                        name: '',
-                        searchable: true,
-                        orderable: true,
-                        search: { value: '', regex: false, fixed: [] },
-                    },
-                    {
-                        data: 'name',
-                        name: '',
-                        searchable: true,
-                        orderable: true,
-                        search: { value: '', regex: false, fixed: [] },
-                    },
-                    // CỘT DESCRIPTION
-                    {
-                        data: 'description',
-                        name: '',
-                        searchable: true,
-                        orderable: true,
-                        search: { value: '', regex: false, fixed: [] },
-                    },
-                    // BỎ CỘT COLOR
-                    {
-                        data: 'createdDate',
-                        name: '',
-                        searchable: true,
-                        orderable: true,
-                        search: { value: '', regex: false, fixed: [] },
-                    },
-                    {
-                        data: 'id',
-                        name: '',
-                        searchable: true,
-                        orderable: true,
-                        search: { value: '', regex: false, fixed: [] },
-                    },
-                ],
-                order: [
-                    {
-                        column: // CẬP NHẬT INDEX
-                            sortField === 'id'
-                                ? 0
-                                : sortField === 'name'
-                                ? 1
-                                : sortField === 'description'
-                                ? 2
-                                : sortField === 'createdDate'
-                                ? 3 // CẬP NHẬT
-                                : 0,
-                        dir: sortDir,
-                        name: '',
-                    },
-                ],
+                columns: columns,
+                order: [{ column: sortColumnIndex, dir: sortDir }],
                 start: (page - 1) * pageSize,
                 length: pageSize,
-                search: { value: search, regex: false, fixed: [] },
-            };
+                search: { value: search, regex: false }, // Gửi "Tìm kiếm chung"
 
-            if (filters) {
-                if (filters.name) {
-                    requestBody.columns[1].search.value = filters.name;
-                }
-                if (filters.createdDate) {
-                    // CẬP NHẬT INDEX
-                    requestBody.columns[3].search.value = filters.createdDate;
-                }
-            }
+                // Bộ lọc nâng cao (từ FuelLogDTParameters)
+                vehicleIds: filters.vehicleIds || [],
+                // [THAY ĐỔI] Đã xóa driverIds
+                // [THAY ĐỔI] Đã xóa tripIds
+                fuelTypes: filters.fuelTypes || [],
+                statusIds: filters.statusIds || [],
+            };
 
             const res = await axios.post(`${apiUrl}/paged-advanced`, requestBody, {
                 headers: {
@@ -120,7 +99,7 @@ export default function ExpenseTypeTable({ apiUrl, token, onEdit, refreshFlag, f
                 setTotalRecords(0);
             }
         } catch (err) {
-            console.error('❌ Lỗi tải dữ liệu:', err);
+            console.error(' ❌  Lỗi tải dữ liệu:', err);
         } finally {
             setLoading(false);
         }
@@ -139,37 +118,33 @@ export default function ExpenseTypeTable({ apiUrl, token, onEdit, refreshFlag, f
         }
     };
 
-    const handleDeleteClick = (id) => {
-        setDeleteId(id);
-        setShowConfirm(true);
-    };
-
-    const confirmDelete = async () => {
-        try {
-            await axios.delete(`${apiUrl}/${deleteId}`, {
-                headers: { Authorization: `Bearer ${token}` },
-            });
-            setResultSuccess(true);
-            setResultMessage('Xóa thành công!');
-        } catch (err)
-        {
-            console.error('❌ Lỗi xóa:', err);
-            setResultSuccess(false);
-            setResultMessage(`Xóa thất bại: ${err.response?.data?.message || err.message}`);
-        } finally {
-            setShowConfirm(false);
-            setShowResult(true);
-            fetchData();
+    const PENDING_STATUS = 0;
+    const renderActions = (row) => {
+        // Logic if/else này đã đúng, chỉ cần hằng số PENDING_STATUS đúng
+        if (row.status === PENDING_STATUS) {
+            return (
+                <>
+                    <button className="btn btn-sm btn-success me-1" onClick={() => onApprove(row.id)} title="Duyệt">
+                        <i className="fa fa-check"></i>
+                    </button>
+                    <button className="btn btn-sm btn-warning me-1" onClick={() => onReject(row)} title="Từ chối">
+                        <i className="fa fa-times"></i>
+                    </button>
+                    <button className="btn btn-sm btn-primary me-1" onClick={() => onEdit(row)} title="Sửa">
+                        <i className="fa fa-pen"></i>
+                    </button>
+                    <button className="btn btn-sm btn-danger" onClick={() => onDelete(row.id)} title="Xóa">
+                        <i className="fa fa-trash"></i>
+                    </button>
+                </>
+            );
         }
-    };
-
-    const closeConfirm = () => {
-        setShowConfirm(false);
-        setDeleteId(null);
-    };
-
-    const closeResult = () => {
-        setShowResult(false);
+        // Với các status khác (1: Đã duyệt, 2: Từ chối), chỉ hiện nút "Xem"
+        return (
+            <button className="btn btn-sm btn-secondary me-1" onClick={() => onEdit(row)} title="Xem chi tiết">
+                <i className="fa fa-eye"></i>
+            </button>
+        );
     };
 
     return (
@@ -178,115 +153,85 @@ export default function ExpenseTypeTable({ apiUrl, token, onEdit, refreshFlag, f
                 <input
                     type="text"
                     className="form-control w-auto"
-                    placeholder="Tìm kiếm..."
+                    placeholder="Tìm kiếm chung..."
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
                 />
                 <span className="text-muted">Tổng: {totalRecords} bản ghi</span>
             </div>
-
-            <table className="table table-hover">
-                <thead>
-                    <tr className="text-uppercase text-gray-500 fs-7">
-                        <th>STT</th>
-                        <th onClick={() => handleSort('name')} style={{ cursor: 'pointer' }}>
-                            Tên {sortField === 'name' && (sortDir === 'asc' ? '▲' : '▼')}
-                        </th>
-                        <th onClick={() => handleSort('description')} style={{ cursor: 'pointer' }}>
-                            Mô tả {sortField === 'description' && (sortDir === 'asc' ? '▲' : '▼')}
-                        </th>
-                        {/* BỎ CỘT MÀU SẮC */}
-                        <th onClick={() => handleSort('createdDate')} style={{ cursor: 'pointer' }}>
-                            Ngày tạo {sortField === 'createdDate' && (sortDir === 'asc' ? '▲' : '▼')}
-                        </th>
-                        <th className="text-end">Thao tác</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {loading ? (
-                        <tr>
-                            <td colSpan={5} className="text-center">
-                                {/* CẬP NHẬT COLSPAN */}
-                                Đang tải...
-                            </td>
+            <div className="table-responsive">
+                <table className="table table-hover">
+                    <thead>
+                        <tr className="text-uppercase text-gray-500 fs-7">
+                            <th>STT</th>
+                            <th onClick={() => handleSort('vehicleRegistrationNumber')} style={{ cursor: 'pointer' }}>
+                                Xe {sortField === 'vehicleRegistrationNumber' && (sortDir === 'asc' ? '▲' : '▼')}
+                            </th>
+                            <th onClick={() => handleSort('driverName')} style={{ cursor: 'pointer' }}>
+                                Lái xe {sortField === 'driverName' && (sortDir === 'asc' ? '▲' : '▼')}
+                            </th>
+                            <th onClick={() => handleSort('tripCode')} style={{ cursor: 'pointer' }}>
+                                Chuyến đi {sortField === 'tripCode' && (sortDir === 'asc' ? '▲' : '▼')}
+                            </th>
+                            <th onClick={() => handleSort('gasStation')} style={{ cursor: 'pointer' }}>
+                                Trạm xăng {sortField === 'gasStation' && (sortDir === 'asc' ? '▲' : '▼')}
+                            </th>
+                            <th onClick={() => handleSort('createdDate')} style={{ cursor: 'pointer' }}>
+                                Ngày tạo {sortField === 'createdDate' && (sortDir === 'asc' ? '▲' : '▼')}
+                            </th>
+                            <th onClick={() => handleSort('fuelTypeName')} style={{ cursor: 'pointer' }}>
+                                Nhiên liệu
+                            </th>
+                            <th onClick={() => handleSort('totalCost')} style={{ cursor: 'pointer' }}>
+                                Tổng tiền {sortField === 'totalCost' && (sortDir === 'asc' ? '▲' : '▼')}
+                            </th>
+                            <th onClick={() => handleSort('statusName')} style={{ cursor: 'pointer' }}>
+                                Trạng thái
+                            </th>
+                            <th className="text-end">Thao tác</th>
                         </tr>
-                    ) : data.length === 0 ? (
-                        <tr>
-                            <td colSpan={5} className="text-center">
-                                {/* CẬP NHẬT COLSPAN */}
-                                Không có dữ liệu
-                            </td>
-                        </tr>
-                    ) : (
-                        data.map((row, index) => (
-                            <tr key={row.id}>
-                                <td>{(page - 1) * pageSize + index + 1}</td>
-                                <td>{row.name}</td>
-                                <td>{row.description}</td>
-                                {/* BỎ CỘT MÀU SẮC */}
-                                <td>{moment(row.createdDate).format('DD/MM/YYYY HH:mm:ss')}</td>
-                                <td className="text-end">
-                                    <button className="btn btn-sm btn-primary me-2" onClick={() => onEdit(row)}>
-                                        Sửa
-                                    </button>
-                                    <button className="btn btn-sm btn-danger" onClick={() => handleDeleteClick(row.id)}>
-                                        Xóa
-                                    </button>
+                    </thead>
+                    <tbody>
+                        {loading ? (
+                            <tr>
+                                <td colSpan={10} className="text-center">
+                                    Đang tải...
                                 </td>
                             </tr>
-                        ))
-                    )}
-                </tbody>
-            </table>
-            {/* Modal xác nhận xóa */}
-            {showConfirm && (
-                <div className="modal fade show d-block" style={{ background: 'rgba(0,0,0,0.4)' }}>
-                    <div className="modal-dialog modal-dialog-centered">
-                        <div className="modal-content">
-                            <div className="modal-header">
-                                <h5 className="modal-title">Xác nhận xóa</h5>
-                            </div>
-                            <div className="modal-body">
-                                <p>Bạn có chắc muốn xóa loại chi phí này không?</p>
-                                {/* THAY ĐỔI TEXT */}
-                            </div>
-                            <div className="modal-footer">
-                                <button className="btn btn-secondary" onClick={closeConfirm}>
-                                    Hủy
-                                </button>
-                                <button className="btn btn-danger" onClick={confirmDelete}>
-                                    Có, xóa
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            )}
+                        ) : data.length === 0 ? (
+                            <tr>
+                                <td colSpan={10} className="text-center">
+                                    Không có dữ liệu
+                                </td>
+                            </tr>
+                        ) : (
+                            data.map((row, index) => (
+                                <tr key={row.id}>
+                                    <td>{(page - 1) * pageSize + index + 1}</td>
+                                    <td>{`[${row.vehicleRegistrationNumber}] ${row.vehicleModelName}`}</td>
+                                    <td>{row.driverName}</td>
+                                    <td>{row.tripCode || 'N/A'}</td>
+                                    <td>{row.gasStation}</td>
+                                    <td>{moment(row.createdDate).format('DD/MM/YYYY HH:mm')}</td>
+                                    <td>{row.fuelTypeName}</td>
+                                    <td>{formatCurrency(row.totalCost)}</td>
+                                    <td>
+                                        <span
+                                            className={`badge`}
+                                            style={{ backgroundColor: row.statusColor, color: '#fff' }}
+                                        >
+                                            {row.statusName}
+                                        </span>
+                                    </td>
+                                    <td className="text-end">{renderActions(row)}</td>
+                                </tr>
+                            ))
+                        )}
+                    </tbody>
+                </table>
+            </div>
 
-            {/* Modal kết quả */}
-            {showResult && (
-                <div className="modal fade show d-block" style={{ background: 'rgba(0,0,0,0.4)' }}>
-                    <div className="modal-dialog modal-dialog-centered">
-                        <div className="modal-content">
-                            <div className="modal-header">
-                                <h5 className={`modal-title ${resultSuccess ? 'text-success' : 'text-danger'}`}>
-                                    {resultSuccess ? 'Thành công' : 'Thất bại'}
-                                </h5>
-                            </div>
-                            <div className="modal-body">
-                                <p>{resultMessage}</p>
-                            </div>
-                            <div className="modal-footer">
-                                <button className="btn btn-primary" onClick={closeResult}>
-                                    Đóng
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            )}
-
-            {/* Phân trang */}
+            {/* Pagination Controls */}
             <div className="d-flex justify-content-between align-items-center mt-3">
                 <select
                     className="form-select w-auto"
@@ -302,12 +247,10 @@ export default function ExpenseTypeTable({ apiUrl, token, onEdit, refreshFlag, f
                         </option>
                     ))}
                 </select>
-
-                <div className="btn-group" role="group" aria-label="Pagination buttons">
+                <div className="btn-group" role="group">
                     {(() => {
                         const totalPages = Math.ceil(totalRecords / pageSize);
-                        if (totalPages <= 1) return null;
-
+                        if (totalPages === 0) return null; // Không hiển thị gì nếu không có trang
                         const maxVisible = 5;
                         let start = Math.max(1, page - Math.floor(maxVisible / 2));
                         let end = Math.min(totalPages, start + maxVisible - 1);
@@ -315,28 +258,6 @@ export default function ExpenseTypeTable({ apiUrl, token, onEdit, refreshFlag, f
                             start = Math.max(1, end - maxVisible + 1);
                         }
                         const buttons = [];
-
-                        buttons.push(
-                            <button
-                                key="first"
-                                className="btn btn-outline-primary"
-                                disabled={page === 1}
-                                onClick={() => setPage(1)}
-                            >
-                                «
-                            </button>,
-                        );
-                        buttons.push(
-                            <button
-                                key="prev"
-                                className="btn btn-outline-primary"
-                                disabled={page === 1}
-                                onClick={() => setPage((p) => p - 1)}
-                            >
-                                ‹
-                            </button>,
-                        );
-
                         if (start > 1) {
                             buttons.push(
                                 <button key={1} className="btn btn-outline-primary" onClick={() => setPage(1)}>
@@ -350,7 +271,6 @@ export default function ExpenseTypeTable({ apiUrl, token, onEdit, refreshFlag, f
                                     </button>,
                                 );
                         }
-
                         for (let i = start; i <= end; i++) {
                             buttons.push(
                                 <button
@@ -362,7 +282,6 @@ export default function ExpenseTypeTable({ apiUrl, token, onEdit, refreshFlag, f
                                 </button>,
                             );
                         }
-
                         if (end < totalPages) {
                             if (end < totalPages - 1)
                                 buttons.push(
@@ -380,29 +299,35 @@ export default function ExpenseTypeTable({ apiUrl, token, onEdit, refreshFlag, f
                                 </button>,
                             );
                         }
-
-                        buttons.push(
-                            <button
-                                key="next"
-                                className="btn btn-outline-primary"
-                                disabled={page >= totalPages}
-                                onClick={() => setPage((p) => p + 1)}
-                            >
-                                ›
-                            </button>,
+                        return (
+                            <>
+                                <button className="btn btn-outline-primary" disabled={page === 1} onClick={() => setPage(1)}>
+                                    «
+                                </button>
+                                <button
+                                    className="btn btn-outline-primary"
+                                    disabled={page === 1}
+                                    onClick={() => setPage((p) => p - 1)}
+                                >
+                                    ‹
+                                </button>
+                                {buttons}
+                                <button
+                                    className="btn btn-outline-primary"
+                                    disabled={page >= totalPages}
+                                    onClick={() => setPage((p) => p + 1)}
+                                >
+                                    ›
+                                </button>
+                                <button
+                                    className="btn btn-outline-primary"
+                                    disabled={page >= totalPages}
+                                    onClick={() => setPage(totalPages)}
+                                >
+                                    »
+                                </button>
+                            </>
                         );
-                        buttons.push(
-                            <button
-                                key="last"
-                                className="btn btn-outline-primary"
-                                disabled={page >= totalPages}
-                                onClick={() => setPage(totalPages)}
-                            >
-                                »
-                            </button>,
-                        );
-
-                        return buttons;
                     })()}
                 </div>
             </div>

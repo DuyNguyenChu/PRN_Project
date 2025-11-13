@@ -40,18 +40,19 @@ export default function FuelLog({ permissionFlags }) {
 
     // State cho dữ liệu bộ lọc
     const [vehicleList, setVehicleList] = useState([]);
-    const [driverList, setDriverList] = useState([]);
-    const [tripList, setTripList] = useState([]);
+    // [THAY ĐỔI] Đã xóa driverList
+    // [THAY ĐỔI] Đã xóa tripList
     const [fuelTypeList, setFuelTypeList] = useState([]);
     const [statusList, setStatusList] = useState([]);
 
     // State cho giá trị input bộ lọc
     const [dateRange, setDateRange] = useState([null, null]);
     const [startDate, endDate] = dateRange;
-    const [filterInputs, setFilterInputs] = useState({ gasStation: '', tripCode: '' });
+    // [THAY ĐỔI] Thêm driverName vào filterInputs
+    const [filterInputs, setFilterInputs] = useState({ gasStation: '', tripCode: '', driverName: '' });
     const [selectedVehicles, setSelectedVehicles] = useState([]);
-    const [selectedDrivers, setSelectedDrivers] = useState([]);
-    const [selectedTrips, setSelectedTrips] = useState([]);
+    // [THAY ĐỔI] Đã xóa selectedDrivers
+    // [THAY ĐỔI] Đã xóa selectedTrips
     const [selectedFuelTypes, setSelectedFuelTypes] = useState([]);
     const [selectedStatuses, setSelectedStatuses] = useState([]);
 
@@ -73,37 +74,40 @@ export default function FuelLog({ permissionFlags }) {
     // State cho bộ lọc đã "Áp dụng"
     const [appliedFilters, setAppliedFilters] = useState({});
 
-   // Fetch dữ liệu cho các dropdown bộ lọc
+    // Fetch dữ liệu cho các dropdown bộ lọc
     useEffect(() => {
         const headers = { Authorization: `Bearer ${token}` };
-        
+
         // GIẢ SỬ BẠN CÓ CÁC API ENDPOINT NÀY ĐỂ LẤY DANH SÁCH
         // THAY ĐỔI: Đã xóa /all
-        axios.get(`${API_URL}/Vehicle`, { headers }).then(res => 
-            // Vui lòng kiểm tra lại cấu trúc trả về. 
-            // Tôi đang giả định nó trả về { resources: [...] } giống như các API khác.
-            setVehicleList(res.data.resources.map(v => ({ value: v.id, label: `[${v.registrationNumber}] ${v.vehicleModelName}` })))
-        ).catch(err => console.error("Lỗi tải Vehicle:", err));
-        
-        // THAY ĐỔI: Đã xóa /all
-        axios.get(`${API_URL}/Driver`, { headers }).then(res => 
-            setDriverList(res.data.resources.map(d => ({ value: d.id, label: d.name })))
-        ).catch(err => console.error("Lỗi tải Driver:", err));
+        axios
+            .get(`${API_URL}/Vehicle`, { headers })
+            .then((res) =>
+                // Vui lòng kiểm tra lại cấu trúc trả về.
+                // Tôi đang giả định nó trả về { resources: [...] } giống như các API khác.
+                setVehicleList(
+                    res.data.resources.map((v) => ({
+                        value: v.id,
+                        label: `[${v.registrationNumber}] ${v.vehicleModelName}`,
+                    })),
+                ),
+            )
+            .catch((err) => console.error('Lỗi tải Vehicle:', err));
 
-        // THAY ĐỔI: Đã xóa /all
-        axios.get(`${API_URL}/Trip`, { headers }).then(res => 
-            setTripList(res.data.resources.map(t => ({ value: t.id, label: t.description })))
-        ).catch(err => console.error("Lỗi tải Trip:", err));
+        // [THAY ĐỔI] Đã xóa fetch cho Driver
+
+        // [THAY ĐỔI] Đã xóa fetch cho Trip
 
         // Các API này đúng theo FuelLogController.cs
-        axios.get(`${apiUrl}/fuel-types`, { headers }).then(res => 
-            setFuelTypeList(res.data.resources.map(f => ({ value: f.id, label: f.name })))
-        ).catch(err => console.error("Lỗi tải FuelTypes:", err));
+        axios
+            .get(`${apiUrl}/fuel-types`, { headers })
+            .then((res) => setFuelTypeList(res.data.resources.map((f) => ({ value: f.id, label: f.name }))))
+            .catch((err) => console.error('Lỗi tải FuelTypes:', err));
 
-        axios.get(`${apiUrl}/status`, { headers }).then(res => 
-            setStatusList(res.data.resources.map(s => ({ value: s.id, label: s.name })))
-        ).catch(err => console.error("Lỗi tải Status:", err));
-
+        axios
+            .get(`${apiUrl}/status`, { headers })
+            .then((res) => setStatusList(res.data.resources.map((s) => ({ value: s.id, label: s.name }))))
+            .catch((err) => console.error('Lỗi tải Status:', err));
     }, [token, apiUrl]);
 
     // Handlers cho các hành động
@@ -178,25 +182,28 @@ export default function FuelLog({ permissionFlags }) {
             createdDateFilter = moment(startDate).format('DD/MM/YYYY');
         }
 
+        // [THAY ĐỔI] Cập nhật setAppliedFilters
         setAppliedFilters({
             gasStation: filterInputs.gasStation.trim(),
             tripCode: filterInputs.tripCode.trim(),
+            driverName: filterInputs.driverName.trim(), // Thêm driverName
             createdDate: createdDateFilter,
-            vehicleIds: selectedVehicles.map(v => v.value),
-            driverIds: selectedDrivers.map(d => d.value),
-            tripIds: selectedTrips.map(t => t.value),
-            fuelTypes: selectedFuelTypes.map(f => f.value),
-            statusIds: selectedStatuses.map(s => s.value),
+            vehicleIds: selectedVehicles.map((v) => v.value),
+            // driverIds: Đã xóa
+            // tripIds: Đã xóa
+            fuelTypes: selectedFuelTypes.map((f) => f.value),
+            statusIds: selectedStatuses.map((s) => s.value),
         });
         setShowFilter(false);
     };
 
     const handleResetFilter = () => {
-        setFilterInputs({ gasStation: '', tripCode: '' });
+        // [THAY ĐỔI] Cập nhật reset filterInputs
+        setFilterInputs({ gasStation: '', tripCode: '', driverName: '' });
         setDateRange([null, null]);
         setSelectedVehicles([]);
-        setSelectedDrivers([]);
-        setSelectedTrips([]);
+        // [THAY ĐỔI] Đã xóa setSelectedDrivers
+        // [THAY ĐỔI] Đã xóa setSelectedTrips
         setSelectedFuelTypes([]);
         setSelectedStatuses([]);
         setAppliedFilters({});
@@ -213,7 +220,9 @@ export default function FuelLog({ permissionFlags }) {
                     <div className="row">
                         {/* Hàng 1: Inputs */}
                         <div className="col-xl-4 mb-3">
-                            <label htmlFor="filter_gasStation" className="form-label">Trạm xăng:</label>
+                            <label htmlFor="filter_gasStation" className="form-label">
+                                Trạm xăng:
+                            </label>
                             <input
                                 type="text"
                                 className="form-control"
@@ -224,7 +233,9 @@ export default function FuelLog({ permissionFlags }) {
                             />
                         </div>
                         <div className="col-xl-4 mb-3">
-                            <label htmlFor="filter_tripCode" className="form-label">Mã chuyến đi:</label>
+                            <label htmlFor="filter_tripCode" className="form-label">
+                                Mã chuyến đi:
+                            </label>
                             <input
                                 type="text"
                                 className="form-control"
@@ -235,7 +246,9 @@ export default function FuelLog({ permissionFlags }) {
                             />
                         </div>
                         <div className="col-xl-4 mb-3">
-                            <label htmlFor="filter_created_date" className="form-label">Ngày tạo</label>
+                            <label htmlFor="filter_created_date" className="form-label">
+                                Ngày tạo
+                            </label>
                             <div className="input-group">
                                 <DatePicker
                                     selectsRange
@@ -250,34 +263,72 @@ export default function FuelLog({ permissionFlags }) {
                                 />
                             </div>
                         </div>
-                        {/* Hàng 2: Selects */}
+                        {/* Hàng 2: Selects & Inputs */}
                         <div className="col-xl-4 mb-3">
                             <label className="form-label">Xe:</label>
-                            <Select isMulti options={vehicleList} value={selectedVehicles} onChange={setSelectedVehicles} placeholder="Chọn xe" />
+                            <Select
+                                isMulti
+                                options={vehicleList}
+                                value={selectedVehicles}
+                                onChange={setSelectedVehicles}
+                                placeholder="Chọn xe"
+                            />
                         </div>
+
+                        {/* [THAY ĐỔI] Thay thế Select Lái xe bằng Input */}
                         <div className="col-xl-4 mb-3">
-                            <label className="form-label">Lái xe:</label>
-                            <Select isMulti options={driverList} value={selectedDrivers} onChange={setSelectedDrivers} placeholder="Chọn lái xe" />
+                            <label htmlFor="filter_driverName" className="form-label">
+                                Lái xe:
+                            </label>
+                            <input
+                                type="text"
+                                className="form-control"
+                                id="filter_driverName"
+                                placeholder="Tên lái xe"
+                                value={filterInputs.driverName}
+                                onChange={(e) => setFilterInputs({ ...filterInputs, driverName: e.target.value })}
+                            />
                         </div>
-                        <div className="col-xl-4 mb-3">
-                            <label className="form-label">Chuyến đi:</label>
-                            <Select isMulti options={tripList} value={selectedTrips} onChange={setSelectedTrips} placeholder="Chọn chuyến đi" />
-                        </div>
+
+                        {/* [THAY ĐỔI] Đã xóa Select Chuyến đi */}
+
                         {/* Hàng 3: Selects */}
                         <div className="col-xl-4 mb-3">
                             <label className="form-label">Loại nhiên liệu:</label>
-                            <Select isMulti options={fuelTypeList} value={selectedFuelTypes} onChange={setSelectedFuelTypes} placeholder="Chọn loại nhiên liệu" />
+                            <Select
+                                isMulti
+                                options={fuelTypeList}
+                                value={selectedFuelTypes}
+                                onChange={setSelectedFuelTypes}
+                                placeholder="Chọn loại nhiên liệu"
+                            />
                         </div>
                         <div className="col-xl-4 mb-3">
                             <label className="form-label">Trạng thái:</label>
-                            <Select isMulti options={statusList} value={selectedStatuses} onChange={setSelectedStatuses} placeholder="Chọn trạng thái" />
+                            <Select
+                                isMulti
+                                options={statusList}
+                                value={selectedStatuses}
+                                onChange={setSelectedStatuses}
+                                placeholder="Chọn trạng thái"
+                            />
                         </div>
                     </div>
                     <div className="d-flex justify-content-end">
-                        <button type="submit" className="btn btn-primary me-3" id="btn_apply_filter" onClick={handleApplyFilter}>
+                        <button
+                            type="submit"
+                            className="btn btn-primary me-3"
+                            id="btn_apply_filter"
+                            onClick={handleApplyFilter}
+                        >
                             Áp dụng
                         </button>
-                        <button type="reset" className="btn btn-outline-primary" id="btn_reset_filter" onClick={handleResetFilter}>
+                        <button
+                            type="reset"
+                            className="btn btn-outline-primary"
+                            id="btn_reset_filter"
+                            onClick={handleResetFilter}
+                        >
                             Đặt lại
                         </button>
                     </div>
@@ -320,7 +371,7 @@ export default function FuelLog({ permissionFlags }) {
                     showNotifyModal={showNotifyModal}
                     // Truyền danh sách đã fetch cho form
                     vehicleList={vehicleList}
-                    tripList={tripList}
+                    // [THAY ĐỔI] Đã xóa tripList
                     fuelTypeList={fuelTypeList}
                 />
             )}

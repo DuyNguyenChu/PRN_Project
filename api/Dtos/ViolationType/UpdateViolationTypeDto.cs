@@ -6,5 +6,7 @@ namespace api.Dtos.ViolationType
     {
         public int Id { get; set; }
         public int? UpdatedBy { get; set; }
+        public string Color { get; set; } = null!;
+
     }
 }

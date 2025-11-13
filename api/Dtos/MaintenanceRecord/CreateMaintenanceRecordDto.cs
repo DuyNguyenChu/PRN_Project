@@ -6,7 +6,6 @@ namespace api.Dtos.MaintenanceRecord
     public class CreateMaintenanceRecordDto
     {
         public int VehicleId { get; set; }
-        public int? TripId { get; set; }
         public int Odometer { get; set; }
         public string ServiceType { get; set; } = null!;
         public string ServiceProvider { get; set; } = null!;

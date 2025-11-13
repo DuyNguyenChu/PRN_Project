@@ -13,6 +13,7 @@ namespace api.Mappers
                 CreatedBy = obj.CreatedBy,
                 Description = obj.Description,
                 Name = obj.Name,
+                Color = obj.Color,
                 CreatedDate = DateTime.Now
             };
         }
@@ -22,6 +23,7 @@ namespace api.Mappers
             existData.UpdatedBy = obj.UpdatedBy;
             existData.Description = obj.Description;
             existData.Name = obj.Name;
+            existData.Color = obj.Color;
             existData.LastModifiedDate = DateTime.Now;
 
             return existData;
@@ -35,6 +37,7 @@ namespace api.Mappers
                 CreatedDate = entity.CreatedDate,
                 Description = entity.Description,
                 Name = entity.Name,
+                Color = entity.Color
             };
         }
     }
