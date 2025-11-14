@@ -1,6 +1,7 @@
 ﻿using System.Globalization;
 using api.DTParameters;
 using api.Extensions;
+using api.Helpers;
 using api.Interface.Repository;
 using api.Models;
 using api.ViewModel;
@@ -11,12 +12,17 @@ namespace api.Repositories
     public class TripRepository : RepositoryBase<Trip, int>, ITripRepository
     {
         private readonly PrnprojectContext _context;
-        public TripRepository(PrnprojectContext context, IUnitOfWork unitOfWork) : base(context, unitOfWork)
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        public TripRepository(PrnprojectContext context, IUnitOfWork unitOfWork, IHttpContextAccessor httpContextAccessor) : base(context, unitOfWork)
         {
             _context = context;
+            _httpContextAccessor = httpContextAccessor;
         }
         public async Task<DTResult<TripAggregate>> GetPagedAsync(TripDTParameters parameters)
         {
+            var currentUserId = _httpContextAccessor.HttpContext?.GetCurrentUserId();
+            var currentDriverId = _httpContextAccessor.HttpContext?.GetCurrentDriverId();
+            var currentRoleId = _httpContextAccessor.HttpContext?.GetCurrentRoleIds();
             var keyword = parameters.Search?.Value;
             var orderCriteria = string.Empty;
             var orderAscendingDirection = true;
@@ -51,6 +57,17 @@ namespace api.Repositories
                                && (t.TripRequestId == null || !tr.IsDeleted)
                                && !creator.IsDeleted
                                && (t.UpdatedBy == null || !approval.IsDeleted)
+                               && (
+                            // 1. Admin hoặc Điều phối viên (DISPATCHER) -> thấy tất cả
+                            currentRoleId.Contains(CommonConstants.Role.ADMIN) ||
+                            currentRoleId.Contains(CommonConstants.Role.DISPATCHER) ||
+
+                            // 2. Người dùng (END_USER) -> chỉ thấy chuyến họ yêu cầu
+                            (currentRoleId.Contains(CommonConstants.Role.END_USER) && tr != null && tr.RequesterId == currentUserId) ||
+
+                            // 3. Lái xe (DRIVER) -> chỉ thấy chuyến gán cho họ
+                            (currentRoleId.Contains(CommonConstants.Role.DRIVER) && t.DriverId == currentDriverId)
+                        )
                         select new TripAggregate
                         {
                             Id = t.Id,
