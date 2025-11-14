@@ -19,8 +19,8 @@ export default function VehicleAccidentPopup(props) {
 
     // ✅ fallback prop tương tự VehicleTypePopup
     const visible = typeof show !== 'undefined' ? show : true;
-    const closeFn = handleClose ?? onClose ?? (() => {});
-    const successFn = handleSave ?? onSuccess ?? (() => {});
+    const closeFn = handleClose ?? onClose ?? (() => { });
+    const successFn = handleSave ?? onSuccess ?? (() => { });
     const edit = editItem ?? item ?? null;
     const apiUrl = propApiUrl ?? `${API_URL}/vehicle-accident`;
     const token =
@@ -38,7 +38,32 @@ export default function VehicleAccidentPopup(props) {
     });
     const [saving, setSaving] = useState(false);
     const [errors, setErrors] = useState({});
+    const [vehicles, setVehicles] = useState([]);
+    const [drivers, setDrivers] = useState([]);
+    useEffect(() => {
+        if (!visible) return;
 
+        const fetchData = async () => {
+            try {
+                const usedToken =
+                    token || JSON.parse(localStorage.getItem('userData'))?.resources?.accessToken;
+                const headers = usedToken ? { Authorization: `Bearer ${usedToken}` } : {};
+
+                const vehicleRes = await axios.get(`${API_URL}/Vehicle`, { headers });
+                setVehicles(vehicleRes.data?.resources || []); // <--- SAFE FIX
+
+                const driverRes = await axios.get(`${API_URL}/Driver`, { headers });
+                setDrivers(driverRes.data?.resources || []); // <--- SAFE FIX
+
+            } catch (err) {
+                console.error("Lỗi tải danh sách:", err);
+                setVehicles([]);
+                setDrivers([]);
+            }
+        };
+
+        fetchData();
+    }, [show]);
     // ✅ reset form khi edit thay đổi
     useEffect(() => {
         if (edit) {
@@ -150,49 +175,52 @@ export default function VehicleAccidentPopup(props) {
                                 </div>
                             )}
 
-                            <div className="form-group mb-2">
-                                <label>Mã xe</label>
-                                <input
-                                    type="text"
-                                    className={`form-control ${
-                                        errors.vehicleId ? 'is-invalid' : ''
-                                    }`}
+                            <div className="mb-3">
+                                <label className="form-label">Xe</label>
+                                <select
                                     name="vehicleId"
                                     value={formData.vehicleId}
                                     onChange={onChange}
-                                />
-                                {errors.vehicleId && (
-                                    <div className="invalid-feedback">
-                                        {errors.vehicleId}
-                                    </div>
-                                )}
+                                    className="form-select"
+                                    required
+                                >
+                                    <option value="">-- Chọn xe --</option>
+                                    {vehicles && vehicles.length > 0 &&
+                                        vehicles.map(v => (
+                                            <option key={v.id} value={v.id}>
+                                                {v.name}
+                                            </option>
+                                        ))
+                                    }
+
+                                </select>
                             </div>
 
-                            <div className="form-group mb-2">
-                                <label>Mã tài xế</label>
-                                <input
-                                    type="text"
-                                    className={`form-control ${
-                                        errors.driverId ? 'is-invalid' : ''
-                                    }`}
+
+                            <div className="mb-3">
+                                <label className="form-label">Tài xế</label>
+                                <select
                                     name="driverId"
                                     value={formData.driverId}
                                     onChange={onChange}
-                                />
-                                {errors.driverId && (
-                                    <div className="invalid-feedback">
-                                        {errors.driverId}
-                                    </div>
-                                )}
+                                    className="form-select"
+                                    required
+                                >
+                                    <option value="">-- Chọn tài xế --</option>
+                                    {drivers.map(d => (
+                                        <option key={d.id} value={d.id}>
+                                            {d.fullName}
+                                        </option>
+                                    ))}
+                                </select>
                             </div>
 
                             <div className="form-group mb-2">
                                 <label>Ngày tai nạn</label>
                                 <input
                                     type="date"
-                                    className={`form-control ${
-                                        errors.accidentDate ? 'is-invalid' : ''
-                                    }`}
+                                    className={`form-control ${errors.accidentDate ? 'is-invalid' : ''
+                                        }`}
                                     name="accidentDate"
                                     value={formData.accidentDate}
                                     onChange={onChange}
@@ -208,9 +236,8 @@ export default function VehicleAccidentPopup(props) {
                                 <label>Địa điểm</label>
                                 <input
                                     type="text"
-                                    className={`form-control ${
-                                        errors.location ? 'is-invalid' : ''
-                                    }`}
+                                    className={`form-control ${errors.location ? 'is-invalid' : ''
+                                        }`}
                                     name="location"
                                     value={formData.location}
                                     onChange={onChange}
@@ -274,8 +301,8 @@ export default function VehicleAccidentPopup(props) {
                                 {saving
                                     ? 'Đang lưu...'
                                     : edit
-                                    ? 'Cập nhật'
-                                    : 'Thêm'}
+                                        ? 'Cập nhật'
+                                        : 'Thêm'}
                             </button>
                         </div>
                     </form>

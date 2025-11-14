@@ -269,6 +269,136 @@ export default function VehicleInsuranceTable({ apiUrl, token, onEdit, refreshFl
                     </div>
                 </div>
             )}
+            {/* Popup thêm/sửa */}
+            {showPopup && (
+                <VehicleInsurancePopup
+                    show={showPopup}
+                    handleClose={() => setShowPopup(false)}
+                    handleSave={() => {
+                        setShowPopup(false);
+                        fetchData();
+                    }}
+                    editItem={editItem}
+                    apiUrl={apiUrl}
+                    token={token}
+                />
+            )}
+            <div className="d-flex justify-content-between align-items-center mt-3">
+                {/* chọn số bản ghi mỗi trang */}
+                <select
+                    className="form-select w-auto"
+                    value={pageSize}
+                    onChange={(e) => {
+                        setPageSize(Number(e.target.value));
+                        setPage(1); // reset về trang đầu
+                    }}
+                >
+                    {[5, 10, 20, 50].map((n) => (
+                        <option key={n} value={n}>
+                            {n} / trang
+                        </option>
+                    ))}
+                </select>
+
+                {/* nhóm nút phân trang */}
+                <div className="btn-group" role="group" aria-label="Pagination buttons">
+                    {/* Trang đầu */}
+                    <button className="btn btn-outline-primary" disabled={page === 1} onClick={() => setPage(1)}>
+                        «
+                    </button>
+
+                    {/* Trang trước */}
+                    <button
+                        className="btn btn-outline-primary"
+                        disabled={page === 1}
+                        onClick={() => setPage((p) => p - 1)}
+                    >
+                        ‹
+                    </button>
+
+                    {/* Số trang hiển thị giới hạn */}
+                    {(() => {
+                        const totalPages = Math.ceil(totalRecords / pageSize);
+                        const maxVisible = 5; // số nút tối đa hiển thị
+                        let start = Math.max(1, page - Math.floor(maxVisible / 2));
+                        let end = Math.min(totalPages, start + maxVisible - 1);
+
+                        // đảm bảo hiển thị 5 nút khi gần cuối danh sách
+                        if (end - start < maxVisible - 1) {
+                            start = Math.max(1, end - maxVisible + 1);
+                        }
+
+                        const buttons = [];
+
+                        // Nút đầu tiên "1 ..."
+                        if (start > 1) {
+                            buttons.push(
+                                <button key={1} className="btn btn-outline-primary" onClick={() => setPage(1)}>
+                                    1
+                                </button>,
+                            );
+                            if (start > 2)
+                                buttons.push(
+                                    <button key="start-ellipsis" className="btn btn-light" disabled>
+                                        ...
+                                    </button>,
+                                );
+                        }
+
+                        // Các nút giữa
+                        for (let i = start; i <= end; i++) {
+                            buttons.push(
+                                <button
+                                    key={i}
+                                    className={`btn ${i === page ? 'btn-primary' : 'btn-outline-primary'}`}
+                                    onClick={() => setPage(i)}
+                                >
+                                    {i}
+                                </button>,
+                            );
+                        }
+
+                        // Nút cuối "... N"
+                        if (end < totalPages) {
+                            if (end < totalPages - 1)
+                                buttons.push(
+                                    <button key="end-ellipsis" className="btn btn-light" disabled>
+                                        ...
+                                    </button>,
+                                );
+                            buttons.push(
+                                <button
+                                    key={totalPages}
+                                    className="btn btn-outline-primary"
+                                    onClick={() => setPage(totalPages)}
+                                >
+                                    {totalPages}
+                                </button>,
+                            );
+                        }
+
+                        return buttons;
+                    })()}
+
+                    {/* Trang sau */}
+                    <button
+                        className="btn btn-outline-primary"
+                        disabled={page >= Math.ceil(totalRecords / pageSize)}
+                        onClick={() => setPage((p) => p + 1)}
+                    >
+                        ›
+                    </button>
+
+                    {/* Trang cuối */}
+                    <button
+                        className="btn btn-outline-primary"
+                        disabled={page >= Math.ceil(totalRecords / pageSize)}
+                        onClick={() => setPage(Math.ceil(totalRecords / pageSize))}
+                    >
+                        »
+                    </button>
+                </div>
+            </div>
         </div>
     );
 }

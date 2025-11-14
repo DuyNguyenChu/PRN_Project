@@ -22,8 +22,8 @@ export default function VehicleInspectionPopup(props) {
     } = props;
 
     const visible = typeof show !== 'undefined' ? show : true; // nếu component được mount bởi parent có điều kiện, visible = true
-    const closeFn = handleClose ?? onClose ?? (() => {});
-    const successFn = handleSave ?? onSuccess ?? (() => {});
+    const closeFn = handleClose ?? onClose ?? (() => { });
+    const successFn = handleSave ?? onSuccess ?? (() => { });
     const edit = editItem ?? item ?? null;
     const apiUrl = propApiUrl ?? `${API_URL}/vehicle-inspections`;
     const token = propToken ?? (JSON.parse(localStorage.getItem('userData'))?.resources?.accessToken);
@@ -38,7 +38,32 @@ export default function VehicleInspectionPopup(props) {
     });
     const [saving, setSaving] = useState(false);
     const [errors, setErrors] = useState({});
+    const [vehicles, setVehicles] = useState([]);
+    const [drivers, setDrivers] = useState([]);
+    useEffect(() => {
+        if (!visible) return;
 
+        const fetchData = async () => {
+            try {
+                const usedToken =
+                    token || JSON.parse(localStorage.getItem('userData'))?.resources?.accessToken;
+                const headers = usedToken ? { Authorization: `Bearer ${usedToken}` } : {};
+
+                const vehicleRes = await axios.get(`${API_URL}/Vehicle`, { headers });
+                setVehicles(vehicleRes.data?.resources || []); // <--- SAFE FIX
+
+                const driverRes = await axios.get(`${API_URL}/Driver`, { headers });
+                setDrivers(driverRes.data?.resources || []); // <--- SAFE FIX
+
+            } catch (err) {
+                console.error("Lỗi tải danh sách:", err);
+                setVehicles([]);
+                setDrivers([]);
+            }
+        };
+
+        fetchData();
+    }, [show]);
     useEffect(() => {
         if (edit) {
             setFormData({
@@ -127,16 +152,25 @@ export default function VehicleInspectionPopup(props) {
                         <div className="modal-body">
                             {errors.submit && <div className="alert alert-danger">{errors.submit}</div>}
 
-                            <div className="form-group mb-2">
-                                <label>Xe</label>
-                                <input
-                                    type="number"
-                                    className={`form-control ${errors.vehicleId ? 'is-invalid' : ''}`}
+                            <div className="mb-3">
+                                <label className="form-label">Xe</label>
+                                <select
                                     name="vehicleId"
                                     value={formData.vehicleId}
                                     onChange={onChange}
-                                />
-                                {errors.vehicleId && <div className="invalid-feedback">{errors.vehicleId}</div>}
+                                    className="form-select"
+                                    required
+                                >
+                                    <option value="">-- Chọn xe --</option>
+                                    {vehicles && vehicles.length > 0 &&
+                                        vehicles.map(v => (
+                                            <option key={v.id} value={v.id}>
+                                                {v.name}
+                                            </option>
+                                        ))
+                                    }
+
+                                </select>
                             </div>
 
                             <div className="form-group mb-2">
@@ -150,7 +184,7 @@ export default function VehicleInspectionPopup(props) {
                                 />
                                 {errors.inspectionDate && <div className="invalid-feedback">{errors.inspectionDate}</div>}
                             </div>
-
+{/* 
                             <div className="form-group mb-2">
                                 <label>Người kiểm định</label>
                                 <input
@@ -160,6 +194,25 @@ export default function VehicleInspectionPopup(props) {
                                     value={formData.inspectorId}
                                     onChange={onChange}
                                 />
+                                {errors.inspectorId && <div className="invalid-feedback">{errors.inspectorId}</div>}
+                            </div> */}
+
+                            <div className="form-group mb-2">
+                                <label className="form-label">Người kiểm định</label>
+                                <select
+                                    name="inspectorId"
+                                    value={formData.inspectorId}
+                                    onChange={onChange}
+                                    className={`form-select ${errors.inspectorId ? 'is-invalid' : ''}`}
+                                    required
+                                >
+                                    <option value="">-- Chọn người kiểm định --</option>
+                                    {drivers.map(i => (
+                                        <option key={i.userId} value={i.userId}>
+                                            {i.fullName}
+                                        </option>
+                                    ))}
+                                </select>
                                 {errors.inspectorId && <div className="invalid-feedback">{errors.inspectorId}</div>}
                             </div>
 
