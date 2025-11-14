@@ -2,7 +2,7 @@ import { useEffect, useState, useCallback, useRef } from 'react';
 import moment from 'moment';
 import axios from 'axios';
 
-export default function FuelLogTable({ apiUrl, token, onEdit, onDelete, onApprove, onReject, refreshFlag, filters }) {
+export default function FuelLogTable({ apiUrl, token, onEdit, onDelete, onApprove, onReject, refreshFlag, filters, isDispatcher, isDriver }) {
     const [data, setData] = useState([]);
     const [totalRecords, setTotalRecords] = useState(0);
     const [page, setPage] = useState(1);
@@ -122,19 +122,30 @@ export default function FuelLogTable({ apiUrl, token, onEdit, onDelete, onApprov
         // Logic if/else này đã đúng, chỉ cần hằng số PENDING_STATUS đúng
         if (row.status === PENDING_STATUS) {
             return (
-                <>
-                    <button className="btn btn-sm btn-success me-1" onClick={() => onApprove(row.id)} title="Duyệt">
-                        <i className="fa fa-check"></i>
-                    </button>
-                    <button className="btn btn-sm btn-warning me-1" onClick={() => onReject(row)} title="Từ chối">
-                        <i className="fa fa-times"></i>
-                    </button>
-                    <button className="btn btn-sm btn-primary me-1" onClick={() => onEdit(row)} title="Sửa">
-                        <i className="fa fa-pen"></i>
-                    </button>
-                    <button className="btn btn-sm btn-danger" onClick={() => onDelete(row.id)} title="Xóa">
-                        <i className="fa fa-trash"></i>
-                    </button>
+                <>  
+                
+                    {isDispatcher && (
+                        <>
+                            <button
+                                className="btn btn-sm btn-success me-1" onClick={() => onApprove(row.id)} title="Duyệt" >
+                                <i className="fa fa-check"></i>
+                            </button>
+                            <button
+                                className="btn btn-sm btn-warning me-1" onClick={() => onReject(row)} title="Từ chối">
+                                <i className="fa fa-times"></i>
+                            </button>
+                        </>
+                        )}
+                        {isDriver && (
+                        <>
+                            <button className="btn btn-sm btn-primary me-1" onClick={() => onEdit(row)} title="Sửa">
+                                <i className="fa fa-pen"></i>
+                            </button>
+                            <button className="btn btn-sm btn-danger" onClick={() => onDelete(row.id)} title="Xóa" >
+                                <i className="fa fa-trash"></i>
+                            </button>
+                        </>
+                    )}
                 </>
             );
         }

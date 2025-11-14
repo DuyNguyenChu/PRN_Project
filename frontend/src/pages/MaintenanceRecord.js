@@ -9,7 +9,7 @@ import Select from 'react-select';
 import { API_URL } from '~/api/api';
 import moment from 'moment';
 import axios from 'axios'; 
-import { canView } from '~/utils/permissionUtils'; 
+import { canView, isDispatcher, isDriver } from '~/utils/permissionUtils'; 
 import { useNavigate } from 'react-router-dom';
 import { PERMISSION_IDS } from '~/utils/menuIdForPermission';
 
@@ -55,6 +55,9 @@ export default function MaintenanceRecord({ permissionFlags }) {
     // [THAY ĐỔI] Đã xóa selectedTrips
     const [selectedStatuses, setSelectedStatuses] = useState([]);
 
+    const isDispatcherUser = isDispatcher();
+    const isDriverUser = isDriver();
+
     // State cho bộ lọc đã "Áp dụng"
     const [appliedFilters, setAppliedFilters] = useState({});
 
@@ -77,7 +80,7 @@ export default function MaintenanceRecord({ permissionFlags }) {
     useEffect(() => {
         const headers = { Authorization: `Bearer ${token}` };
         
-        axios.get(`${API_URL}/Vehicle`, { headers }).then(res => setVehicleList(res.data.resources.map(v => ({ value: v.id, label: `[${v.registrationNumber}] ${v.vehicleModelName}` })))).catch(err => console.error("Lỗi tải Vehicle:", err));
+        axios.get(`${API_URL}/Vehicle`, { headers }).then(res => setVehicleList(res.data.resources.map(v => ({ value: v.id, label: `${v.vehicleModelName}` })))).catch(err => console.error("Lỗi tải Vehicle:", err));
         
         // [THAY ĐỔI] Đã xóa fetch /Driver
         // [THAY ĐỔI] Đã xóa fetch /Trip
@@ -295,7 +298,9 @@ export default function MaintenanceRecord({ permissionFlags }) {
                         onReject={handleReject}
                         refreshFlag={refreshFlag}
                         filters={appliedFilters}
-                        onDelete={handleDelete}                    
+                        onDelete={handleDelete}  
+                        isDispatcher={isDispatcherUser}           
+                        isDriver={isDriverUser}       
                         />
                 </div>
             </div>

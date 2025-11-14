@@ -12,7 +12,9 @@ export default function MaintenanceRecordTable({
     onReject, 
     refreshFlag, 
     filters,
-    onDelete
+    onDelete,
+    isDispatcher,
+    isDriver
 }) {
     const [data, setData] = useState([]);
     const [totalRecords, setTotalRecords] = useState(0);
@@ -126,18 +128,26 @@ export default function MaintenanceRecordTable({
         if (row.status === PENDING_STATUS) {
             return (
                 <>
-                    <button className="btn btn-sm btn-success me-1" onClick={() => onApprove(row.id)} title="Duyệt">
-                        <i className="fa fa-check"></i>
-                    </button>
-                    <button className="btn btn-sm btn-warning me-1" onClick={() => onReject(row)} title="Từ chối">
-                        <i className="fa fa-times"></i>
-                    </button>
-                    <button className="btn btn-sm btn-primary me-1" onClick={() => onEdit(row)} title="Sửa">
-                        <i className="fa fa-pen"></i>
-                    </button>
-                    <button className="btn btn-sm btn-danger" onClick={() => onDelete(row.id)} title="Xóa" >
-                        <i className="fa fa-trash"></i>
-                    </button>
+                    {isDispatcher && (
+                        <>
+                            <button className="btn btn-sm btn-success me-1" onClick={() => onApprove(row.id)} title="Duyệt">
+                                <i className="fa fa-check"></i>
+                            </button>
+                            <button className="btn btn-sm btn-warning me-1" onClick={() => onReject(row)} title="Từ chối">
+                                <i className="fa fa-times"></i>
+                            </button>
+                        </>
+                    )}
+                    {isDriver && (
+                        <>
+                            <button className="btn btn-sm btn-primary me-1" onClick={() => onEdit(row)} title="Sửa">
+                                <i className="fa fa-pen"></i>
+                            </button>
+                            <button className="btn btn-sm btn-danger" onClick={() => onDelete(row.id)} title="Xóa" >
+                                <i className="fa fa-trash"></i>
+                            </button>
+                        </>
+                    )}
                 </>
             );
         }
@@ -198,7 +208,7 @@ export default function MaintenanceRecordTable({
                             data.map((row, index) => (
                                 <tr key={row.id}>
                                     <td>{(page - 1) * pageSize + index + 1}</td>
-                                    <td>{`[${row.vehicleRegistrationNumber}] ${row.vehicleModelName}`}</td>
+                                    <td>{`${row.vehicleModelName}`}</td>
                                     <td>{row.driverName}</td>
                                     <td>{row.serviceProvider}</td>
                                     <td>{moment(row.startTime).format('DD/MM/YYYY HH:mm')}</td>

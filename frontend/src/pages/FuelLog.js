@@ -9,7 +9,7 @@ import Select from 'react-select'; // Thêm react-select cho bộ lọc
 import { API_URL } from '~/api/api';
 import moment from 'moment';
 import axios from 'axios'; // Thêm axios
-import { canView } from '~/utils/permissionUtils'; // Bỏ canCreate, canUpdate, canDelete nếu không dùng
+import { canView, isDispatcher, isDriver } from '~/utils/permissionUtils'; // Bỏ canCreate, canUpdate, canDelete nếu không dùng
 import { useNavigate } from 'react-router-dom';
 import { PERMISSION_IDS } from '~/utils/menuIdForPermission';
 
@@ -37,6 +37,8 @@ export default function FuelLog({ permissionFlags }) {
     const [showNotify, setShowNotify] = useState(false);
     const [notifySuccess, setNotifySuccess] = useState(true);
     const [onCancelConfirm, setOnCancelConfirm] = useState(null);
+    const isDispatcherUser = isDispatcher();
+    const isDriverUser = isDriver();
 
     // State cho dữ liệu bộ lọc
     const [vehicleList, setVehicleList] = useState([]);
@@ -352,6 +354,8 @@ export default function FuelLog({ permissionFlags }) {
                         onReject={handleReject}
                         refreshFlag={refreshFlag}
                         filters={appliedFilters}
+                        isDispatcher={isDispatcherUser}
+                        isDriver={isDriverUser}
                     />
                 </div>
             </div>
