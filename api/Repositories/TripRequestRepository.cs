@@ -1,8 +1,10 @@
 ﻿using api.DTParameters;
 using api.Extensions;
+using api.Helpers;
 using api.Interface.Repository;
 using api.Models;
 using api.ViewModel;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -16,13 +18,17 @@ namespace api.Repositories
     public class TripRequestRepository : RepositoryBase<TripRequest, int>, ITripRequestRepository
     {
         private readonly PrnprojectContext _context;
-        public TripRequestRepository(PrnprojectContext context, IUnitOfWork unitOfWork) : base(context, unitOfWork)
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        public TripRequestRepository(PrnprojectContext context, IUnitOfWork unitOfWork, IHttpContextAccessor httpContextAccessor) : base(context, unitOfWork)
         {
             _context = context;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public async Task<DTResult<TripRequestAggregate>> GetPagedAsync(TripRequestDTParameters parameters)
         {
+            var currentUserId = _httpContextAccessor.HttpContext?.GetCurrentUserId();
+            var currentRoleId = _httpContextAccessor.HttpContext?.GetCurrentRoleIds();
             var keyword = parameters.Search?.Value;
             var orderCriteria = string.Empty;
             var orderAscendingDirection = true;
@@ -49,6 +55,14 @@ namespace api.Repositories
                             !requester.IsDeleted &&
                             !tripRequestStatus.IsDeleted &&
                             (cancelled == null || !cancelled.IsDeleted)
+                            && (
+                    // 1. Admin hoặc Điều phối viên (DISPATCHER) -> thấy tất cả
+                    currentRoleId.Contains(CommonConstants.Role.ADMIN) ||
+                    currentRoleId.Contains(CommonConstants.Role.DISPATCHER) ||
+
+                    // 2. Người dùng (END_USER) -> chỉ thấy yêu cầu của mình (so sánh với RequesterId)
+                    (currentRoleId.Contains(CommonConstants.Role.END_USER) && tr.RequesterId == currentUserId)
+                )
                         select new TripRequestAggregate
                         {
                             CreatedDate = tr.CreatedDate,
