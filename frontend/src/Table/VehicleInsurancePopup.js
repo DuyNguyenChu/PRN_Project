@@ -19,12 +19,34 @@ export default function VehicleInsurancePopup(props) {
     } = props;
 
     const visible = typeof show !== 'undefined' ? show : true;
-    const closeFn = handleClose ?? onClose ?? (() => {});
-    const successFn = handleSave ?? onSuccess ?? (() => {});
+    const closeFn = handleClose ?? onClose ?? (() => { });
+    const successFn = handleSave ?? onSuccess ?? (() => { });
     const edit = editItem ?? item ?? null;
     const apiUrl = propApiUrl ?? `${API_URL}/vehicle-insurances`;
     const token = propToken ?? (JSON.parse(localStorage.getItem('userData'))?.resources?.accessToken);
+    const [vehicles, setVehicles] = useState([]);
+    useEffect(() => {
+        if (!visible) {
+            console.log("Popup is hidden -> Skip API");
+            return;
+        }
+        const fetchData = async () => {
+            try {
+                const usedToken =
+                    token || JSON.parse(localStorage.getItem('userData'))?.resources?.accessToken;
+                const headers = usedToken ? { Authorization: `Bearer ${usedToken}` } : {};
 
+                const vehicleRes = await axios.get(`${API_URL}/Vehicle`, { headers });
+                setVehicles(vehicleRes.data?.resources || []); // <--- SAFE FIX
+
+            } catch (err) {
+                console.error("Lỗi tải danh sách:", err);
+                setVehicles([]);
+            }
+        };
+
+        fetchData();
+    }, [show]);
     const [formData, setFormData] = useState({
         vehicleId: '',
         insuranceProvider: '',
@@ -66,6 +88,7 @@ export default function VehicleInsurancePopup(props) {
         setErrors({});
     }, [edit]);
 
+
     const validate = () => {
         const e = {};
         if (!formData.vehicleId) e.vehicleId = 'Vui lòng chọn xe';
@@ -74,6 +97,7 @@ export default function VehicleInsurancePopup(props) {
         if (!formData.startDate) e.startDate = 'Vui lòng chọn ngày bắt đầu';
         if (!formData.endDate) e.endDate = 'Vui lòng chọn ngày kết thúc';
         if (new Date(formData.endDate) < new Date(formData.startDate)) e.endDate = 'Ngày kết thúc không hợp lệ';
+        if (formData.premium <= 0) e.premium = "Phí bảo hiểm không thể mang giá trị âm được";
         setErrors(e);
         return Object.keys(e).length === 0;
     };
@@ -130,16 +154,25 @@ export default function VehicleInsurancePopup(props) {
                         <div className="modal-body">
                             {errors.submit && <div className="alert alert-danger">{errors.submit}</div>}
 
-                            <div className="form-group mb-2">
-                                <label>Xe</label>
-                                <input
-                                    type="number"
-                                    className={`form-control ${errors.vehicleId ? 'is-invalid' : ''}`}
+                            <div className="mb-3">
+                                <label className="form-label">Xe</label>
+                                <select
                                     name="vehicleId"
                                     value={formData.vehicleId}
                                     onChange={onChange}
-                                />
-                                {errors.vehicleId && <div className="invalid-feedback">{errors.vehicleId}</div>}
+                                    className="form-select"
+                                    required
+                                >
+                                    <option value="">-- Chọn xe --</option>
+                                    {vehicles && vehicles.length > 0 &&
+                                        vehicles.map(v => (
+                                            <option key={v.id} value={v.id}>
+                                                {v.name}
+                                            </option>
+                                        ))
+                                    }
+
+                                </select>
                             </div>
 
                             <div className="form-group mb-2">
@@ -194,11 +227,12 @@ export default function VehicleInsurancePopup(props) {
                                 <label>Phí bảo hiểm</label>
                                 <input
                                     type="number"
-                                    className="form-control"
+                                    className={`form-control ${errors.premium ? 'is-invalid' : ''}`}
                                     name="premium"
                                     value={formData.premium}
                                     onChange={onChange}
                                 />
+                                {errors.premium && <div className="invalid-feedback">{errors.premium}</div>}
                             </div>
 
                             <div className="form-group mb-2">

@@ -13,6 +13,34 @@ export default function VehicleAssignmentPopup({ show, handleClose, handleSave, 
         notes: ''
     });
     const [error, setError] = useState('');
+    const [vehicles, setVehicles] = useState([]);
+    const [drivers, setDrivers] = useState([]);
+    useEffect(() => {
+        if (!show) return;
+
+        const fetchData = async () => {
+            try {
+                const usedToken =
+                    token || JSON.parse(localStorage.getItem('userData'))?.resources?.accessToken;
+                const headers = usedToken ? { Authorization: `Bearer ${usedToken}` } : {};
+
+                const vehicleRes = await axios.get(`${API_URL}/Vehicle`, { headers });
+                setVehicles(vehicleRes.data?.resources || []); // <--- SAFE FIX
+
+                const driverRes = await axios.get(`${API_URL}/Driver`, { headers });
+                setDrivers(driverRes.data?.resources || []); // <--- SAFE FIX
+
+            } catch (err) {
+                console.error("Lỗi tải danh sách:", err);
+                setVehicles([]);
+                setDrivers([]);
+            }
+        };
+
+        fetchData();
+    }, [show]);
+
+
 
     useEffect(() => {
         if (editItem) {
@@ -90,28 +118,45 @@ export default function VehicleAssignmentPopup({ show, handleClose, handleSave, 
                             {error && <div className="alert alert-danger">{error}</div>}
 
                             <div className="mb-3">
-                                <label className="form-label">ID Xe</label>
-                                <input
-                                    type="number"
+                                <label className="form-label">Xe</label>
+                                <select
                                     name="vehicleId"
                                     value={formData.vehicleId}
                                     onChange={handleChange}
-                                    className="form-control"
+                                    className="form-select"
                                     required
-                                />
+                                >
+                                    <option value="">-- Chọn xe --</option>
+                                    {vehicles && vehicles.length > 0 &&
+                                        vehicles.map(v => (
+                                            <option key={v.id} value={v.id}>
+                                                {v.name}
+                                            </option>
+                                        ))
+                                    }
+
+                                </select>
                             </div>
 
+
                             <div className="mb-3">
-                                <label className="form-label">ID Tài xế</label>
-                                <input
-                                    type="number"
+                                <label className="form-label">Tài xế</label>
+                                <select
                                     name="driverId"
                                     value={formData.driverId}
                                     onChange={handleChange}
-                                    className="form-control"
+                                    className="form-select"
                                     required
-                                />
+                                >
+                                    <option value="">-- Chọn tài xế --</option>
+                                    {drivers.map(d => (
+                                        <option key={d.id} value={d.id}>
+                                            {d.fullName}
+                                        </option>
+                                    ))}
+                                </select>
                             </div>
+
 
                             <div className="mb-3">
                                 <label className="form-label">Ngày bắt đầu</label>
