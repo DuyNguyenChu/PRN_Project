@@ -2,7 +2,7 @@ import { useEffect, useState, useCallback, useRef } from 'react';
 import moment from 'moment';
 import axios from 'axios';
 
-export default function FuelLogTable({ apiUrl, token, onEdit, onDelete, onApprove, onReject, refreshFlag, filters }) {
+export default function FuelLogTable({ apiUrl, token, onEdit, onDelete, onApprove, onReject, refreshFlag, filters, isDispatcher, isDriver }) {
     const [data, setData] = useState([]);
     const [totalRecords, setTotalRecords] = useState(0);
     const [page, setPage] = useState(1);
@@ -21,7 +21,7 @@ export default function FuelLogTable({ apiUrl, token, onEdit, onDelete, onApprov
         } else {
             setPage(1);
         }
-    }, [filters, search]); // <--- SỬA LỖI Ở ĐÂY
+    }, [filters, search]);
 
     const formatCurrency = (value) => {
         if (value === null || value === undefined) return '';
@@ -47,23 +47,27 @@ export default function FuelLogTable({ apiUrl, token, onEdit, onDelete, onApprov
             ];
 
             // Map sortField to column index
-            const sortColumnIndex = {
-                id: 0,
-                vehicleRegistrationNumber: 1,
-                driverName: 2,
-                tripCode: 3,
-                gasStation: 4,
-                createdDate: 5,
-                fuelTypeName: 6,
-                totalCost: 7,
-                statusName: 8,
-            }[sortField] || 5; // Mặc định là createdDate
+            const sortColumnIndex =
+                {
+                    id: 0,
+                    vehicleRegistrationNumber: 1,
+                    driverName: 2,
+                    tripCode: 3,
+                    gasStation: 4,
+                    createdDate: 5,
+                    fuelTypeName: 6,
+                    totalCost: 7,
+                    statusName: 8,
+                }[sortField] || 5; // Mặc định là createdDate
 
+            // === [THAY ĐỔI QUAN TRỌNG] ===
             // Áp dụng bộ lọc cột từ `filters` (cho thanh lọc)
+            // Gán giá trị driverName vào đúng
+            if (filters.driverName) columns[2].search.value = filters.driverName;
             if (filters.tripCode) columns[3].search.value = filters.tripCode;
             if (filters.gasStation) columns[4].search.value = filters.gasStation;
             if (filters.createdDate) columns[5].search.value = filters.createdDate;
-            
+
             const requestBody = {
                 draw: page,
                 columns: columns,
@@ -74,8 +78,6 @@ export default function FuelLogTable({ apiUrl, token, onEdit, onDelete, onApprov
 
                 // Bộ lọc nâng cao (từ FuelLogDTParameters)
                 vehicleIds: filters.vehicleIds || [],
-                driverIds: filters.driverIds || [],
-                tripIds: filters.tripIds || [],
                 fuelTypes: filters.fuelTypes || [],
                 statusIds: filters.statusIds || [],
             };
@@ -115,24 +117,35 @@ export default function FuelLogTable({ apiUrl, token, onEdit, onDelete, onApprov
         }
     };
 
-    const PENDING_STATUS = 0; 
-        const renderActions = (row) => {
+    const PENDING_STATUS = 0;
+    const renderActions = (row) => {
         // Logic if/else này đã đúng, chỉ cần hằng số PENDING_STATUS đúng
         if (row.status === PENDING_STATUS) {
             return (
-                <>
-                    <button className="btn btn-sm btn-success me-1" onClick={() => onApprove(row.id)} title="Duyệt">
-                        <i className="fa fa-check"></i>
-                    </button>
-                    <button className="btn btn-sm btn-warning me-1" onClick={() => onReject(row)} title="Từ chối">
-                        <i className="fa fa-times"></i>
-                    </button>
-                    <button className="btn btn-sm btn-primary me-1" onClick={() => onEdit(row)} title="Sửa">
-                        <i className="fa fa-pen"></i>
-                    </button>
-                    <button className="btn btn-sm btn-danger" onClick={() => onDelete(row.id)} title="Xóa">
-                        <i className="fa fa-trash"></i>
-                    </button>
+                <>  
+                
+                    {isDispatcher && (
+                        <>
+                            <button
+                                className="btn btn-sm btn-success me-1" onClick={() => onApprove(row.id)} title="Duyệt" >
+                                <i className="fa fa-check"></i>
+                            </button>
+                            <button
+                                className="btn btn-sm btn-warning me-1" onClick={() => onReject(row)} title="Từ chối">
+                                <i className="fa fa-times"></i>
+                            </button>
+                        </>
+                        )}
+                        {isDriver && (
+                        <>
+                            <button className="btn btn-sm btn-primary me-1" onClick={() => onEdit(row)} title="Sửa">
+                                <i className="fa fa-pen"></i>
+                            </button>
+                            <button className="btn btn-sm btn-danger" onClick={() => onDelete(row.id)} title="Xóa" >
+                                <i className="fa fa-trash"></i>
+                            </button>
+                        </>
+                    )}
                 </>
             );
         }
@@ -177,27 +190,35 @@ export default function FuelLogTable({ apiUrl, token, onEdit, onDelete, onApprov
                                 Ngày tạo {sortField === 'createdDate' && (sortDir === 'asc' ? '▲' : '▼')}
                             </th>
                             <th onClick={() => handleSort('fuelTypeName')} style={{ cursor: 'pointer' }}>
-                                Nhiên liệu 
+                                Nhiên liệu
                             </th>
                             <th onClick={() => handleSort('totalCost')} style={{ cursor: 'pointer' }}>
-                                Tổng tiền {sortField === 'totalCost' && (sortDir ==='asc' ? '▲' : '▼')}
+                                Tổng tiền {sortField === 'totalCost' && (sortDir === 'asc' ? '▲' : '▼')}
                             </th>
                             <th onClick={() => handleSort('statusName')} style={{ cursor: 'pointer' }}>
-                                Trạng thái 
+                                Trạng thái
                             </th>
                             <th className="text-end">Thao tác</th>
                         </tr>
                     </thead>
                     <tbody>
                         {loading ? (
-                            <tr><td colSpan={10} className="text-center">Đang tải...</td></tr>
+                            <tr>
+                                <td colSpan={10} className="text-center">
+                                    Đang tải...
+                                </td>
+                            </tr>
                         ) : data.length === 0 ? (
-                            <tr><td colSpan={10} className="text-center">Không có dữ liệu</td></tr>
+                            <tr>
+                                <td colSpan={10} className="text-center">
+                                    Không có dữ liệu
+                                </td>
+                            </tr>
                         ) : (
                             data.map((row, index) => (
                                 <tr key={row.id}>
                                     <td>{(page - 1) * pageSize + index + 1}</td>
-                                    <td>{`[${row.vehicleRegistrationNumber}] ${row.vehicleModelName}`}</td>
+                                    <td>{`${row.vehicleModelName}`}</td>
                                     <td>{row.driverName}</td>
                                     <td>{row.tripCode || 'N/A'}</td>
                                     <td>{row.gasStation}</td>
@@ -205,7 +226,10 @@ export default function FuelLogTable({ apiUrl, token, onEdit, onDelete, onApprov
                                     <td>{row.fuelTypeName}</td>
                                     <td>{formatCurrency(row.totalCost)}</td>
                                     <td>
-                                        <span className={`badge`} style={{ backgroundColor: row.statusColor, color: '#fff' }}>
+                                        <span
+                                            className={`badge`}
+                                            style={{ backgroundColor: row.statusColor, color: '#fff' }}
+                                        >
                                             {row.statusName}
                                         </span>
                                     </td>
@@ -228,7 +252,9 @@ export default function FuelLogTable({ apiUrl, token, onEdit, onDelete, onApprov
                     }}
                 >
                     {[5, 10, 20, 50].map((n) => (
-                        <option key={n} value={n}>{n} / trang</option>
+                        <option key={n} value={n}>
+                            {n} / trang
+                        </option>
                     ))}
                 </select>
                 <div className="btn-group" role="group">
@@ -243,23 +269,73 @@ export default function FuelLogTable({ apiUrl, token, onEdit, onDelete, onApprov
                         }
                         const buttons = [];
                         if (start > 1) {
-                            buttons.push(<button key={1} className="btn btn-outline-primary" onClick={() => setPage(1)}>1</button>);
-                            if (start > 2) buttons.push(<button key="start-ellipsis" className="btn btn-light" disabled>...</button>);
+                            buttons.push(
+                                <button key={1} className="btn btn-outline-primary" onClick={() => setPage(1)}>
+                                    1
+                                </button>,
+                            );
+                            if (start > 2)
+                                buttons.push(
+                                    <button key="start-ellipsis" className="btn btn-light" disabled>
+                                        ...
+                                    </button>,
+                                );
                         }
                         for (let i = start; i <= end; i++) {
-                            buttons.push(<button key={i} className={`btn ${i === page ? 'btn-primary' : 'btn-outline-primary'}`} onClick={() => setPage(i)}>{i}</button>);
+                            buttons.push(
+                                <button
+                                    key={i}
+                                    className={`btn ${i === page ? 'btn-primary' : 'btn-outline-primary'}`}
+                                    onClick={() => setPage(i)}
+                                >
+                                    {i}
+                                </button>,
+                            );
                         }
                         if (end < totalPages) {
-                            if (end < totalPages - 1) buttons.push(<button key="end-ellipsis" className="btn btn-light" disabled>...</button>);
-                            buttons.push(<button key={totalPages} className="btn btn-outline-primary" onClick={() => setPage(totalPages)}>{totalPages}</button>);
+                            if (end < totalPages - 1)
+                                buttons.push(
+                                    <button key="end-ellipsis" className="btn btn-light" disabled>
+                                        ...
+                                    </button>,
+                                );
+                            buttons.push(
+                                <button
+                                    key={totalPages}
+                                    className="btn btn-outline-primary"
+                                    onClick={() => setPage(totalPages)}
+                                >
+                                    {totalPages}
+                                </button>,
+                            );
                         }
                         return (
                             <>
-                                <button className="btn btn-outline-primary" disabled={page === 1} onClick={() => setPage(1)}>«</button>
-                                <button className="btn btn-outline-primary" disabled={page === 1} onClick={() => setPage((p) => p - 1)}>‹</button>
+                                <button className="btn btn-outline-primary" disabled={page === 1} onClick={() => setPage(1)}>
+                                    «
+                                </button>
+                                <button
+                                    className="btn btn-outline-primary"
+                                    disabled={page === 1}
+                                    onClick={() => setPage((p) => p - 1)}
+                                >
+                                    ‹
+                                </button>
                                 {buttons}
-                                <button className="btn btn-outline-primary" disabled={page >= totalPages} onClick={() => setPage((p) => p + 1)}>›</button>
-                                <button className="btn btn-outline-primary" disabled={page >= totalPages} onClick={() => setPage(totalPages)}>»</button>
+                                <button
+                                    className="btn btn-outline-primary"
+                                    disabled={page >= totalPages}
+                                    onClick={() => setPage((p) => p + 1)}
+                                >
+                                    ›
+                                </button>
+                                <button
+                                    className="btn btn-outline-primary"
+                                    disabled={page >= totalPages}
+                                    onClick={() => setPage(totalPages)}
+                                >
+                                    »
+                                </button>
                             </>
                         );
                     })()}

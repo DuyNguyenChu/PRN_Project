@@ -167,19 +167,19 @@ namespace api.Helpers
 
         public static class VehicleStatus
         {
-            public const int AVAILABLE = 1001;
-            public const int IN_USE = 1002;
-            public const int IN_MAINTENANCE = 1003;
-            public const int BROKEN = 1004;
-            public const int UNAVAILABLE = 1005;
+            public const int AVAILABLE = 1;
+            public const int IN_USE = 2;
+            public const int IN_MAINTENANCE = 3;
+            public const int BROKEN = 5;
+            public const int UNAVAILABLE = 4;
         }
 
         public static class DriverStatus
         {
-            public const int AVAILABLE = 1001;
-            public const int ON_TRIP = 1002;
-            public const int ON_LEAVE = 1003;
-            public const int UNAVAILABLE = 1004;
+            public const int AVAILABLE = 2;
+            public const int ON_TRIP = 3;
+            public const int ON_LEAVE = 4;
+            public const int UNAVAILABLE = 5;
         }
 
         public static class TripRequestStatus
@@ -231,11 +231,11 @@ namespace api.Helpers
 
         public static class ExpenseType
         {
-            public const int TOLL_FEE = 1001; // cầu đường
-            public const int PARKING_FEE = 1002; // đỗ xe
-            public const int ACCOMMODATION = 1003; // lưu trú
-            public const int MEAL = 1004; // ăn uống
-            public const int OTHER = 1005; // khác
+            public const int TOLL_FEE = 1; // cầu đường
+            public const int PARKING_FEE = 2; // đỗ xe
+            public const int ACCOMMODATION = 3; // lưu trú
+            public const int MEAL = 4; // ăn uống
+            public const int OTHER = 5; // khác
 
         }
 

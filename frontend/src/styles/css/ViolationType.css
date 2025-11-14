@@ -1,0 +1,58 @@
+.filter-box {
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    transition: all 0.4s ease;
+}
+
+.filter-box.show {
+    max-height: 500px; /* đủ cao để chứa form */
+    opacity: 1;
+    margin-top: 10px;
+}
+
+.popup-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4);
+    -webkit-backdrop-filter: blur(4px);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1050;
+}
+
+.popup-content {
+    width: 400px;
+    background: #fff;
+    border-radius: 12px;
+}
+
+/* Đảm bảo popper của DatePicker hiển thị đúng */
+.react-datepicker-popper {
+    z-index: 1050 !important; /* Tăng z-index để hiển thị trên các phần tử khác */
+}
+
+/* Đảm bảo div cha không cắt nội dung popper */
+.filter-box {
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    transition: all 0.4s ease;
+    pointer-events: none;
+}
+
+.filter-box.show {
+    max-height: 500px;
+    opacity: 1;
+    margin-top: 10px;
+    pointer-events: auto;
+    position: relative;
+    z-index: 10;
+    overflow: visible !important;
+}
+
+.react-datepicker-wrapper {
+    width: 100%;
+}

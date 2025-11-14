@@ -20,8 +20,8 @@ namespace api.ViewModel
         public string FullName { get; set; } = null!;
         public string Email { get; set; } = null!;
         public string? PhoneNumber { get; set; } = null!;
-        public int? AvatarId { get; set; }
-        public string? AvatarUrl { get; set; }
+        //public int? AvatarId { get; set; }
+        //public string? AvatarUrl { get; set; }
         public DateTimeOffset CreatedDate { get; set; }
     }
 

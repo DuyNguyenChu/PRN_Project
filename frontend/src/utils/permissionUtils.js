@@ -15,6 +15,77 @@ const ACTION_ID = {
     // Thêm các ID khác nếu cần (vd: APPROVE: 5)
 };
 
+const ROLES = {
+    DISPATCHER: "Điều phối viên", // <-- SỬA TÊN NÀY
+    DRIVER: "Lái xe",           // <-- SỬA TÊN NÀY
+    USER: "Người dùng",      // <-- SỬA TÊN NÀY
+    ADMIN: "admin",       // <-- SỬA TÊN NÀY
+};
+
+// Biến cache (bộ nhớ đệm) để lưu vai trò
+function loadUserRoles() {
+    try {
+        const userDataString = localStorage.getItem('userData');
+        if (!userDataString) {
+            return []; // <-- SỬA: Trả về mảng rỗng
+        }
+        const userData = JSON.parse(userDataString);
+        
+        const roles = userData?.resources?.userInfo.roles;
+        
+        if (Array.isArray(roles)) {
+            // Chuyển thành mảng tên vai trò (viết thường) để dễ so sánh
+            const freshRoles = roles.map(role => role.name.toLowerCase());
+            console.log("Vai trò người dùng vừa được tải:", freshRoles);
+            return freshRoles; // <-- SỬA: Trả về mảng
+        } else {
+            return []; // <-- SỬA: Trả về mảng rỗng
+        }
+    } catch (e) {
+        console.error("Lỗi đọc vai trò từ localStorage:", e);
+        return []; // <-- SỬA: Trả về mảng rỗng
+    }
+}
+
+// XÓA: Không cần tải vai trò khi import file
+// loadUserRoles(); // <-- ĐÃ XÓA
+
+/**
+ * SỬA: Hàm helper kiểm tra vai trò.
+ * Sẽ gọi loadUserRoles() MỖI LẦN để lấy dữ liệu mới nhất.
+ */
+function hasRole(roleName) {
+    const userRoles = loadUserRoles(); // <-- SỬA: Lấy vai trò mới nhất
+    return userRoles.includes(roleName.toLowerCase());
+}
+
+/**
+ * (MỚI) Export các hàm kiểm tra vai trò
+ * (Giữ nguyên, chúng hoạt động đúng)
+ */
+export function isDispatcher() {
+    // console.log(hasRole(ROLES.DISPATCHER) || hasRole(ROLES.ADMIN));
+    return hasRole(ROLES.DISPATCHER) || hasRole(ROLES.ADMIN); // Admin cũng là ĐPV
+}
+
+export function isDriver() {
+    return hasRole(ROLES.DRIVER);
+}
+
+export function isUser() {
+    return hasRole(ROLES.USER);
+}
+
+export function isAdmin() {
+    return hasRole(ROLES.ADMIN);
+}
+
+/**
+ * (MỚI) Hàm này phải được gọi khi người dùng ĐĂNG XUẤT
+ * để xóa cache vai trò.
+ */
+
+
 /**
  * Lấy và phân tích (parse) mảng permissions từ localStorage.
  * Đảm bảo cấu trúc [{menuId: number, actionIds: Array<number>}, ...].

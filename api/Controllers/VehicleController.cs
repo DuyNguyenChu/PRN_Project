@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using api.Dtos.Vehicle;
 using api.Helpers;
 using api.Interface.Services;
+using api.Service;
 using Microsoft.AspNetCore.Mvc;
 
 namespace api.Controllers
@@ -81,6 +82,13 @@ namespace api.Controllers
             var ok = await _service.DeleteAsync(id);
             if (!ok) return NotFound();
             return Ok(ok);
+        }
+
+        [HttpGet("available-vehicle")]
+        public async Task<IActionResult> GetAvailableVehicleAsync()
+        {
+            var result = await _service.GetVehicleAvailableAsync();
+            return BaseResult(result);
         }
     }
 }

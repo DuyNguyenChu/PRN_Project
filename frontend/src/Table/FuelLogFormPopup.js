@@ -14,9 +14,9 @@ function FuelLogFormPopup({
     onSuccess, 
     showConfirmModal, 
     showNotifyModal,
-    vehicleList,
-    tripList,
-    fuelTypeList 
+    vehicleList = [], // <--- Thêm = []
+    tripList = [],    // <--- Thêm = []
+    fuelTypeList = [] // <--- Thêm = []
 }) {
     
     const findOption = (list, value) => list.find(opt => opt.value === value) || null;

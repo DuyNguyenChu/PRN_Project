@@ -38,7 +38,8 @@ namespace api.Repositories
                         join vb in _context.VehicleBranches on v.VehicleBranchId equals vb.Id
                         join d in _context.Drivers on t.DriverId equals d.Id
                         join creator in _context.Users on t.CreatedBy equals creator.Id
-                        join approval in _context.Users on t.UpdatedBy equals approval.Id
+                        join approvalUser in _context.Users on t.UpdatedBy equals approvalUser.Id into approvalGroup
+                        from approval in approvalGroup.DefaultIfEmpty()
                         join tr in _context.TripRequests on t.TripRequestId equals tr.Id into tripRequestGroup
                         from tr in tripRequestGroup.DefaultIfEmpty()
                         where !t.IsDeleted
@@ -49,7 +50,7 @@ namespace api.Repositories
                                && !d.IsDeleted
                                && (t.TripRequestId == null || !tr.IsDeleted)
                                && !creator.IsDeleted
-                               && !approval.IsDeleted
+                               && (t.UpdatedBy == null || !approval.IsDeleted)
                         select new TripAggregate
                         {
                             Id = t.Id,

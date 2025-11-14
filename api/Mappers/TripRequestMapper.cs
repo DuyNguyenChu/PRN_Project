@@ -128,6 +128,7 @@ namespace api.Mappers
                 ToLatitude = existData.ToLatitude,
                 ToLongtitude = existData.ToLongtitude,
                 TripRequestId = existData.Id,
+                Description = "",
                 // Purpose = existData.Purpose,
                 // Notes = obj.Notes,
                 // TripCode = DateTime.Now.Ticks.ToString(),

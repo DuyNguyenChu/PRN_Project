@@ -9,6 +9,9 @@ import Select from 'react-select';
 import { API_URL } from '~/api/api';
 import moment from 'moment';
 import axios from 'axios'; 
+import { canView, isDispatcher, isDriver } from '~/utils/permissionUtils'; 
+import { useNavigate } from 'react-router-dom';
+import { PERMISSION_IDS } from '~/utils/menuIdForPermission';
 
 export default function MaintenanceRecord({ permissionFlags }) {
     const [showFilter, setShowFilter] = useState(false);
@@ -37,36 +40,54 @@ export default function MaintenanceRecord({ permissionFlags }) {
 
     // State cho dữ liệu bộ lọc
     const [vehicleList, setVehicleList] = useState([]);
-    const [driverList, setDriverList] = useState([]);
-    const [tripList, setTripList] = useState([]);
+    // [THAY ĐỔI] Đã xóa driverList
+    // [THAY ĐỔI] Đã xóa tripList
     const [serviceTypeList, setServiceTypeList] = useState([]); // Mới
     const [statusList, setStatusList] = useState([]);
 
     // State cho giá trị input bộ lọc
     const [dateRange, setDateRange] = useState([null, null]);
     const [startDate, endDate] = dateRange;
-    const [filterInputs, setFilterInputs] = useState({ serviceProvider: '', tripCode: '' }); // Sửa
+    // [THAY ĐỔI] Sửa filterInputs, thêm driverName, bỏ tripCode
+    const [filterInputs, setFilterInputs] = useState({ serviceProvider: '', driverName: '' });
     const [selectedVehicles, setSelectedVehicles] = useState([]);
-    const [selectedDrivers, setSelectedDrivers] = useState([]);
-    const [selectedTrips, setSelectedTrips] = useState([]);
+    // [THAY ĐỔI] Đã xóa selectedDrivers
+    // [THAY ĐỔI] Đã xóa selectedTrips
     const [selectedStatuses, setSelectedStatuses] = useState([]);
+
+    const isDispatcherUser = isDispatcher();
+    const isDriverUser = isDriver();
 
     // State cho bộ lọc đã "Áp dụng"
     const [appliedFilters, setAppliedFilters] = useState({});
 
+    const navigate = useNavigate();
+    const [isAccessChecked, setIsAccessChecked] = useState(false);
+    const [isAllowedToView, setIsAllowedToView] = useState(false);
+
+    useEffect(() => {
+        if (!canView(PERMISSION_IDS.MAINTENANCE_RECORD)) {
+            console.warn(`Người dùng không có quyền xem trang (ID: ${PERMISSION_IDS.MAINTENANCE_RECORD}). Đang chuyển hướng...`);
+            setIsAllowedToView(false);
+            navigate('/error');
+        } else {
+            setIsAllowedToView(true);
+        }
+        setIsAccessChecked(true);
+    }, [navigate]);
+
     // Fetch dữ liệu cho các dropdown bộ lọc
     useEffect(() => {
         const headers = { Authorization: `Bearer ${token}` };
-        // Giả sử bạn có các API endpoint này để lấy danh sách (không có /all)
-        axios.get(`${API_URL}/Vehicle`, { headers }).then(res => setVehicleList(res.data.resources.map(v => ({ value: v.id, label: `[${v.registrationNumber}] ${v.vehicleModelName}` })))).catch(err => console.error("Lỗi tải Vehicle:", err));
-        axios.get(`${API_URL}/Driver`, { headers }).then(res => setDriverList(res.data.resources.map(d => ({ value: d.id, label: d.name })))).catch(err => console.error("Lỗi tải Driver:", err));
-        axios.get(`${API_URL}/Trip`, { headers }).then(res => setTripList(res.data.resources.map(t => ({ value: t.id, label: t.description })))).catch(err => console.error("Lỗi tải Trip:", err));
         
-        // API mới từ MaintenanceRecordController
+        axios.get(`${API_URL}/Vehicle`, { headers }).then(res => setVehicleList(res.data.resources.map(v => ({ value: v.id, label: `${v.vehicleModelName}` })))).catch(err => console.error("Lỗi tải Vehicle:", err));
+        
+        // [THAY ĐỔI] Đã xóa fetch /Driver
+        // [THAY ĐỔI] Đã xóa fetch /Trip
+        
         axios.get(`${apiUrl}/service-types`, { headers }).then(res => setServiceTypeList(res.data.resources.map(f => ({ value: f.id, label: f.name })))).catch(err => console.error("Lỗi tải ServiceTypes:", err));
-        
-        // Dùng chung API status từ FuelLog (vì backend dùng chung CommonConstants)
         axios.get(`${API_URL}/FuelLog/status`, { headers }).then(res => setStatusList(res.data.resources.map(s => ({ value: s.id, label: s.name })))).catch(err => console.error("Lỗi tải Status:", err));
+    
     }, [token, apiUrl]);
 
     // Handlers cho các hành động
@@ -75,29 +96,19 @@ export default function MaintenanceRecord({ permissionFlags }) {
         setShowPopup(true);
     };
 
-const handleEdit = (item) => {
-        // Gọi GetByIdAsync để lấy chi tiết (details)
+    const handleEdit = (item) => {
         axios.get(`${apiUrl}/${item.id}`, { headers: { Authorization: `Bearer ${token}` } })
             .then(res => {
                 const itemDetails = res.data.resources;
                 
-                // Chuyển đổi định dạng cho form
                 const formattedItem = {
-                    // Lấy tất cả dữ liệu chi tiết
                     ...itemDetails, 
-
-                    // === SỬA LỖI Ở ĐÂY ===
-                    // Ghi đè 'status' (là object) bằng 'status.id' (là number)
-                    // Logic isReadOnly trong FormPopup sẽ dựa vào con số này
                     status: itemDetails.status.id, 
-                    // ======================
-
-                    // Map lại các ID cho <Select>
                     vehicleId: itemDetails.vehicle?.id || null,
-                    tripId: itemDetails.trip?.id || null,
+                    // [THAY ĐỔI] Xóa tripId
+                    // tripId: itemDetails.trip?.id || null,
                     serviceType: itemDetails.serviceType?.id || null,
                     
-                    // Map lại details (giữ nguyên)
                     details: itemDetails.detail.map(d => ({
                         description: d.description,
                         quantity: d.quantity,
@@ -110,10 +121,10 @@ const handleEdit = (item) => {
             })
             .catch(err => showNotifyModal("Lỗi khi tải chi tiết: " + err.message, false));
     };
+    
     const handleDelete = (id) => {
         showConfirmModal('Bạn có chắc chắn muốn xóa bản ghi này? (Không thể hoàn tác)', async () => {
             try {
-                // Gọi API DELETE mới
                 await axios.delete(`${apiUrl}/${id}`, { headers: { Authorization: `Bearer ${token}` } });
                 showNotifyModal('Xóa thành công!');
                 reloadTable();
@@ -144,8 +155,6 @@ const handleEdit = (item) => {
         setShowNotify(true);
     };
 
-
-    
     const handleApprove = (id) => {
         showConfirmModal('Bạn có chắc chắn muốn duyệt bản ghi này?', async () => {
             try {
@@ -173,25 +182,27 @@ const handleEdit = (item) => {
             startTimeFilter = moment(startDate).format('DD/MM/YYYY');
         }
 
+        // [THAY ĐỔI] Cập nhật appliedFilters
         setAppliedFilters({
             serviceProvider: filterInputs.serviceProvider.trim(),
-            tripCode: filterInputs.tripCode.trim(),
-            startTime: startTimeFilter, // Sửa tên
+            driverName: filterInputs.driverName.trim(), // Thêm driverName
+            // tripCode: Đã xóa
+            startTime: startTimeFilter, 
             vehicleIds: selectedVehicles.map(v => v.value),
-            driverIds: selectedDrivers.map(d => d.value),
-            tripIds: selectedTrips.map(t => t.value),
+            // driverIds: Đã xóa
+            // tripIds: Đã xóa
             statusIds: selectedStatuses.map(s => s.value),
-            // Không có serviceTypes trong DTParameters
         });
         setShowFilter(false);
     };
 
     const handleResetFilter = () => {
-        setFilterInputs({ serviceProvider: '', tripCode: '' });
+        // [THAY ĐỔI] Cập nhật reset filter
+        setFilterInputs({ serviceProvider: '', driverName: '' });
         setDateRange([null, null]);
         setSelectedVehicles([]);
-        setSelectedDrivers([]);
-        setSelectedTrips([]);
+        // [THAY ĐỔI] Đã xóa setSelectedDrivers
+        // [THAY ĐỔI] Đã xóa setSelectedTrips
         setSelectedStatuses([]);
         setAppliedFilters({});
     };
@@ -216,16 +227,19 @@ const handleEdit = (item) => {
                                 onChange={(e) => setFilterInputs({ ...filterInputs, serviceProvider: e.target.value })}
                             />
                         </div>
+
+                        {/* [THAY ĐỔI] Thay thế TripCode bằng DriverName */}
                         <div className="col-xl-4 mb-3">
-                            <label className="form-label">Mã chuyến đi:</label>
+                            <label className="form-label">Lái xe:</label>
                             <input
                                 type="text"
                                 className="form-control"
-                                placeholder="Mã chuyến đi"
-                                value={filterInputs.tripCode}
-                                onChange={(e) => setFilterInputs({ ...filterInputs, tripCode: e.target.value })}
+                                placeholder="Tên lái xe"
+                                value={filterInputs.driverName}
+                                onChange={(e) => setFilterInputs({ ...filterInputs, driverName: e.target.value })}
                             />
                         </div>
+
                         <div className="col-xl-4 mb-3">
                             <label className="form-label">Ngày bắt đầu</label>
                             <div className="input-group">
@@ -247,14 +261,10 @@ const handleEdit = (item) => {
                             <label className="form-label">Xe:</label>
                             <Select isMulti options={vehicleList} value={selectedVehicles} onChange={setSelectedVehicles} placeholder="Chọn xe" />
                         </div>
-                        <div className="col-xl-4 mb-3">
-                            <label className="form-label">Lái xe:</label>
-                            <Select isMulti options={driverList} value={selectedDrivers} onChange={setSelectedDrivers} placeholder="Chọn lái xe" />
-                        </div>
-                        <div className="col-xl-4 mb-3">
-                            <label className="form-label">Chuyến đi:</label>
-                            <Select isMulti options={tripList} value={selectedTrips} onChange={setSelectedTrips} placeholder="Chọn chuyến đi" />
-                        </div>
+                        
+                        {/* [THAY ĐỔI] Đã xóa Select Lái xe */}
+                        {/* [THAY ĐỔI] Đã xóa Select Chuyến đi */}
+
                         {/* Hàng 3: Selects */}
                         <div className="col-xl-4 mb-3">
                             <label className="form-label">Trạng thái:</label>
@@ -288,7 +298,9 @@ const handleEdit = (item) => {
                         onReject={handleReject}
                         refreshFlag={refreshFlag}
                         filters={appliedFilters}
-                        onDelete={handleDelete}                    
+                        onDelete={handleDelete}  
+                        isDispatcher={isDispatcherUser}           
+                        isDriver={isDriverUser}       
                         />
                 </div>
             </div>
@@ -306,9 +318,9 @@ const handleEdit = (item) => {
                     }}
                     showConfirmModal={(message, action) => showConfirmModal(message, action, () => setShowPopup(true))}
                     showNotifyModal={showNotifyModal}
-                    // Truyền danh sách đã fetch cho form
+                    
                     vehicleList={vehicleList}
-                    tripList={tripList}
+                    // [THAY ĐỔI] Đã xóa tripList
                     serviceTypeList={serviceTypeList}
                 />
             )}

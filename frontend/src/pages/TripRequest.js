@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import axios from 'axios'; // THÊM VÀO
+import axios from 'axios';
 import TripRequestTable from '../Table/TripRequestTable';
 import '../styles/css/TripRequest.css';
 import TripRequestFormPopup from '../Table/TripRequestFormPopup';
@@ -10,13 +10,15 @@ import { API_URL } from '~/api/api';
 import moment from 'moment';
 import { canView, canCreate, canUpdate, canDelete } from '~/utils/permissionUtils';
 import { useNavigate } from 'react-router-dom';
-import { PERMISSION_IDS } from '~/utils/menuIdForPermission'; // SỬA: Dùng file constants
+import { PERMISSION_IDS } from '~/utils/menuIdForPermission';
+import { ROLES, TRIP_REQUEST_STATUS } from '~/utils/tripConstants';
+import ApproveTripRequestPopup from '../Table/ApproveTripRequestPopup'; // Popup mới
 
 export default function TripRequest() {
     const [showFilter, setShowFilter] = useState(false);
     const toggleFilter = () => setShowFilter(!showFilter);
 
-    const apiUrl = `${API_URL}/TripRequest`; // URL API của bạn
+    const apiUrl = `${API_URL}/TripRequest`;
     const userDataString = localStorage.getItem('userData');
 
     const userData = JSON.parse(userDataString);
@@ -24,8 +26,10 @@ export default function TripRequest() {
         throw new Error('Không tìm thấy token người dùng. Vui lòng đăng nhập lại.');
     }
     const token = userData.resources.accessToken;
+    const loggedInUserId = userData.resources.userInfo.id || 0;
 
-    const [showForm, setShowForm] = useState(false);
+    const [userRole, setUserRole] = useState(null);
+
     const [showPopup, setShowPopup] = useState(false);
     const [editingItem, setEditingItem] = useState(null);
     const [refreshFlag, setRefreshFlag] = useState(false);
@@ -38,14 +42,15 @@ export default function TripRequest() {
     const [showNotify, setShowNotify] = useState(false);
     const [notifySuccess, setNotifySuccess] = useState(true);
 
-    // --- (SỬA) State cho Bộ lọc ---
+    // State cho các Popup
+    const [isPopupReadOnly, setIsPopupReadOnly] = useState(false);
+    const [showApprovePopup, setShowApprovePopup] = useState(false);
+    const [itemToApprove, setItemToApprove] = useState(null);
+
+    // --- State cho Bộ lọc (Giữ nguyên) ---
     const [dateRange, setDateRange] = useState([null, null]);
     const [startDate, endDate] = dateRange;
-
-    // State cho các giá trị lọc đã được "Áp dụng"
     const [appliedFilters, setAppliedFilters] = useState({});
-
-    // State cho các giá trị đang được nhập trong form lọc
     const [filterInputs, setFilterInputs] = useState({
         fromLocation: '',
         toLocation: '',
@@ -53,8 +58,6 @@ export default function TripRequest() {
         requesterIds: [],
         cancellerIds: [],
     });
-
-    // State cho dữ liệu dropdown của bộ lọc
     const [statusOptions, setStatusOptions] = useState([]);
     const [userOptions, setUserOptions] = useState([]);
     const [loadingFilters, setLoadingFilters] = useState(true);
@@ -64,11 +67,20 @@ export default function TripRequest() {
     const navigate = useNavigate();
     const [isAccessChecked, setIsAccessChecked] = useState(false);
     const [isAllowedToView, setIsAllowedToView] = useState(false);
+    const [isAllowedToCreate, setIsAllowedToCreate] = useState(false);
 
     // useEffect kiểm tra quyền xem trang
     useEffect(() => {
-        // SỬA: Đổi ID thành ID của trang TripRequest
-        // (Giả sử ID là PERMISSION_IDS.TRIP_REQUEST, bạn hãy thay bằng ID đúng)
+        try {
+            const role = userData.resources.userInfo.roles
+                                .map((role) => role.name)
+
+                                // 2. Dùng .join() để biến mảng thành chuỗi: ["Admin", "User"] -> "Admin, User"
+                                .join(', ') || ROLES.USER;
+            setUserRole(role);
+        } catch (e) {
+            setUserRole(ROLES.USER);
+        }
         if (!canView(PERMISSION_IDS.TRIP_REQUEST_LIST)) {
             console.warn(`Người dùng không có quyền xem trang (ID: ${PERMISSION_IDS.TRIP_REQUEST_LIST}). Đang chuyển hướng...`);
             setIsAllowedToView(false);
@@ -77,42 +89,95 @@ export default function TripRequest() {
             setIsAllowedToView(true);
         }
         setIsAccessChecked(true);
-    }, [navigate]);
+    }, [navigate, userData]);
 
-    // THÊM VÀO: useEffect fetch dữ liệu cho bộ lọc
+    // useEffect fetch dữ liệu cho bộ lọc (Giữ nguyên)
     useEffect(() => {
         const fetchFilterData = async () => {
-            if (!token) return; // Đảm bảo có token
+            if (!token) return;
             setLoadingFilters(true);
             try {
-                // Giả sử API trả về mảng trong `resources`
                 const [statusRes, userRes] = await Promise.all([
                     axios.get(`${API_URL}/TripRequestStatus`, { headers: { Authorization: `Bearer ${token}` } }),
-                    axios.get(`${API_URL}/User`, { headers: { Authorization: `Bearer ${token}` } }), // API lấy tất cả user
+                    axios.get(`${API_URL}/User`, { headers: { Authorization: `Bearer ${token}` } }),
                 ]);
 
                 setStatusOptions(statusRes.data.resources || []);
                 setUserOptions(userRes.data.resources || []);
             } catch (err) {
                 console.error('Lỗi tải dữ liệu filter:', err);
-                // Dùng showNotifyModal nội bộ (nếu có) hoặc console.error
             } finally {
                 setLoadingFilters(false);
             }
         };
 
         fetchFilterData();
-    }, [token]); // Chỉ chạy 1 lần khi có token
+    }, [token]);
 
     const handleAdd = () => {
         setEditingItem(null);
+        setIsPopupReadOnly(false); // SỬA: Đảm bảo không ở chế độ chỉ xem
         setShowPopup(true);
     };
 
-    const handleEdit = (item) => {
+    // SỬA: handleEdit nhận thêm cờ isReadOnly
+    const handleEdit = (item, isReadOnly = false) => {
         setEditingItem(item);
+        setIsPopupReadOnly(isReadOnly);
         setShowPopup(true);
     };
+
+    // --- (THÊM MỚI) Các hàm xử lý Hủy, Duyệt, Từ chối ---
+
+    const handleCancel = (item) => {
+        showConfirmModal(
+            `Bạn có chắc chắn muốn HỦY yêu cầu (ID: ${item.id})?`,
+            async () => {
+                try {
+                    // API Hủy: PUT /api/TripRequest/cancel
+                    // Giả định payload cần cancellerId
+                    const payload = {
+                        requesterId: loggedInUserId,
+                    };
+
+                    await axios.put(`${apiUrl}/cancel`, payload, { headers: { Authorization: `Bearer ${token}` } });
+                    showNotifyModal('Hủy yêu cầu thành công!', true);
+                    reloadTable();
+                } catch (err) {
+                    showNotifyModal('Hủy yêu cầu thất bại: ' + (err.response?.data?.message || err.message), false);
+                }
+            },
+            () => {}, // Không làm gì khi nhấn "Hủy" trong confirm
+        );
+    };
+
+    const handleReject = (item) => {
+        showConfirmModal(
+            `Bạn có chắc chắn muốn TỪ CHỐI yêu cầu (ID: ${item.id})?`,
+            async () => {
+                try {
+                    // API Từ chối: PUT /api/TripRequest/reject
+                    const payload = {
+                        id: item.id,
+                    };
+
+                    await axios.put(`${apiUrl}/reject`, payload, { headers: { Authorization: `Bearer ${token}` } });
+                    showNotifyModal('Từ chối yêu cầu thành công!', true);
+                    reloadTable();
+                } catch (err) {
+                    showNotifyModal('Từ chối yêu cầu thất bại: ' + (err.response?.data?.message || err.message), false);
+                }
+            },
+            () => {}, // Không làm gì khi nhấn "Hủy" trong confirm
+        );
+    };
+
+    const handleApprove = (item) => {
+        setItemToApprove(item);
+        setShowApprovePopup(true);
+    };
+
+    // --- (Hết) Các hàm xử lý mới ---
 
     const showConfirmModal = (message, user, onCancel) => {
         setConfirmMessage(message);
@@ -136,15 +201,12 @@ export default function TripRequest() {
 
     const handleClose = () => setShowPopup(false);
 
-    // --- (SỬA) Logic xử lý Filter ---
-
-    // Xử lý input text
+    // --- Logic xử lý Filter (Giữ nguyên) ---
     const handleFilterInputChange = (e) => {
         const { name, value } = e.target;
         setFilterInputs((prev) => ({ ...prev, [name]: value }));
     };
 
-    // Xử lý select multiple
     const handleMultiSelectChange = (e) => {
         const { name } = e.target;
         const selectedIds = Array.from(e.target.selectedOptions, (option) => Number(option.value));
@@ -154,7 +216,6 @@ export default function TripRequest() {
     const handleApplyFilter = () => {
         const [startDate, endDate] = dateRange;
         const newFilters = {
-            // Lấy từ state filterInputs
             fromLocation: filterInputs.fromLocation.trim(),
             toLocation: filterInputs.toLocation.trim(),
             tripRequestStatusIds: filterInputs.tripRequestStatusIds,
@@ -163,7 +224,6 @@ export default function TripRequest() {
             createdDate: null,
         };
 
-        // Tạo chuỗi ngày tháng
         if (startDate && endDate) {
             newFilters.createdDate = `${moment(startDate).format('DD/MM/YYYY')} - ${moment(endDate).format(
                 'DD/MM/YYYY',
@@ -177,7 +237,6 @@ export default function TripRequest() {
     };
 
     const handleResetFilter = () => {
-        // Reset các giá trị trong ô input
         setFilterInputs({
             fromLocation: '',
             toLocation: '',
@@ -186,25 +245,22 @@ export default function TripRequest() {
             cancellerIds: [],
         });
         setDateRange([null, null]);
-
-        // Reset bộ lọc đã áp dụng
         setAppliedFilters({});
     };
-
     // --- (Kết thúc) Logic xử lý Filter ---
 
     const reloadTable = () => setRefreshFlag((prev) => !prev);
 
-    // THÊM: Kiểm tra quyền truy cập
     if (!isAccessChecked) {
         return <div className="text-center p-5">Đang kiểm tra quyền truy cập...</div>;
     }
     if (!isAllowedToView) {
-        return null; // Đã bị chuyển hướng
+        return null;
     }
 
     return (
         <div className="container-fluid pt-4 px-4">
+            {/* ... (Toàn bộ JSX của Bộ lọc được giữ nguyên) ... */}
             <button
                 type="button"
                 className="btn btn-outline-primary m-2"
@@ -219,7 +275,6 @@ export default function TripRequest() {
                     {loadingFilters ? (
                         <p>Đang tải dữ liệu lọc...</p>
                     ) : (
-                        // SỬA: Thêm các ô lọc
                         <>
                             <div className="row">
                                 <div className="col-md-6 mb-3">
@@ -339,7 +394,7 @@ export default function TripRequest() {
                             className="btn btn-primary me-3"
                             id="btn_apply_filter"
                             onClick={handleApplyFilter}
-                            disabled={loadingFilters} // Vô hiệu hóa khi đang tải
+                            disabled={loadingFilters}
                         >
                             Áp dụng
                         </button>
@@ -358,21 +413,34 @@ export default function TripRequest() {
             <div className="col-sm-12 col-xl-12 py-4">
                 <div className="bg-light rounded h-100 p-4">
                     <div className="d-flex justify-content-between align-items-center mb-4">
-                        {/* SỬA: Tiêu đề */}
                         <h6 className="mb-4">Danh sách yêu cầu chuyến đi</h6>
-                        <button type="button" className="btn btn-primary" id="btn_add_user_status" onClick={handleAdd}>
-                            <i className="fa fa-plus me-2"></i>Thêm mới
-                        </button>
+                        {/* Nút Thêm mới chỉ hiển thị cho Người dùng (hoặc vai trò khác được phép) */}
+                        {userRole === ROLES.USER && (
+                            <button
+                                type="button"
+                                className="btn btn-primary"
+                                id="btn_add_user_status"
+                                onClick={handleAdd}
+                            >
+                                <i className="fa fa-plus me-2"></i>Thêm mới
+                            </button>
+                        )}
                     </div>
+                    {/* SỬA: Truyền các props mới xuống Table */}
                     <TripRequestTable
                         apiUrl={apiUrl}
                         token={token}
                         onEdit={handleEdit}
                         refreshFlag={refreshFlag}
-                        filters={appliedFilters} // Truyền filter đã áp dụng xuống
+                        filters={appliedFilters}
+                        userRole={userRole}
+                        onCancel={handleCancel}
+                        onApprove={handleApprove}
+                        onReject={handleReject}
                     />
                 </div>
             </div>
+
             {/* Popup nhập liệu */}
             {showPopup && (
                 <TripRequestFormPopup
@@ -386,9 +454,30 @@ export default function TripRequest() {
                     }}
                     showConfirmModal={(message, user) => showConfirmModal(message, user, () => setShowPopup(true))}
                     showNotifyModal={showNotifyModal}
+                    isReadOnly={isPopupReadOnly} // SỬA: Truyền cờ chỉ xem
                 />
             )}
-            {/* Giữ nguyên các Modal Confirm và Notify */}
+
+            {/* THÊM MỚI: Popup Duyệt */}
+            {showApprovePopup && (
+                <ApproveTripRequestPopup
+                    item={itemToApprove}
+                    onClose={() => setShowApprovePopup(false)}
+                    apiUrl={apiUrl}
+                    token={token}
+                    onSuccess={() => {
+                        reloadTable();
+                        setShowApprovePopup(false);
+                    }}
+                    // Sửa onCancel để mở lại popup duyệt nếu user nhấn "Hủy" trong confirm
+                    showConfirmModal={(message, user, onCancel) =>
+                        showConfirmModal(message, user, onCancel || (() => setShowApprovePopup(true)))
+                    }
+                    showNotifyModal={showNotifyModal}
+                />
+            )}
+
+            {/* Modal Confirm và Notify (Giữ nguyên) */}
             {showConfirm && (
                 <ConfirmModal
                     message={confirmMessage}

@@ -2,7 +2,6 @@ import { useEffect, useState, useCallback, useRef } from 'react';
 import moment from 'moment';
 import axios from 'axios';
 
-// Giả định Status = 0 là "Chờ duyệt"
 const PENDING_STATUS = 0;
 
 export default function MaintenanceRecordTable({ 
@@ -13,14 +12,16 @@ export default function MaintenanceRecordTable({
     onReject, 
     refreshFlag, 
     filters,
-    onDelete
+    onDelete,
+    isDispatcher,
+    isDriver
 }) {
     const [data, setData] = useState([]);
     const [totalRecords, setTotalRecords] = useState(0);
     const [page, setPage] = useState(1);
     const [pageSize, setPageSize] = useState(10);
     const [search, setSearch] = useState('');
-    const [sortField, setSortField] = useState('startTime'); // Sửa sort mặc định
+    const [sortField, setSortField] = useState('startTime'); 
     const [sortDir, setSortDir] = useState('desc');
     const [loading, setLoading] = useState(false);
     const isInitialMount = useRef(true);
@@ -41,7 +42,6 @@ export default function MaintenanceRecordTable({
     const fetchData = useCallback(async () => {
         setLoading(true);
         try {
-            // Các cột này ánh xạ 1:1 với MaintenanceRecordAggregate
             const columns = [
                 { data: 'id', name: '', searchable: true, orderable: true, search: { value: '', regex: false } }, // 0
                 { data: 'vehicleRegistrationNumber', name: '', searchable: true, orderable: true, search: { value: '', regex: false } }, // 1
@@ -67,8 +67,10 @@ export default function MaintenanceRecordTable({
                 statusName: 8,
             }[sortField] || 5; 
 
-            // Áp dụng bộ lọc cột từ `filters`
-            if (filters.tripCode) columns[3].search.value = filters.tripCode;
+            // [THAY ĐỔI] Áp dụng bộ lọc cột từ `filters`
+            if (filters.driverName) columns[2].search.value = filters.driverName;
+            // [THAY ĐỔI] Đã xóa filter tripCode
+            // if (filters.tripCode) columns[3].search.value = filters.tripCode;
             if (filters.serviceProvider) columns[4].search.value = filters.serviceProvider;
             if (filters.startTime) columns[5].search.value = filters.startTime;
             
@@ -80,14 +82,14 @@ export default function MaintenanceRecordTable({
                 length: pageSize,
                 search: { value: search, regex: false },
 
-                // Bộ lọc nâng cao (từ MaintenanceRecordDTParameters)
+                // [THAY ĐỔI] Cập nhật bộ lọc nâng cao
                 vehicleIds: filters.vehicleIds || [],
-                driverIds: filters.driverIds || [],
-                tripIds: filters.tripIds || [],
+                // driverIds: Đã xóa
+                // tripIds: Đã xóa
                 statusIds: filters.statusIds || [],
             };
 
-            const res = await axios.post(`${apiUrl}/paged`, requestBody, { // Dùng /paged
+            const res = await axios.post(`${apiUrl}/paged`, requestBody, { 
                 headers: {
                     'Content-Type': 'application/json',
                     Authorization: `Bearer ${token}`,
@@ -126,18 +128,26 @@ export default function MaintenanceRecordTable({
         if (row.status === PENDING_STATUS) {
             return (
                 <>
-                    <button className="btn btn-sm btn-success me-1" onClick={() => onApprove(row.id)} title="Duyệt">
-                        <i className="fa fa-check"></i>
-                    </button>
-                    <button className="btn btn-sm btn-warning me-1" onClick={() => onReject(row)} title="Từ chối">
-                        <i className="fa fa-times"></i>
-                    </button>
-                    <button className="btn btn-sm btn-primary me-1" onClick={() => onEdit(row)} title="Sửa">
-                        <i className="fa fa-pen"></i>
-                    </button>
-                    <button className="btn btn-sm btn-danger" onClick={() => onDelete(row.id)} title="Xóa" >
-                        <i className="fa fa-trash"></i>
-                    </button>
+                    {isDispatcher && (
+                        <>
+                            <button className="btn btn-sm btn-success me-1" onClick={() => onApprove(row.id)} title="Duyệt">
+                                <i className="fa fa-check"></i>
+                            </button>
+                            <button className="btn btn-sm btn-warning me-1" onClick={() => onReject(row)} title="Từ chối">
+                                <i className="fa fa-times"></i>
+                            </button>
+                        </>
+                    )}
+                    {isDriver && (
+                        <>
+                            <button className="btn btn-sm btn-primary me-1" onClick={() => onEdit(row)} title="Sửa">
+                                <i className="fa fa-pen"></i>
+                            </button>
+                            <button className="btn btn-sm btn-danger" onClick={() => onDelete(row.id)} title="Xóa" >
+                                <i className="fa fa-trash"></i>
+                            </button>
+                        </>
+                    )}
                 </>
             );
         }
@@ -198,7 +208,7 @@ export default function MaintenanceRecordTable({
                             data.map((row, index) => (
                                 <tr key={row.id}>
                                     <td>{(page - 1) * pageSize + index + 1}</td>
-                                    <td>{`[${row.vehicleRegistrationNumber}] ${row.vehicleModelName}`}</td>
+                                    <td>{`${row.vehicleModelName}`}</td>
                                     <td>{row.driverName}</td>
                                     <td>{row.serviceProvider}</td>
                                     <td>{moment(row.startTime).format('DD/MM/YYYY HH:mm')}</td>
@@ -218,7 +228,6 @@ export default function MaintenanceRecordTable({
             </div>
 
             {/* Pagination Controls */}
-            {/* (Copy code phân trang từ FuelLogTable.js vào đây) */}
              <div className="d-flex justify-content-between align-items-center mt-3">
                 <select
                     className="form-select w-auto"

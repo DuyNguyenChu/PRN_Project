@@ -59,19 +59,9 @@ namespace api.Service
 
              var model = obj.ToMaintenanceRecordFromCreateDto(currentUserId); 
 
-            if (obj.TripId.HasValue)
-            {
-                var trip = await _tripRepository.FirstOrDefaultAsync(x => x.Id == obj.TripId);
-                 if (trip == null || trip.DriverId != currentDriverId || trip.VehicleId != model.VehicleId) 
-                    return ApiResponse.BadRequest<string>(null, "Chuyến đi không hợp lệ.");
-
-                 model.DriverId = trip.DriverId; 
-                 model.VehicleId = trip.VehicleId; 
-            }
-            else
-            {
+            
                  model.DriverId = currentDriverId; 
-            }
+            
 
             // Tính tổng chi phí từ chi tiết
              model.ServiceCost = obj.Details.Sum(x => x.Quantity * x.UnitPrice);
@@ -114,16 +104,7 @@ namespace api.Service
                 return ApiResponse.Forbidden<string>("Bạn không có quyền cập nhật bản ghi này.");
 
              obj.ToMaintenanceRecordFromUpdateDto(existData, currentUserId); 
-
-            if (obj.TripId.HasValue)
-            {
-                var trip = await _tripRepository.FirstOrDefaultAsync(x => x.Id == obj.TripId);
-                 if (trip == null || trip.DriverId != existData.DriverId || trip.VehicleId != obj.VehicleId) 
-                    return ApiResponse.BadRequest<string>(null, "Chuyến đi không hợp lệ.");
-
-                 existData.DriverId = trip.DriverId; 
-                 existData.VehicleId = trip.VehicleId; 
-            }
+           
 
             try
             {
