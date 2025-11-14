@@ -207,7 +207,7 @@ export default function FuelLogTable({ apiUrl, token, onEdit, onDelete, onApprov
                             data.map((row, index) => (
                                 <tr key={row.id}>
                                     <td>{(page - 1) * pageSize + index + 1}</td>
-                                    <td>{`[${row.vehicleRegistrationNumber}] ${row.vehicleModelName}`}</td>
+                                    <td>{`${row.vehicleModelName}`}</td>
                                     <td>{row.driverName}</td>
                                     <td>{row.tripCode || 'N/A'}</td>
                                     <td>{row.gasStation}</td>

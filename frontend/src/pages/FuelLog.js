@@ -88,7 +88,7 @@ export default function FuelLog({ permissionFlags }) {
                 setVehicleList(
                     res.data.resources.map((v) => ({
                         value: v.id,
-                        label: `[${v.registrationNumber}] ${v.vehicleModelName}`,
+                        label: `${v.vehicleModelName}`,
                     })),
                 ),
             )
