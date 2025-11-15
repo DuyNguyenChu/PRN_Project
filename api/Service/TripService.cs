@@ -1563,6 +1563,84 @@ namespace api.Service
             return ApiResponse.Success(data); // Trả về dữ liệu
         }
 
+        public async Task<ApiResponse> GetTripByCurrentUser()
+        {
+            // Lấy thông tin người dùng hiện tại
+            var currentUserId = _httpContextAccessor.HttpContext?.GetCurrentUserId() ?? 0;
+            var currentRoleIds = _httpContextAccessor.HttpContext?.GetCurrentRoleIds() ?? new List<int>();
+            var currentDriverId = _httpContextAccessor.HttpContext?.GetCurrentDriverId() ?? 0;
+
+            // Kiểm tra vai trò
+            bool isDispatcherOrAdmin = currentRoleIds.Any(roleId =>
+                roleId == CommonConstants.Role.ADMIN ||
+                roleId == CommonConstants.Role.DISPATCHER);
+
+            bool isDriver = currentRoleIds.Contains(CommonConstants.Role.DRIVER);
+
+            var query = _tripRepository.FindByCondition(x => !x.IsDeleted);
+
+            // 1. Nếu là Admin/ĐPV, không lọc gì cả
+            if (isDispatcherOrAdmin)
+            {
+                // Giữ nguyên query
+            }
+            // 2. Nếu là Lái xe, lọc theo DriverId
+            else if (isDriver)
+            {
+                query = query.Where(x => x.DriverId == currentDriverId);
+            }
+            // 3. Nếu là Người dùng, lọc theo RequesterId
+            else
+            {
+                query = query.Where(x => x.TripRequest.RequesterId == currentUserId);
+            }
+
+            // Triển khai logic lấy tất cả các chuyến đi
+            var data = await query
+                  .Select(x => new
+                  {
+                      Trip = x,
+                      DriverUser = x.Driver.Users.FirstOrDefault(),
+                      RequesterUser = x.TripRequest != null ? x.TripRequest.Requester : null,
+                      TripStatus = x.TripStatus,
+                      VehicleModel = x.Vehicle.VehicleModel
+                  })
+                  .Select(x => new TripListDto()
+                  {
+                      Id = x.Trip.Id,
+                      ActualStartTime = x.Trip.ActualStartTime,
+                      ActualEndTime = x.Trip.ActualEndTime,
+                      StartOdometer = x.Trip.StartOdoMeter,
+                      EndOdometer = x.Trip.EndOdoMeter,
+                      PickUpTime = x.Trip.PickUpTime,
+                      FromLocation = x.Trip.FromLocation,
+                      FromLatitude = x.Trip.FromLatitude,
+                      FromLongitude = x.Trip.FromLongtitude,
+                      ToLocation = x.Trip.ToLocation,
+                      ToLatitude = x.Trip.ToLatitude,
+                      ToLongitude = x.Trip.ToLongtitude,
+                      TripStatusId = x.Trip.TripStatusId,
+                      TripStatusName = x.TripStatus != null ? x.TripStatus.Name : null,
+                      TripStatusColor = x.TripStatus != null ? x.TripStatus.Color : null,
+                      VehicleId = x.Trip.VehicleId,
+                      VehicleModelName = x.VehicleModel != null ? x.VehicleModel.Name : null,
+                      DriverId = x.Trip.DriverId,
+                      DriverName = x.DriverUser != null ? x.DriverUser.FirstName + " " + x.DriverUser.LastName : null,
+                      DriverPhone = x.DriverUser != null ? x.DriverUser.PhoneNumber : null,
+                      TripRequestId = x.Trip.TripRequestId,
+                      RequesterId = x.RequesterUser != null ? x.RequesterUser.Id : null,
+                      RequesterName = x.RequesterUser != null ? x.RequesterUser.FirstName + " " + x.RequesterUser.LastName : null,
+                      RequesterPhone = x.RequesterUser != null ? x.RequesterUser.PhoneNumber : null,
+                      CancelledByUserId = x.Trip.UpdatedBy,
+                      ApprovalBy = x.Trip.UpdatedBy,
+                      CreatedBy = (int)(x.Trip.CreatedBy ?? 0),
+                      CreatedDate = x.Trip.CreatedDate,
+                  })
+                  .ToListAsync();
+
+            return ApiResponse.Success(data);
+        }
+
         //private async Task SendNotificationsWithFcmAsync(List<Notification> notifications)
         //{
         //    try

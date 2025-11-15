@@ -149,5 +149,13 @@ namespace api.Controllers
 
             return BaseResult(result);
         }
+
+        [HttpGet("current")]
+        public async Task<IActionResult> GetByCurrentUser()
+        {
+            var result = await _tripService.GetTripByCurrentUser();
+
+            return BaseResult(result);
+        }
     }
 }

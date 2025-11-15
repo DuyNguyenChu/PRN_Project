@@ -15,3 +15,15 @@ export const TRIP_REQUEST_STATUS = {
     REJECTED: 4,
     CANCELLED: 5,
 };
+
+export const TRIP_STATUS = {
+    ASSIGNED: 4, // Đã khởi hành / Giao cho tài xế
+    ACCEPTED: 5, // Lái xe đã nhận
+    ARRIVING: 8, // Lái xe đang đi đến đón
+    PICKED_UP: 9, // Đã đến đón
+    EN_ROUTE: 10, // Đang đến đích
+    ARRIVED: 11, // Đã đến đích
+    COMPLETED: 12, // Hoàn thành
+    CANCELLED: 15, // Đã hủy
+    REJECTED: 6, // Lái xe từ chối
+};

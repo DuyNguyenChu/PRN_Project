@@ -120,5 +120,13 @@ namespace api.Controllers
 
             return BaseResult(data);
         }
+
+        [HttpGet("current")]
+        public async Task<IActionResult> GetByCurrentUser()
+        {
+            var result = await _tripRequestService.GetTripRequestsByRequesterIdAsync();
+
+            return BaseResult(result);
+        }
     }
 }

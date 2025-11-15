@@ -22,5 +22,6 @@ namespace api.Interface.Services
         Task<ApiResponse> DriverArrivedAtDestination(DriverUpdateTripDto obj);
         Task<ApiResponse> DriverCompleteTrip(DriverUpdateTripCompleteDto obj);
         Task<ApiResponse> CancelAsync(CancelTripDto obj);
+        Task<ApiResponse> GetTripByCurrentUser();
     }
 }

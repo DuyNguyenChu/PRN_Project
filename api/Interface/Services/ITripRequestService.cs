@@ -15,5 +15,6 @@ namespace api.Interface.Services
         Task<ApiResponse> RejectAsync(RejectTripRequestDto obj);
         Task<ApiResponse> CancelAsync(CancelTripRequestDto obj);
         Task<ApiResponse> ApproveAsync(ApproveTripRequestDto obj);
+        Task<ApiResponse> GetTripRequestsByRequesterIdAsync();
     }
 }

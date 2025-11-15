@@ -811,5 +811,43 @@ namespace api.Service
             return ApiResponse.Success();
 
         }
+
+        public async Task<ApiResponse> GetTripRequestsByRequesterIdAsync()
+        {
+            // Lấy thông tin người dùng hiện tại
+            var currentUserId = _httpContextAccessor.HttpContext?.GetCurrentUserId() ?? 0;
+            var currentRoleIds = _httpContextAccessor.HttpContext?.GetCurrentRoleIds() ?? new List<int>();
+
+            // Kiểm tra vai trò Admin/Điều phối viên
+            bool isDispatcherOrAdmin = currentRoleIds.Any(roleId =>
+                roleId == CommonConstants.Role.ADMIN ||
+                roleId == CommonConstants.Role.DISPATCHER);
+
+            var query = _tripRequestRepository.FindByCondition(x => !x.IsDeleted);
+
+            // Nếu KHÔNG phải Admin/ĐPV, thì lọc theo RequesterId
+            if (!isDispatcherOrAdmin)
+            {
+                query = query.Where(x => x.RequesterId == currentUserId);
+            }
+
+            var data = await query.Select(x => new TripRequestDetailDto
+            {
+                Id = x.Id,
+                CreatedDate = x.CreatedDate,
+                Description = x.Description,
+                RequesterId = x.RequesterId,
+                FromLocation = x.FromLocation,
+                FromLatitude = x.FromLatitude,
+                FromLongitude = x.FromLongtitude,
+                ToLocation = x.ToLocation,
+                ToLatitude = x.ToLatitude,
+                ToLongitude = x.ToLongtitude,
+                TripRequestStatusId = x.TripRequestStatusId,
+            })
+                .ToListAsync();
+
+            return ApiResponse.Success(data);
+        }
     }
 }
