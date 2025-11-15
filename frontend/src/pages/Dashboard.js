@@ -318,7 +318,7 @@ export default function Dashboard() {
     const renderStats = () => {
         if (loading) return <p className="p-4">Đang tải thống kê...</p>;
 
-        const icons = ['fa-car', 'fa-file-text', 'fa-truck', 'fa-user-circle'];
+        const icons = ['fa-car', 'fa-motorcycle', 'fa-truck', 'fa-user-circle'];
         return Object.entries(stats).map(([title, value], index) => (
             <StatCard
                 key={title}
